@@ -7,76 +7,54 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0f0f0f;
-      --bg2: #181818;
-      --bg3: #222222;
-      --border: #2a2a2a;
-      --accent: #e8ff47;
-      --accent2: #ff6b35;
-      --text: #f0f0f0;
-      --text2: #888;
-      --text3: #555;
-      --teal: #00d4aa;
-      --amber: #ffb347;
-      --red: #ff4757;
-      --radius: 10px;
-      --font-mono: 'Space Mono', monospace;
-      --font-sans: 'DM Sans', sans-serif;
+      --bg: #0f0f0f; --bg2: #181818; --bg3: #222222;
+      --border: #2a2a2a; --accent: #e8ff47; --accent2: #ff6b35;
+      --text: #f0f0f0; --text2: #888; --text3: #555;
+      --teal: #00d4aa; --amber: #ffb347; --red: #ff4757;
+      --radius: 10px; --font-mono: 'Space Mono', monospace; --font-sans: 'DM Sans', sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 15px; min-height: 100vh; }
 
-    /* HEADER */
-    header {
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 60px; position: sticky; top: 0; z-index: 100;
+    /* LOGIN */
+    #login-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
       background: var(--bg);
     }
+    .login-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 16px; padding: 40px; width: 100%; max-width: 400px;
+    }
+    .login-logo { font-family: var(--font-mono); font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .login-logo span { color: var(--accent); }
+    .login-subtitle { color: var(--text3); font-size: 13px; margin-bottom: 32px; font-family: var(--font-mono); }
+    .login-error { background: #3a1a1a; border: 1px solid var(--red); color: var(--red); border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; display: none; }
+    .login-error.show { display: block; }
+
+    /* HEADER */
+    header { border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; background: var(--bg); }
     .logo { font-family: var(--font-mono); font-size: 16px; font-weight: 700; letter-spacing: -0.5px; }
     .logo span { color: var(--accent); }
+    .header-right { display: flex; align-items: center; gap: 16px; }
     .header-status { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); font-family: var(--font-mono); }
     .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); }
     .dot.online { background: var(--teal); box-shadow: 0 0 6px var(--teal); }
+    .user-info { font-family: var(--font-mono); font-size: 11px; color: var(--text3); }
 
     /* NAV */
-    nav {
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      display: flex; gap: 0;
-    }
-    .nav-btn {
-      font-family: var(--font-mono); font-size: 12px; font-weight: 700;
-      padding: 14px 20px; border: none; background: none; color: var(--text3);
-      cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s;
-      letter-spacing: 0.5px; text-transform: uppercase;
-    }
+    nav { border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; gap: 0; }
+    .nav-btn { font-family: var(--font-mono); font-size: 12px; font-weight: 700; padding: 14px 20px; border: none; background: none; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s; letter-spacing: 0.5px; text-transform: uppercase; }
     .nav-btn:hover { color: var(--text); }
     .nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
     /* MAIN */
     main { padding: 24px; max-width: 1200px; margin: 0 auto; }
-
-    /* SECTION TITLE */
-    .section-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 20px;
-    }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
     .section-title { font-family: var(--font-mono); font-size: 13px; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; }
-    .count-badge {
-      font-family: var(--font-mono); font-size: 11px;
-      background: var(--bg3); border: 1px solid var(--border);
-      padding: 3px 10px; border-radius: 20px; color: var(--text2);
-    }
+    .count-badge { font-family: var(--font-mono); font-size: 11px; background: var(--bg3); border: 1px solid var(--border); padding: 3px 10px; border-radius: 20px; color: var(--text2); }
 
     /* BTN */
-    .btn {
-      font-family: var(--font-mono); font-size: 12px; font-weight: 700;
-      padding: 10px 18px; border-radius: var(--radius); cursor: pointer;
-      border: none; transition: all .15s; letter-spacing: 0.3px;
-      display: inline-flex; align-items: center; gap: 7px;
-    }
+    .btn { font-family: var(--font-mono); font-size: 12px; font-weight: 700; padding: 10px 18px; border-radius: var(--radius); cursor: pointer; border: none; transition: all .15s; letter-spacing: 0.3px; display: inline-flex; align-items: center; gap: 7px; }
     .btn-primary { background: var(--accent); color: #0f0f0f; }
     .btn-primary:hover { background: #d4eb30; transform: translateY(-1px); }
     .btn-ghost { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
@@ -84,13 +62,12 @@
     .btn-danger { background: transparent; color: var(--red); border: 1px solid var(--red); }
     .btn-danger:hover { background: var(--red); color: white; }
     .btn-sm { padding: 6px 12px; font-size: 11px; }
+    .btn-logout { background: transparent; color: var(--text3); border: 1px solid var(--border); font-size: 11px; padding: 6px 12px; }
+    .btn-logout:hover { color: var(--red); border-color: var(--red); }
 
-    /* STATS ROW */
+    /* STATS */
     .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 28px; }
-    .stat-card {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 16px;
-    }
+    .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
     .stat-label { font-family: var(--font-mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
     .stat-value { font-family: var(--font-mono); font-size: 22px; font-weight: 700; }
     .stat-value.teal { color: var(--teal); }
@@ -101,20 +78,13 @@
     .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
     table { width: 100%; border-collapse: collapse; }
     thead { background: var(--bg2); }
-    th {
-      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
-      color: var(--text3); text-transform: uppercase; letter-spacing: 1px;
-      padding: 12px 16px; text-align: left; white-space: nowrap;
-    }
+    th { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; padding: 12px 16px; text-align: left; white-space: nowrap; }
     td { padding: 13px 16px; border-top: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
     tr:hover td { background: var(--bg2); }
     .empty-row td { text-align: center; color: var(--text3); font-family: var(--font-mono); font-size: 12px; padding: 40px; }
 
     /* BADGES */
-    .badge {
-      display: inline-block; padding: 3px 10px; border-radius: 20px;
-      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
-    }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-family: var(--font-mono); font-size: 11px; font-weight: 700; }
     .badge-pla { background: #1a3a2a; color: var(--teal); }
     .badge-petg { background: #1a2a3a; color: #7ab8f5; }
     .badge-abs { background: #3a1a1a; color: var(--red); }
@@ -122,25 +92,12 @@
     .badge-other { background: var(--bg3); color: var(--text2); }
     .badge-yes { background: #1a3a2a; color: var(--teal); }
     .badge-no { background: var(--bg3); color: var(--text3); }
-
-    .color-dot {
-      display: inline-block; width: 10px; height: 10px; border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.2); vertical-align: middle; margin-right: 7px;
-    }
+    .color-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); vertical-align: middle; margin-right: 7px; }
 
     /* MODAL */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 200; opacity: 0; pointer-events: none; transition: opacity .2s;
-    }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; pointer-events: none; transition: opacity .2s; }
     .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .modal {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 14px; width: 100%; max-width: 560px; max-height: 90vh;
-      overflow-y: auto; padding: 28px;
-      transform: translateY(20px); transition: transform .2s;
-    }
+    .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; padding: 28px; transform: translateY(20px); transition: transform .2s; }
     .modal-overlay.open .modal { transform: translateY(0); }
     .modal-title { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 24px; letter-spacing: 0.5px; }
 
@@ -149,25 +106,19 @@
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group.full { grid-column: 1 / -1; }
     label { font-family: var(--font-mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
-    input, select, textarea {
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--text); border-radius: 8px; padding: 10px 13px;
-      font-family: var(--font-sans); font-size: 14px;
-      transition: border-color .15s; outline: none;
-    }
+    input, select, textarea { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 13px; font-family: var(--font-sans); font-size: 14px; transition: border-color .15s; outline: none; }
     input:focus, select:focus, textarea:focus { border-color: var(--accent); }
     input::placeholder { color: var(--text3); }
     select option { background: var(--bg3); }
-    .calc-field {
-      background: #1a2a1a; border-color: #2a3a2a; color: var(--teal);
-      font-family: var(--font-mono); font-size: 13px;
-    }
-
+    .calc-field { background: #1a2a1a; border-color: #2a3a2a; color: var(--teal); font-family: var(--font-mono); font-size: 13px; }
     .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
 
-    /* TABS */
+    /* PAGES */
     .page { display: none; }
     .page.active { display: block; }
+
+    /* APP */
+    #app-screen { display: none; }
 
     /* LOADING */
     .loading { text-align: center; padding: 40px; color: var(--text3); font-family: var(--font-mono); font-size: 12px; }
@@ -175,30 +126,18 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* TOAST */
-    .toast {
-      position: fixed; bottom: 24px; right: 24px; z-index: 300;
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 14px 20px;
-      font-family: var(--font-mono); font-size: 12px;
-      transform: translateY(80px); opacity: 0; transition: all .3s;
-      display: flex; align-items: center; gap: 10px;
-    }
+    .toast { position: fixed; bottom: 24px; right: 24px; z-index: 300; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 20px; font-family: var(--font-mono); font-size: 12px; transform: translateY(80px); opacity: 0; transition: all .3s; display: flex; align-items: center; gap: 10px; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { border-color: var(--teal); color: var(--teal); }
     .toast.error { border-color: var(--red); color: var(--red); }
 
     /* FOURNISSEURS */
     .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
-    .fournisseur-card {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 18px;
-      transition: border-color .2s;
-    }
+    .fournisseur-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; transition: border-color .2s; }
     .fournisseur-card:hover { border-color: var(--text3); }
     .fournisseur-nom { font-weight: 600; margin-bottom: 6px; }
     .fournisseur-url { font-size: 12px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 10px; }
     .fournisseur-url a { color: var(--teal); text-decoration: none; }
-    .fournisseur-url a:hover { text-decoration: underline; }
     .fournisseur-comment { font-size: 13px; color: var(--text2); font-style: italic; }
 
     @media (max-width: 600px) {
@@ -213,113 +152,125 @@
 </head>
 <body>
 
-<header>
-  <div class="logo">TADAM<span>-3D</span></div>
-  <div class="header-status">
-    <div class="dot" id="status-dot"></div>
-    <span id="status-text">Connexion...</span>
-  </div>
-</header>
-
-<nav>
-  <button class="nav-btn active" onclick="showPage('filaments')">🧵 Filaments</button>
-  <button class="nav-btn" onclick="showPage('accessoires')">🛒 Accessoires</button>
-  <button class="nav-btn" onclick="showPage('fournisseurs')">🏪 Fournisseurs</button>
-</nav>
-
-<main>
-
-  <!-- PAGE FILAMENTS -->
-  <div class="page active" id="page-filaments">
-    <div class="stats-row" id="stats-filaments">
-      <div class="stat-card"><div class="stat-label">Bobines en stock</div><div class="stat-value accent" id="stat-total">—</div></div>
-      <div class="stat-card"><div class="stat-label">Valeur totale</div><div class="stat-value teal" id="stat-valeur">—</div></div>
-      <div class="stat-card"><div class="stat-label">Matières différentes</div><div class="stat-value amber" id="stat-matieres">—</div></div>
-      <div class="stat-card"><div class="stat-label">Bobines entamées</div><div class="stat-value" id="stat-entamees">—</div></div>
-    </div>
-    <div class="section-header">
-      <div style="display:flex;align-items:center;gap:12px">
-        <span class="section-title">Stock filaments</span>
-        <span class="count-badge" id="count-filaments">0</span>
+<!-- ECRAN LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">TADAM<span>-3D</span></div>
+    <div class="login-subtitle">Accès sécurisé — connectez-vous</div>
+    <div class="login-error" id="login-error"></div>
+    <form onsubmit="doLogin(event)">
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="votre@email.fr" required>
       </div>
-      <button class="btn btn-primary" onclick="openModal('modal-filament')">+ Ajouter</button>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>ID Bobine</th>
-            <th>Marque</th>
-            <th>Couleur</th>
-            <th>Matière</th>
-            <th>Poids (g)</th>
-            <th>Prix (€)</th>
-            <th>€/g</th>
-            <th>Qté</th>
-            <th>Entamé</th>
-            <th>Fournisseur</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="tbody-filaments">
-          <tr class="empty-row"><td colspan="11"><span class="spinner"></span>Chargement...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- PAGE ACCESSOIRES -->
-  <div class="page" id="page-accessoires">
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-label">Produits référencés</div><div class="stat-value accent" id="stat-acc-total">—</div></div>
-      <div class="stat-card"><div class="stat-label">Total investi</div><div class="stat-value teal" id="stat-acc-valeur">—</div></div>
-      <div class="stat-card"><div class="stat-label">Inclus dans coût</div><div class="stat-value amber" id="stat-acc-inclus">—</div></div>
-    </div>
-    <div class="section-header">
-      <div style="display:flex;align-items:center;gap:12px">
-        <span class="section-title">Achats accessoires</span>
-        <span class="count-badge" id="count-accessoires">0</span>
+      <div class="form-group" style="margin-bottom:24px">
+        <label>Mot de passe</label>
+        <input type="password" id="login-password" placeholder="••••••••" required>
       </div>
-      <button class="btn btn-primary" onclick="openModal('modal-accessoire')">+ Ajouter</button>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Produit</th>
-            <th>Type</th>
-            <th>Date achat</th>
-            <th>Qté</th>
-            <th>Prix total</th>
-            <th>Prix unitaire</th>
-            <th>€/impression</th>
-            <th>Dans coût</th>
-            <th>Fournisseur</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="tbody-accessoires">
-          <tr class="empty-row"><td colspan="10"><span class="spinner"></span>Chargement...</td></tr>
-        </tbody>
-      </table>
-    </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center" id="btn-login">
+        Connexion
+      </button>
+    </form>
   </div>
+</div>
 
-  <!-- PAGE FOURNISSEURS -->
-  <div class="page" id="page-fournisseurs">
-    <div class="section-header">
-      <div style="display:flex;align-items:center;gap:12px">
-        <span class="section-title">Fournisseurs</span>
-        <span class="count-badge" id="count-fournisseurs">0</span>
+<!-- ECRAN APPLICATION -->
+<div id="app-screen">
+  <header>
+    <div class="logo">TADAM<span>-3D</span></div>
+    <div class="header-right">
+      <div class="header-status">
+        <div class="dot" id="status-dot"></div>
+        <span id="status-text">Connecté</span>
       </div>
-      <button class="btn btn-primary" onclick="openModal('modal-fournisseur')">+ Ajouter</button>
+      <span class="user-info" id="user-email"></span>
+      <button class="btn btn-logout" onclick="doLogout()">Déconnexion</button>
     </div>
-    <div class="card-grid" id="grid-fournisseurs">
-      <div class="loading"><span class="spinner"></span>Chargement...</div>
-    </div>
-  </div>
+  </header>
 
-</main>
+  <nav>
+    <button class="nav-btn active" onclick="showPage('filaments', event)">🧵 Filaments</button>
+    <button class="nav-btn" onclick="showPage('accessoires', event)">🛒 Accessoires</button>
+    <button class="nav-btn" onclick="showPage('fournisseurs', event)">🏪 Fournisseurs</button>
+  </nav>
+
+  <main>
+    <!-- PAGE FILAMENTS -->
+    <div class="page active" id="page-filaments">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Bobines en stock</div><div class="stat-value accent" id="stat-total">—</div></div>
+        <div class="stat-card"><div class="stat-label">Valeur totale</div><div class="stat-value teal" id="stat-valeur">—</div></div>
+        <div class="stat-card"><div class="stat-label">Matières différentes</div><div class="stat-value amber" id="stat-matieres">—</div></div>
+        <div class="stat-card"><div class="stat-label">Bobines entamées</div><div class="stat-value" id="stat-entamees">—</div></div>
+      </div>
+      <div class="section-header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="section-title">Stock filaments</span>
+          <span class="count-badge" id="count-filaments">0</span>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-filament')">+ Ajouter</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID Bobine</th><th>Marque</th><th>Couleur</th><th>Matière</th>
+              <th>Poids (g)</th><th>Prix (€)</th><th>€/g</th><th>Qté</th>
+              <th>Entamé</th><th>Fournisseur</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-filaments">
+            <tr class="empty-row"><td colspan="11"><span class="spinner"></span>Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE ACCESSOIRES -->
+    <div class="page" id="page-accessoires">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Produits référencés</div><div class="stat-value accent" id="stat-acc-total">—</div></div>
+        <div class="stat-card"><div class="stat-label">Total investi</div><div class="stat-value teal" id="stat-acc-valeur">—</div></div>
+        <div class="stat-card"><div class="stat-label">Inclus dans coût</div><div class="stat-value amber" id="stat-acc-inclus">—</div></div>
+      </div>
+      <div class="section-header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="section-title">Achats accessoires</span>
+          <span class="count-badge" id="count-accessoires">0</span>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-accessoire')">+ Ajouter</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Produit</th><th>Type</th><th>Date achat</th><th>Qté</th>
+              <th>Prix total</th><th>Prix unitaire</th><th>€/impression</th>
+              <th>Dans coût</th><th>Fournisseur</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-accessoires">
+            <tr class="empty-row"><td colspan="10"><span class="spinner"></span>Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE FOURNISSEURS -->
+    <div class="page" id="page-fournisseurs">
+      <div class="section-header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="section-title">Fournisseurs</span>
+          <span class="count-badge" id="count-fournisseurs">0</span>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-fournisseur')">+ Ajouter</button>
+      </div>
+      <div class="card-grid" id="grid-fournisseurs">
+        <div class="loading"><span class="spinner"></span>Chargement...</div>
+      </div>
+    </div>
+  </main>
+</div>
 
 <!-- MODAL FILAMENT -->
 <div class="modal-overlay" id="modal-filament">
@@ -472,23 +423,99 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
 const SUPABASE_URL = 'https://fyzgxkqplhlglnzrxqbf.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5emd4a3FwbGhsZ2xuenJ4cWJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTY0NTMsImV4cCI6MjA5NDg3MjQ1M30.f4hWv64wfXgC8yy2-zkDoEbb2CCitCe4x5e5SDPHjL0';
 
-const headers = {
-  'apikey': SUPABASE_KEY,
-  'Authorization': `Bearer ${SUPABASE_KEY}`,
-  'Content-Type': 'application/json',
-  'Prefer': 'return=representation'
-};
+let accessToken = null;
+let currentUser = null;
+let fournisseurs = [], marques = [], couleurs = [], matieres = [], typesAcc = [];
 
+function authHeaders() {
+  return {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${accessToken || SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  };
+}
+
+// ---- AUTH ----
+async function doLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-login');
+  const errEl = document.getElementById('login-error');
+  btn.textContent = '...'; btn.disabled = true;
+  errEl.classList.remove('show');
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: document.getElementById('login-email').value,
+        password: document.getElementById('login-password').value
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error_description || data.msg || 'Identifiants incorrects');
+    accessToken = data.access_token;
+    currentUser = data.user;
+    localStorage.setItem('tadam_token', accessToken);
+    localStorage.setItem('tadam_user', JSON.stringify(currentUser));
+    showApp();
+  } catch(err) {
+    errEl.textContent = err.message;
+    errEl.classList.add('show');
+  }
+  btn.textContent = 'Connexion'; btn.disabled = false;
+}
+
+async function doLogout() {
+  try {
+    await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${accessToken}` }
+    });
+  } catch(e) {}
+  accessToken = null; currentUser = null;
+  localStorage.removeItem('tadam_token');
+  localStorage.removeItem('tadam_user');
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  document.getElementById('user-email').textContent = currentUser?.email || '';
+  init();
+}
+
+// Vérif session au chargement
+async function checkSession() {
+  const token = localStorage.getItem('tadam_token');
+  if (!token) return;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error();
+    const user = await res.json();
+    accessToken = token;
+    currentUser = user;
+    showApp();
+  } catch(e) {
+    localStorage.removeItem('tadam_token');
+    localStorage.removeItem('tadam_user');
+  }
+}
+
+// ---- API ----
 async function api(method, table, body = null, query = '') {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${query}`, {
-    method, headers,
+    method, headers: authHeaders(),
     body: body ? JSON.stringify(body) : null
   });
   if (!res.ok) {
@@ -498,9 +525,6 @@ async function api(method, table, body = null, query = '') {
   return res.status === 204 ? null : res.json();
 }
 
-// Cache
-let fournisseurs = [], marques = [], couleurs = [], matieres = [], typesAcc = [];
-
 // ---- INIT ----
 async function init() {
   try {
@@ -508,7 +532,7 @@ async function init() {
     setStatus(true);
   } catch(e) {
     setStatus(false);
-    toast('Erreur de connexion à Supabase', 'error');
+    toast('Erreur de connexion', 'error');
   }
 }
 
@@ -540,28 +564,23 @@ function populateSelects() {
 function fillSelect(id, data, valKey, labelKey, withEmpty = false) {
   const sel = document.getElementById(id);
   if (!sel) return;
-  const current = sel.value;
   sel.innerHTML = withEmpty ? '<option value="">— Aucun —</option>' : '<option value="">Choisir...</option>';
   data.forEach(d => {
     const opt = document.createElement('option');
     opt.value = d[valKey]; opt.textContent = d[labelKey];
     sel.appendChild(opt);
   });
-  if (current) sel.value = current;
 }
 
 // ---- FILAMENTS ----
 async function loadFilaments() {
-  const data = await api('GET', 'filaments', null,
-    '?select=*,fournisseurs(nom)&order=created_at.desc');
+  const data = await api('GET', 'filaments', null, '?select=*,fournisseurs(nom)&order=created_at.desc');
   renderFilaments(data);
 }
 
 function renderFilaments(data) {
   const tbody = document.getElementById('tbody-filaments');
   document.getElementById('count-filaments').textContent = data.length;
-
-  // Stats
   const totalQte = data.reduce((s, r) => s + (r.quantite || 1), 0);
   const totalVal = data.reduce((s, r) => s + (r.prix_euros * (r.quantite || 1)), 0);
   const matiereSet = new Set(data.map(r => r.type_matiere)).size;
@@ -570,9 +589,8 @@ function renderFilaments(data) {
   document.getElementById('stat-valeur').textContent = totalVal.toFixed(2) + ' €';
   document.getElementById('stat-matieres').textContent = matiereSet;
   document.getElementById('stat-entamees').textContent = entamees;
-
   if (!data.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="11">Aucun filament en stock — cliquez sur "+ Ajouter"</td></tr>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="11">Aucun filament — cliquez sur "+ Ajouter"</td></tr>';
     return;
   }
   tbody.innerHTML = data.map(r => `
@@ -583,31 +601,28 @@ function renderFilaments(data) {
       <td><span class="badge ${badgeMatiere(r.type_matiere)}">${r.type_matiere}</span></td>
       <td style="font-family:var(--font-mono)">${r.poids_g}g</td>
       <td style="font-family:var(--font-mono)">${parseFloat(r.prix_euros).toFixed(2)}€</td>
-      <td style="font-family:var(--font-mono);color:var(--teal)">${parseFloat(r.prix_par_gramme || 0).toFixed(4)}</td>
-      <td style="font-family:var(--font-mono)">${r.quantite || 1}</td>
-      <td><span class="badge ${r.entame ? 'badge-yes' : 'badge-no'}">${r.entame ? 'Oui' : 'Non'}</span></td>
-      <td style="font-size:13px;color:var(--text2)">${r.fournisseurs?.nom || '—'}</td>
+      <td style="font-family:var(--font-mono);color:var(--teal)">${parseFloat(r.prix_par_gramme||0).toFixed(4)}</td>
+      <td style="font-family:var(--font-mono)">${r.quantite||1}</td>
+      <td><span class="badge ${r.entame?'badge-yes':'badge-no'}">${r.entame?'Oui':'Non'}</span></td>
+      <td style="font-size:13px;color:var(--text2)">${r.fournisseurs?.nom||'—'}</td>
       <td><button class="btn btn-danger btn-sm" onclick="deleteRow('filaments','${r.id}',loadFilaments)">✕</button></td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
 }
 
 // ---- ACCESSOIRES ----
 async function loadAccessoires() {
-  const data = await api('GET', 'achats_accessoires', null,
-    '?select=*,fournisseurs(nom)&order=created_at.desc');
+  const data = await api('GET', 'achats_accessoires', null, '?select=*,fournisseurs(nom)&order=created_at.desc');
   renderAccessoires(data);
 }
 
 function renderAccessoires(data) {
   const tbody = document.getElementById('tbody-accessoires');
   document.getElementById('count-accessoires').textContent = data.length;
-  const totalVal = data.reduce((s,r) => s + parseFloat(r.prix_total_euros || 0), 0);
+  const totalVal = data.reduce((s,r) => s + parseFloat(r.prix_total_euros||0), 0);
   const inclus = data.filter(r => r.inclure_dans_cout).length;
   document.getElementById('stat-acc-total').textContent = data.length;
   document.getElementById('stat-acc-valeur').textContent = totalVal.toFixed(2) + ' €';
   document.getElementById('stat-acc-inclus').textContent = inclus;
-
   if (!data.length) {
     tbody.innerHTML = '<tr class="empty-row"><td colspan="10">Aucun accessoire — cliquez sur "+ Ajouter"</td></tr>';
     return;
@@ -616,16 +631,15 @@ function renderAccessoires(data) {
     <tr>
       <td><strong>${r.produit}</strong></td>
       <td><span class="badge badge-other">${r.type_produit}</span></td>
-      <td style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">${r.date_achat || '—'}</td>
+      <td style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">${r.date_achat||'—'}</td>
       <td style="font-family:var(--font-mono)">${r.quantite}</td>
       <td style="font-family:var(--font-mono)">${parseFloat(r.prix_total_euros).toFixed(2)}€</td>
-      <td style="font-family:var(--font-mono);color:var(--teal)">${parseFloat(r.prix_unitaire || 0).toFixed(4)}€</td>
-      <td style="font-family:var(--font-mono)">${r.prix_par_impression != null ? parseFloat(r.prix_par_impression).toFixed(4)+'€' : '—'}</td>
-      <td><span class="badge ${r.inclure_dans_cout ? 'badge-yes' : 'badge-no'}">${r.inclure_dans_cout ? 'Oui' : 'Non'}</span></td>
-      <td style="font-size:13px;color:var(--text2)">${r.fournisseurs?.nom || '—'}</td>
+      <td style="font-family:var(--font-mono);color:var(--teal)">${parseFloat(r.prix_unitaire||0).toFixed(4)}€</td>
+      <td style="font-family:var(--font-mono)">${r.prix_par_impression!=null?parseFloat(r.prix_par_impression).toFixed(4)+'€':'—'}</td>
+      <td><span class="badge ${r.inclure_dans_cout?'badge-yes':'badge-no'}">${r.inclure_dans_cout?'Oui':'Non'}</span></td>
+      <td style="font-size:13px;color:var(--text2)">${r.fournisseurs?.nom||'—'}</td>
       <td><button class="btn btn-danger btn-sm" onclick="deleteRow('achats_accessoires','${r.id}',loadAccessoires)">✕</button></td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
 }
 
 // ---- FOURNISSEURS ----
@@ -639,80 +653,58 @@ async function loadFournisseurs() {
 function renderFournisseurs(data) {
   const grid = document.getElementById('grid-fournisseurs');
   document.getElementById('count-fournisseurs').textContent = data.length;
-  if (!data.length) {
-    grid.innerHTML = '<div class="loading">Aucun fournisseur</div>';
-    return;
-  }
+  if (!data.length) { grid.innerHTML = '<div class="loading">Aucun fournisseur</div>'; return; }
   grid.innerHTML = data.map(f => `
     <div class="fournisseur-card">
       <div class="fournisseur-nom">${f.nom}</div>
-      <div class="fournisseur-url">${f.site_web ? `<a href="${f.site_web}" target="_blank">${f.site_web}</a>` : '<span>—</span>'}</div>
-      ${f.commentaire ? `<div class="fournisseur-comment">${f.commentaire}</div>` : ''}
+      <div class="fournisseur-url">${f.site_web?`<a href="${f.site_web}" target="_blank">${f.site_web}</a>`:'<span>—</span>'}</div>
+      ${f.commentaire?`<div class="fournisseur-comment">${f.commentaire}</div>`:''}
       <div style="margin-top:12px">
         <button class="btn btn-danger btn-sm" onclick="deleteRow('fournisseurs','${f.id}',loadFournisseurs)">Supprimer</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 // ---- SAVE ----
 async function saveFilament(e) {
   e.preventDefault();
-  const form = e.target;
-  const btn = document.getElementById('btn-save-fil');
+  const form = e.target, btn = document.getElementById('btn-save-fil');
   btn.textContent = '...'; btn.disabled = true;
   try {
-    const body = {
-      id_bobine: form.id_bobine.value.trim(),
-      marque: form.marque.value,
-      couleur: form.couleur.value,
-      type_matiere: form.type_matiere.value,
-      format_bobine: form.format_bobine.value,
-      refill: form.refill.checked,
-      entame: form.entame.checked,
-      poids_g: parseFloat(form.poids_g.value),
+    await api('POST', 'filaments', {
+      id_bobine: form.id_bobine.value.trim(), marque: form.marque.value,
+      couleur: form.couleur.value, type_matiere: form.type_matiere.value,
+      format_bobine: form.format_bobine.value, refill: form.refill.checked,
+      entame: form.entame.checked, poids_g: parseFloat(form.poids_g.value),
       prix_euros: parseFloat(form.prix_euros.value),
-      quantite: parseInt(form.quantite.value) || 1,
-      date_mise_en_stock: form.date_mise_en_stock.value || null,
-      fournisseur_id: form.fournisseur_id.value || null
-    };
-    await api('POST', 'filaments', body);
-    closeModal('modal-filament');
-    form.reset();
-    await loadFilaments();
-    toast('Filament ajouté ✓', 'success');
-  } catch(err) {
-    toast('Erreur : ' + err.message, 'error');
-  }
+      quantite: parseInt(form.quantite.value)||1,
+      date_mise_en_stock: form.date_mise_en_stock.value||null,
+      fournisseur_id: form.fournisseur_id.value||null
+    });
+    closeModal('modal-filament'); form.reset();
+    await loadFilaments(); toast('Filament ajouté ✓', 'success');
+  } catch(err) { toast('Erreur : ' + err.message, 'error'); }
   btn.textContent = 'Enregistrer'; btn.disabled = false;
 }
 
 async function saveAccessoire(e) {
   e.preventDefault();
-  const form = e.target;
-  const btn = document.getElementById('btn-save-acc');
+  const form = e.target, btn = document.getElementById('btn-save-acc');
   btn.textContent = '...'; btn.disabled = true;
   try {
     const qte = parseFloat(form.quantite.value);
-    const body = {
-      produit: form.produit.value.trim(),
-      type_produit: form.type_produit.value,
-      date_achat: form.date_achat.value || null,
-      quantite: qte,
+    await api('POST', 'achats_accessoires', {
+      produit: form.produit.value.trim(), type_produit: form.type_produit.value,
+      date_achat: form.date_achat.value||null, quantite: qte,
       prix_total_euros: parseFloat(form.prix_total_euros.value),
       inclure_dans_cout: form.inclure_dans_cout.checked,
-      prix_par_impression: form.prix_par_impression.value ? parseFloat(form.prix_par_impression.value) : null,
-      stock_restant: form.stock_restant.value ? parseFloat(form.stock_restant.value) : qte,
-      fournisseur_id: form.fournisseur_id.value || null
-    };
-    await api('POST', 'achats_accessoires', body);
-    closeModal('modal-accessoire');
-    form.reset();
-    await loadAccessoires();
-    toast('Accessoire ajouté ✓', 'success');
-  } catch(err) {
-    toast('Erreur : ' + err.message, 'error');
-  }
+      prix_par_impression: form.prix_par_impression.value?parseFloat(form.prix_par_impression.value):null,
+      stock_restant: form.stock_restant.value?parseFloat(form.stock_restant.value):qte,
+      fournisseur_id: form.fournisseur_id.value||null
+    });
+    closeModal('modal-accessoire'); form.reset();
+    await loadAccessoires(); toast('Accessoire ajouté ✓', 'success');
+  } catch(err) { toast('Erreur : ' + err.message, 'error'); }
   btn.textContent = 'Enregistrer'; btn.disabled = false;
 }
 
@@ -722,35 +714,28 @@ async function saveFournisseur(e) {
   try {
     await api('POST', 'fournisseurs', {
       nom: form.nom.value.trim(),
-      site_web: form.site_web.value || null,
-      commentaire: form.commentaire.value || null
+      site_web: form.site_web.value||null,
+      commentaire: form.commentaire.value||null
     });
-    closeModal('modal-fournisseur');
-    form.reset();
-    await loadFournisseurs();
-    toast('Fournisseur ajouté ✓', 'success');
-  } catch(err) {
-    toast('Erreur : ' + err.message, 'error');
-  }
+    closeModal('modal-fournisseur'); form.reset();
+    await loadFournisseurs(); toast('Fournisseur ajouté ✓', 'success');
+  } catch(err) { toast('Erreur : ' + err.message, 'error'); }
 }
 
 async function deleteRow(table, id, reload) {
   if (!confirm('Supprimer cet élément ?')) return;
   try {
     await api('DELETE', table, null, `?id=eq.${id}`);
-    await reload();
-    toast('Supprimé ✓', 'success');
-  } catch(err) {
-    toast('Erreur : ' + err.message, 'error');
-  }
+    await reload(); toast('Supprimé ✓', 'success');
+  } catch(err) { toast('Erreur : ' + err.message, 'error'); }
 }
 
-// ---- UI HELPERS ----
-function showPage(name) {
+// ---- UI ----
+function showPage(name, e) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  event.target.classList.add('active');
+  if (e) e.target.classList.add('active');
 }
 
 function openModal(id) {
@@ -762,54 +747,46 @@ function openModal(id) {
   if (da) da.value = today;
 }
 
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 document.querySelectorAll('.modal-overlay').forEach(m => {
   m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
 });
 
 function calcPrixG() {
-  const poids = parseFloat(document.querySelector('[name=poids_g]')?.value) || 0;
-  const prix = parseFloat(document.querySelector('[name=prix_euros]')?.value) || 0;
+  const poids = parseFloat(document.querySelector('[name=poids_g]')?.value)||0;
+  const prix = parseFloat(document.querySelector('[name=prix_euros]')?.value)||0;
   const el = document.getElementById('preview-prix-g');
-  if (el) el.value = poids > 0 ? (prix / poids).toFixed(4) + ' €/g' : '';
+  if (el) el.value = poids > 0 ? (prix/poids).toFixed(4)+' €/g' : '';
 }
 
 function calcPrixUnit() {
-  const qte = parseFloat(document.querySelector('[name=quantite]')?.value) || 0;
-  const prix = parseFloat(document.querySelector('[name=prix_total_euros]')?.value) || 0;
+  const qte = parseFloat(document.querySelector('[name=quantite]')?.value)||0;
+  const prix = parseFloat(document.querySelector('[name=prix_total_euros]')?.value)||0;
   const el = document.getElementById('preview-prix-unit');
-  if (el) el.value = qte > 0 ? (prix / qte).toFixed(4) + ' €/unité' : '';
+  if (el) el.value = qte > 0 ? (prix/qte).toFixed(4)+' €/unité' : '';
 }
 
 function badgeMatiere(m) {
-  const map = { 'PLA': 'badge-pla', 'PLA+': 'badge-pla', 'PETG': 'badge-petg', 'ABS': 'badge-abs', 'TPU': 'badge-tpu' };
-  return map[m] || 'badge-other';
+  const map = {'PLA':'badge-pla','PLA+':'badge-pla','PETG':'badge-petg','ABS':'badge-abs','TPU':'badge-tpu'};
+  return map[m]||'badge-other';
 }
 
 function colorHex(name) {
-  const map = {
-    'Blanc':'#f0f0f0','Noir':'#1a1a1a','Gris':'#888','Rouge':'#e74c3c',
-    'Bleu':'#3498db','Vert':'#2ecc71','Jaune':'#f1c40f','Orange':'#e67e22',
-    'Rose':'#ff69b4','Violet':'#9b59b6','Marron':'#8B4513',
-    'Transparent':'rgba(255,255,255,0.3)','Or':'#FFD700','Argent':'#C0C0C0'
-  };
-  return map[name] || '#666';
+  const map = {'Blanc':'#f0f0f0','Noir':'#1a1a1a','Gris':'#888','Rouge':'#e74c3c','Bleu':'#3498db','Vert':'#2ecc71','Jaune':'#f1c40f','Orange':'#e67e22','Rose':'#ff69b4','Violet':'#9b59b6','Marron':'#8B4513','Transparent':'rgba(255,255,255,0.3)','Or':'#FFD700','Argent':'#C0C0C0'};
+  return map[name]||'#666';
 }
 
 let toastTimer;
-function toast(msg, type = 'success') {
+function toast(msg, type='success') {
   const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `toast ${type} show`;
+  el.textContent = msg; el.className = `toast ${type} show`;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
 }
 
-// Start
-init();
+// Démarrage
+checkSession();
 </script>
 </body>
 </html>
