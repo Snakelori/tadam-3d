@@ -7,42 +7,46 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f0f2f5; --bg2: #ffffff; --bg3: #e8eaed;
-      --border: #d0d4da; --accent: #1a6bff; --accent2: #0050e6;
-      --text: #1a1d23; --text2: #555e6e; --text3: #8a94a6;
-      --teal: #00d4aa; --amber: #ffb347; --red: #ff4757;
-      --radius: 10px; --font-mono: 'Space Mono', monospace; --font-sans: 'DM Sans', sans-serif;
+      --bg: #f0f2f5;
+      --bg2: #ffffff;
+      --bg3: #e8eaed;
+      --border: #d0d4da;
+      --accent: #1a6bff;
+      --accent2: #0050e6;
+      --text: #1a1d23;
+      --text2: #555e6e;
+      --text3: #8a94a6;
+      --teal: #00a882;
+      --amber: #b06000;
+      --red: #e03030;
+      --radius: 10px;
+      --font-mono: 'Space Mono', monospace;
+      --font-sans: 'DM Sans', sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 15px; min-height: 100vh; }
 
     /* LOGIN */
-    #login-screen {
-      min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      background: var(--bg);
-    }
-    .login-box {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 16px; padding: 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); width: 100%; max-width: 400px;
-    }
-    .login-logo { font-family: var(--font-mono); font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); }
+    .login-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+    .login-logo { font-family: var(--font-mono); font-size: 22px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
     .login-logo span { color: var(--accent); }
     .login-subtitle { color: var(--text3); font-size: 13px; margin-bottom: 32px; font-family: var(--font-mono); }
     .login-error { background: #fdecea; border: 1px solid var(--red); color: var(--red); border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; display: none; }
     .login-error.show { display: block; }
 
     /* HEADER */
-    header { border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; background: var(--bg); }
-    .logo { font-family: var(--font-mono); font-size: 16px; font-weight: 700; letter-spacing: -0.5px; }
+    header { border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; background: var(--bg2); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .logo { font-family: var(--font-mono); font-size: 16px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
     .logo span { color: var(--accent); }
     .header-right { display: flex; align-items: center; gap: 16px; }
     .header-status { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); font-family: var(--font-mono); }
     .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); }
-    .dot.online { background: #00a882; box-shadow: 0 0 6px #00a882; }
+    .dot.online { background: var(--teal); box-shadow: 0 0 6px var(--teal); }
     .user-info { font-family: var(--font-mono); font-size: 11px; color: var(--text3); }
 
     /* NAV */
-    nav { border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; gap: 0; }
+    nav { border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; gap: 0; background: var(--bg2); }
     .nav-btn { font-family: var(--font-mono); font-size: 12px; font-weight: 700; padding: 14px 20px; border: none; background: none; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s; letter-spacing: 0.5px; text-transform: uppercase; }
     .nav-btn:hover { color: var(--text); }
     .nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
@@ -56,7 +60,7 @@
     /* BTN */
     .btn { font-family: var(--font-mono); font-size: 12px; font-weight: 700; padding: 10px 18px; border-radius: var(--radius); cursor: pointer; border: none; transition: all .15s; letter-spacing: 0.3px; display: inline-flex; align-items: center; gap: 7px; }
     .btn-primary { background: var(--accent); color: #ffffff; }
-    .btn-primary:hover { background: #0050e6; transform: translateY(-1px); }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
     .btn-ghost { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
     .btn-ghost:hover { border-color: var(--text3); }
     .btn-danger { background: transparent; color: var(--red); border: 1px solid var(--red); }
@@ -67,7 +71,7 @@
 
     /* STATS */
     .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 28px; }
-    .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+    .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
     .stat-label { font-family: var(--font-mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
     .stat-value { font-family: var(--font-mono); font-size: 22px; font-weight: 700; }
     .stat-value.teal { color: var(--teal); }
@@ -75,12 +79,12 @@
     .stat-value.accent { color: var(--accent); }
 
     /* TABLE */
-    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg2); box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
     table { width: 100%; border-collapse: collapse; }
-    thead { background: var(--bg2); }
+    thead { background: var(--bg3); }
     th { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; padding: 12px 16px; text-align: left; white-space: nowrap; }
     td { padding: 13px 16px; border-top: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
-    tr:hover td { background: var(--bg2); }
+    tr:hover td { background: #f5f7fa; }
     .empty-row td { text-align: center; color: var(--text3); font-family: var(--font-mono); font-size: 12px; padding: 40px; }
 
     /* BADGES */
@@ -88,16 +92,16 @@
     .badge-pla { background: #e6f7f2; color: #0a7a5a; }
     .badge-petg { background: #e6f0fb; color: #1a6bff; }
     .badge-abs { background: #fdecea; color: var(--red); }
-    .badge-tpu { background: #fef3e2; color: #b06000; }
-    .badge-other { background: #e8eaed; color: #555e6e; }
+    .badge-tpu { background: #fef3e2; color: var(--amber); }
+    .badge-other { background: var(--bg3); color: var(--text2); }
     .badge-yes { background: #e6f7f2; color: #0a7a5a; }
-    .badge-no { background: #e8eaed; color: #8a94a6; }
-    .color-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); vertical-align: middle; margin-right: 7px; }
+    .badge-no { background: var(--bg3); color: var(--text3); }
+    .color-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.15); vertical-align: middle; margin-right: 7px; }
 
     /* MODAL */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; pointer-events: none; transition: opacity .2s; }
     .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; padding: 28px; transform: translateY(20px); transition: transform .2s; }
+    .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; padding: 28px; transform: translateY(20px); transition: transform .2s; box-shadow: 0 8px 40px rgba(0,0,0,0.12); }
     .modal-overlay.open .modal { transform: translateY(0); }
     .modal-title { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 24px; letter-spacing: 0.5px; }
 
@@ -107,17 +111,15 @@
     .form-group.full { grid-column: 1 / -1; }
     label { font-family: var(--font-mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
     input, select, textarea { background: #ffffff; border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 13px; font-family: var(--font-sans); font-size: 14px; transition: border-color .15s; outline: none; }
-    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,107,255,0.1); }
     input::placeholder { color: var(--text3); }
-    select option { background: #ffffff; }
+    select option { background: #ffffff; color: var(--text); }
     .calc-field { background: #e8f5f0; border-color: #a0dcc8; color: #0a7a5a; font-family: var(--font-mono); font-size: 13px; }
     .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
 
     /* PAGES */
     .page { display: none; }
     .page.active { display: block; }
-
-    /* APP */
     #app-screen { display: none; }
 
     /* LOADING */
@@ -126,18 +128,19 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* TOAST */
-    .toast { position: fixed; bottom: 24px; right: 24px; z-index: 300; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 20px; font-family: var(--font-mono); font-size: 12px; transform: translateY(80px); opacity: 0; transition: all .3s; display: flex; align-items: center; gap: 10px; }
+    .toast { position: fixed; bottom: 24px; right: 24px; z-index: 300; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 20px; font-family: var(--font-mono); font-size: 12px; transform: translateY(80px); opacity: 0; transition: all .3s; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { border-color: var(--teal); color: var(--teal); }
     .toast.error { border-color: var(--red); color: var(--red); }
 
     /* FOURNISSEURS */
     .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
-    .fournisseur-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; transition: border-color .2s; }
-    .fournisseur-card:hover { border-color: var(--text3); }
+    .fournisseur-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; transition: border-color .2s; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+    .fournisseur-card:hover { border-color: var(--accent); }
     .fournisseur-nom { font-weight: 600; margin-bottom: 6px; }
     .fournisseur-url { font-size: 12px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 10px; }
-    .fournisseur-url a { color: var(--teal); text-decoration: none; }
+    .fournisseur-url a { color: var(--accent); text-decoration: none; }
+    .fournisseur-url a:hover { text-decoration: underline; }
     .fournisseur-comment { font-size: 13px; color: var(--text2); font-style: italic; }
 
     @media (max-width: 600px) {
@@ -167,9 +170,7 @@
         <label>Mot de passe</label>
         <input type="password" id="login-password" placeholder="••••••••" required>
       </div>
-      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center" id="btn-login">
-        Connexion
-      </button>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center" id="btn-login">Connexion</button>
     </form>
   </div>
 </div>
@@ -278,54 +279,17 @@
     <div class="modal-title">+ NOUVEAU FILAMENT</div>
     <form id="form-filament" onsubmit="saveFilament(event)">
       <div class="form-grid">
-        <div class="form-group">
-          <label>ID Bobine *</label>
-          <input type="text" name="id_bobine" placeholder="ex: PLA-BLK-001" required>
-        </div>
-        <div class="form-group">
-          <label>Marque *</label>
-          <select name="marque" required id="sel-marque"><option value="">Choisir...</option></select>
-        </div>
-        <div class="form-group">
-          <label>Couleur *</label>
-          <select name="couleur" required id="sel-couleur"><option value="">Choisir...</option></select>
-        </div>
-        <div class="form-group">
-          <label>Matière *</label>
-          <select name="type_matiere" required id="sel-matiere"><option value="">Choisir...</option></select>
-        </div>
-        <div class="form-group">
-          <label>Format bobine</label>
-          <select name="format_bobine">
-            <option value="Standard">Standard</option>
-            <option value="Refill">Refill</option>
-            <option value="Autre">Autre</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Fournisseur</label>
-          <select name="fournisseur_id" id="sel-fourn-fil"><option value="">— Aucun —</option></select>
-        </div>
-        <div class="form-group">
-          <label>Poids total (g) *</label>
-          <input type="number" name="poids_g" placeholder="1000" min="1" required oninput="calcPrixG()">
-        </div>
-        <div class="form-group">
-          <label>Prix d'achat (€) *</label>
-          <input type="number" name="prix_euros" placeholder="24.90" step="0.01" min="0" required oninput="calcPrixG()">
-        </div>
-        <div class="form-group">
-          <label>Prix / gramme (calculé)</label>
-          <input type="text" class="calc-field" id="preview-prix-g" readonly placeholder="0.0000 €/g">
-        </div>
-        <div class="form-group">
-          <label>Quantité</label>
-          <input type="number" name="quantite" value="1" min="1">
-        </div>
-        <div class="form-group">
-          <label>Date mise en stock</label>
-          <input type="date" name="date_mise_en_stock" id="date-stock">
-        </div>
+        <div class="form-group"><label>ID Bobine *</label><input type="text" name="id_bobine" placeholder="ex: PLA-BLK-001" required></div>
+        <div class="form-group"><label>Marque *</label><select name="marque" required id="sel-marque"><option value="">Choisir...</option></select></div>
+        <div class="form-group"><label>Couleur *</label><select name="couleur" required id="sel-couleur"><option value="">Choisir...</option></select></div>
+        <div class="form-group"><label>Matière *</label><select name="type_matiere" required id="sel-matiere"><option value="">Choisir...</option></select></div>
+        <div class="form-group"><label>Format bobine</label><select name="format_bobine"><option value="Standard">Standard</option><option value="Refill">Refill</option><option value="Autre">Autre</option></select></div>
+        <div class="form-group"><label>Fournisseur</label><select name="fournisseur_id" id="sel-fourn-fil"><option value="">— Aucun —</option></select></div>
+        <div class="form-group"><label>Poids total (g) *</label><input type="number" name="poids_g" placeholder="1000" min="1" required oninput="calcPrixG()"></div>
+        <div class="form-group"><label>Prix d'achat (€) *</label><input type="number" name="prix_euros" placeholder="24.90" step="0.01" min="0" required oninput="calcPrixG()"></div>
+        <div class="form-group"><label>Prix / gramme (calculé)</label><input type="text" class="calc-field" id="preview-prix-g" readonly placeholder="0.0000 €/g"></div>
+        <div class="form-group"><label>Quantité</label><input type="number" name="quantite" value="1" min="1"></div>
+        <div class="form-group"><label>Date mise en stock</label><input type="date" name="date_mise_en_stock" id="date-stock"></div>
         <div class="form-group" style="display:flex;flex-direction:row;align-items:center;gap:12px;padding-top:20px">
           <input type="checkbox" name="refill" id="chk-refill" style="width:18px;height:18px;accent-color:var(--accent)">
           <label for="chk-refill" style="text-transform:none;font-size:14px;cursor:pointer">Refill</label>
@@ -347,42 +311,15 @@
     <div class="modal-title">+ NOUVEL ACCESSOIRE</div>
     <form id="form-accessoire" onsubmit="saveAccessoire(event)">
       <div class="form-grid">
-        <div class="form-group full">
-          <label>Nom du produit *</label>
-          <input type="text" name="produit" placeholder="ex: Papier de verre 400" required>
-        </div>
-        <div class="form-group">
-          <label>Type *</label>
-          <select name="type_produit" required id="sel-type-acc"><option value="">Choisir...</option></select>
-        </div>
-        <div class="form-group">
-          <label>Fournisseur</label>
-          <select name="fournisseur_id" id="sel-fourn-acc"><option value="">— Aucun —</option></select>
-        </div>
-        <div class="form-group">
-          <label>Date d'achat</label>
-          <input type="date" name="date_achat" id="date-achat">
-        </div>
-        <div class="form-group">
-          <label>Quantité achetée *</label>
-          <input type="number" name="quantite" placeholder="10" min="0.01" step="0.01" required oninput="calcPrixUnit()">
-        </div>
-        <div class="form-group">
-          <label>Prix total (€) *</label>
-          <input type="number" name="prix_total_euros" placeholder="5.90" step="0.01" min="0" required oninput="calcPrixUnit()">
-        </div>
-        <div class="form-group">
-          <label>Prix unitaire (calculé)</label>
-          <input type="text" class="calc-field" id="preview-prix-unit" readonly placeholder="0.0000 €/unité">
-        </div>
-        <div class="form-group">
-          <label>Prix par impression (€)</label>
-          <input type="number" name="prix_par_impression" placeholder="0.05" step="0.0001" min="0">
-        </div>
-        <div class="form-group">
-          <label>Stock restant</label>
-          <input type="number" name="stock_restant" placeholder="Idem quantité" step="0.01" min="0">
-        </div>
+        <div class="form-group full"><label>Nom du produit *</label><input type="text" name="produit" placeholder="ex: Papier de verre 400" required></div>
+        <div class="form-group"><label>Type *</label><select name="type_produit" required id="sel-type-acc"><option value="">Choisir...</option></select></div>
+        <div class="form-group"><label>Fournisseur</label><select name="fournisseur_id" id="sel-fourn-acc"><option value="">— Aucun —</option></select></div>
+        <div class="form-group"><label>Date d'achat</label><input type="date" name="date_achat" id="date-achat"></div>
+        <div class="form-group"><label>Quantité achetée *</label><input type="number" name="quantite" placeholder="10" min="0.01" step="0.01" required oninput="calcPrixUnit()"></div>
+        <div class="form-group"><label>Prix total (€) *</label><input type="number" name="prix_total_euros" placeholder="5.90" step="0.01" min="0" required oninput="calcPrixUnit()"></div>
+        <div class="form-group"><label>Prix unitaire (calculé)</label><input type="text" class="calc-field" id="preview-prix-unit" readonly placeholder="0.0000 €/unité"></div>
+        <div class="form-group"><label>Prix par impression (€)</label><input type="number" name="prix_par_impression" placeholder="0.05" step="0.0001" min="0"></div>
+        <div class="form-group"><label>Stock restant</label><input type="number" name="stock_restant" placeholder="Idem quantité" step="0.01" min="0"></div>
         <div class="form-group" style="display:flex;flex-direction:row;align-items:center;gap:12px;padding-top:20px">
           <input type="checkbox" name="inclure_dans_cout" id="chk-inclure" checked style="width:18px;height:18px;accent-color:var(--accent)">
           <label for="chk-inclure" style="text-transform:none;font-size:14px;cursor:pointer">Inclure dans coût d'impression</label>
@@ -402,18 +339,9 @@
     <div class="modal-title">+ NOUVEAU FOURNISSEUR</div>
     <form id="form-fournisseur" onsubmit="saveFournisseur(event)">
       <div class="form-grid">
-        <div class="form-group full">
-          <label>Nom *</label>
-          <input type="text" name="nom" placeholder="ex: 3DJake" required>
-        </div>
-        <div class="form-group full">
-          <label>Site web</label>
-          <input type="url" name="site_web" placeholder="https://...">
-        </div>
-        <div class="form-group full">
-          <label>Commentaire</label>
-          <textarea name="commentaire" rows="2" placeholder="Notes, délais de livraison..."></textarea>
-        </div>
+        <div class="form-group full"><label>Nom *</label><input type="text" name="nom" placeholder="ex: 3DJake" required></div>
+        <div class="form-group full"><label>Site web</label><input type="url" name="site_web" placeholder="https://..."></div>
+        <div class="form-group full"><label>Commentaire</label><textarea name="commentaire" rows="2" placeholder="Notes, délais de livraison..."></textarea></div>
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn-ghost" onclick="closeModal('modal-fournisseur')">Annuler</button>
@@ -436,13 +364,12 @@ let fournisseurs = [], marques = [], couleurs = [], matieres = [], typesAcc = []
 function authHeaders() {
   return {
     'apikey': SUPABASE_KEY,
-    'Authorization': `Bearer ${accessToken || SUPABASE_KEY}`,
+    'Authorization': 'Bearer ' + (accessToken || SUPABASE_KEY),
     'Content-Type': 'application/json',
     'Prefer': 'return=representation'
   };
 }
 
-// ---- AUTH ----
 async function doLogin(e) {
   e.preventDefault();
   const btn = document.getElementById('btn-login');
@@ -450,7 +377,7 @@ async function doLogin(e) {
   btn.textContent = '...'; btn.disabled = true;
   errEl.classList.remove('show');
   try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    const res = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
       method: 'POST',
       headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -463,7 +390,6 @@ async function doLogin(e) {
     accessToken = data.access_token;
     currentUser = data.user;
     localStorage.setItem('tadam_token', accessToken);
-    localStorage.setItem('tadam_user', JSON.stringify(currentUser));
     showApp();
   } catch(err) {
     errEl.textContent = err.message;
@@ -474,14 +400,13 @@ async function doLogin(e) {
 
 async function doLogout() {
   try {
-    await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+    await fetch(SUPABASE_URL + '/auth/v1/logout', {
       method: 'POST',
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${accessToken}` }
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + accessToken }
     });
   } catch(e) {}
   accessToken = null; currentUser = null;
   localStorage.removeItem('tadam_token');
-  localStorage.removeItem('tadam_user');
   document.getElementById('app-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
 }
@@ -493,39 +418,36 @@ function showApp() {
   init();
 }
 
-// Vérif session au chargement
 async function checkSession() {
   const token = localStorage.getItem('tadam_token');
   if (!token) return;
   try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${token}` }
+    const res = await fetch(SUPABASE_URL + '/auth/v1/user', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token }
     });
     if (!res.ok) throw new Error();
-    const user = await res.json();
+    currentUser = await res.json();
     accessToken = token;
-    currentUser = user;
     showApp();
   } catch(e) {
     localStorage.removeItem('tadam_token');
-    localStorage.removeItem('tadam_user');
   }
 }
 
-// ---- API ----
-async function api(method, table, body = null, query = '') {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${query}`, {
-    method, headers: authHeaders(),
+async function api(method, table, body, query) {
+  query = query || '';
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + table + query, {
+    method: method,
+    headers: authHeaders(),
     body: body ? JSON.stringify(body) : null
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
+    const err = await res.json().catch(function() { return {}; });
     throw new Error(err.message || res.statusText);
   }
   return res.status === 204 ? null : res.json();
 }
 
-// ---- INIT ----
 async function init() {
   try {
     await Promise.all([loadRefs(), loadFilaments(), loadAccessoires(), loadFournisseurs()]);
@@ -542,49 +464,50 @@ function setStatus(ok) {
 }
 
 async function loadRefs() {
-  [marques, couleurs, matieres, typesAcc, fournisseurs] = await Promise.all([
+  var results = await Promise.all([
     api('GET', 'ref_marques', null, '?order=nom'),
     api('GET', 'ref_couleurs', null, '?order=nom'),
     api('GET', 'ref_matieres', null, '?order=nom'),
     api('GET', 'ref_types_accessoires', null, '?order=nom'),
     api('GET', 'fournisseurs', null, '?order=nom')
   ]);
+  marques = results[0]; couleurs = results[1]; matieres = results[2];
+  typesAcc = results[3]; fournisseurs = results[4];
   populateSelects();
 }
 
 function populateSelects() {
-  fillSelect('sel-marque', marques, 'nom', 'nom');
-  fillSelect('sel-couleur', couleurs, 'nom', 'nom');
-  fillSelect('sel-matiere', matieres, 'nom', 'nom');
-  fillSelect('sel-type-acc', typesAcc, 'nom', 'nom');
+  fillSelect('sel-marque', marques, 'nom', 'nom', false);
+  fillSelect('sel-couleur', couleurs, 'nom', 'nom', false);
+  fillSelect('sel-matiere', matieres, 'nom', 'nom', false);
+  fillSelect('sel-type-acc', typesAcc, 'nom', 'nom', false);
   fillSelect('sel-fourn-fil', fournisseurs, 'id', 'nom', true);
   fillSelect('sel-fourn-acc', fournisseurs, 'id', 'nom', true);
 }
 
-function fillSelect(id, data, valKey, labelKey, withEmpty = false) {
-  const sel = document.getElementById(id);
+function fillSelect(id, data, valKey, labelKey, withEmpty) {
+  var sel = document.getElementById(id);
   if (!sel) return;
   sel.innerHTML = withEmpty ? '<option value="">— Aucun —</option>' : '<option value="">Choisir...</option>';
-  data.forEach(d => {
-    const opt = document.createElement('option');
+  data.forEach(function(d) {
+    var opt = document.createElement('option');
     opt.value = d[valKey]; opt.textContent = d[labelKey];
     sel.appendChild(opt);
   });
 }
 
-// ---- FILAMENTS ----
 async function loadFilaments() {
-  const data = await api('GET', 'filaments', null, '?select=*,fournisseurs(nom)&order=created_at.desc');
+  var data = await api('GET', 'filaments', null, '?select=*,fournisseurs(nom)&order=created_at.desc');
   renderFilaments(data);
 }
 
 function renderFilaments(data) {
-  const tbody = document.getElementById('tbody-filaments');
+  var tbody = document.getElementById('tbody-filaments');
   document.getElementById('count-filaments').textContent = data.length;
-  const totalQte = data.reduce((s, r) => s + (r.quantite || 1), 0);
-  const totalVal = data.reduce((s, r) => s + (r.prix_euros * (r.quantite || 1)), 0);
-  const matiereSet = new Set(data.map(r => r.type_matiere)).size;
-  const entamees = data.filter(r => r.entame).length;
+  var totalQte = data.reduce(function(s,r){ return s + (r.quantite||1); }, 0);
+  var totalVal = data.reduce(function(s,r){ return s + (r.prix_euros*(r.quantite||1)); }, 0);
+  var matiereSet = new Set(data.map(function(r){ return r.type_matiere; })).size;
+  var entamees = data.filter(function(r){ return r.entame; }).length;
   document.getElementById('stat-total').textContent = totalQte;
   document.getElementById('stat-valeur').textContent = totalVal.toFixed(2) + ' €';
   document.getElementById('stat-matieres').textContent = matiereSet;
@@ -593,33 +516,21 @@ function renderFilaments(data) {
     tbody.innerHTML = '<tr class="empty-row"><td colspan="11">Aucun filament — cliquez sur "+ Ajouter"</td></tr>';
     return;
   }
-  tbody.innerHTML = data.map(r => `
-    <tr>
-      <td><span style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">${r.id_bobine}</span></td>
-      <td>${r.marque}</td>
-      <td><span class="color-dot" style="background:${colorHex(r.couleur)}"></span>${r.couleur}</td>
-      <td><span class="badge ${badgeMatiere(r.type_matiere)}">${r.type_matiere}</span></td>
-      <td style="font-family:var(--font-mono)">${r.poids_g}g</td>
-      <td style="font-family:var(--font-mono)">${parseFloat(r.prix_euros).toFixed(2)}€</td>
-      <td style="font-family:var(--font-mono);color:var(--teal)">${parseFloat(r.prix_par_gramme||0).toFixed(4)}</td>
-      <td style="font-family:var(--font-mono)">${r.quantite||1}</td>
-      <td><span class="badge ${r.entame?'badge-yes':'badge-no'}">${r.entame?'Oui':'Non'}</span></td>
-      <td style="font-size:13px;color:var(--text2)">${r.fournisseurs?.nom||'—'}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteRow('filaments','${r.id}',loadFilaments)">✕</button></td>
-    </tr>`).join('');
+  tbody.innerHTML = data.map(function(r) {
+    return '<tr><td><span style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">' + r.id_bobine + '</span></td><td>' + r.marque + '</td><td><span class="color-dot" style="background:' + colorHex(r.couleur) + '"></span>' + r.couleur + '</td><td><span class="badge ' + badgeMatiere(r.type_matiere) + '">' + r.type_matiere + '</span></td><td style="font-family:var(--font-mono)">' + r.poids_g + 'g</td><td style="font-family:var(--font-mono)">' + parseFloat(r.prix_euros).toFixed(2) + '€</td><td style="font-family:var(--font-mono);color:var(--teal)">' + parseFloat(r.prix_par_gramme||0).toFixed(4) + '</td><td style="font-family:var(--font-mono)">' + (r.quantite||1) + '</td><td><span class="badge ' + (r.entame?'badge-yes':'badge-no') + '">' + (r.entame?'Oui':'Non') + '</span></td><td style="font-size:13px;color:var(--text2)">' + ((r.fournisseurs&&r.fournisseurs.nom)||'—') + '</td><td><button class="btn btn-danger btn-sm" onclick="deleteRow(\'filaments\',\'' + r.id + '\',loadFilaments)">✕</button></td></tr>';
+  }).join('');
 }
 
-// ---- ACCESSOIRES ----
 async function loadAccessoires() {
-  const data = await api('GET', 'achats_accessoires', null, '?select=*,fournisseurs(nom)&order=created_at.desc');
+  var data = await api('GET', 'achats_accessoires', null, '?select=*,fournisseurs(nom)&order=created_at.desc');
   renderAccessoires(data);
 }
 
 function renderAccessoires(data) {
-  const tbody = document.getElementById('tbody-accessoires');
+  var tbody = document.getElementById('tbody-accessoires');
   document.getElementById('count-accessoires').textContent = data.length;
-  const totalVal = data.reduce((s,r) => s + parseFloat(r.prix_total_euros||0), 0);
-  const inclus = data.filter(r => r.inclure_dans_cout).length;
+  var totalVal = data.reduce(function(s,r){ return s + parseFloat(r.prix_total_euros||0); }, 0);
+  var inclus = data.filter(function(r){ return r.inclure_dans_cout; }).length;
   document.getElementById('stat-acc-total').textContent = data.length;
   document.getElementById('stat-acc-valeur').textContent = totalVal.toFixed(2) + ' €';
   document.getElementById('stat-acc-inclus').textContent = inclus;
@@ -627,48 +538,30 @@ function renderAccessoires(data) {
     tbody.innerHTML = '<tr class="empty-row"><td colspan="10">Aucun accessoire — cliquez sur "+ Ajouter"</td></tr>';
     return;
   }
-  tbody.innerHTML = data.map(r => `
-    <tr>
-      <td><strong>${r.produit}</strong></td>
-      <td><span class="badge badge-other">${r.type_produit}</span></td>
-      <td style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">${r.date_achat||'—'}</td>
-      <td style="font-family:var(--font-mono)">${r.quantite}</td>
-      <td style="font-family:var(--font-mono)">${parseFloat(r.prix_total_euros).toFixed(2)}€</td>
-      <td style="font-family:var(--font-mono);color:var(--teal)">${parseFloat(r.prix_unitaire||0).toFixed(4)}€</td>
-      <td style="font-family:var(--font-mono)">${r.prix_par_impression!=null?parseFloat(r.prix_par_impression).toFixed(4)+'€':'—'}</td>
-      <td><span class="badge ${r.inclure_dans_cout?'badge-yes':'badge-no'}">${r.inclure_dans_cout?'Oui':'Non'}</span></td>
-      <td style="font-size:13px;color:var(--text2)">${r.fournisseurs?.nom||'—'}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteRow('achats_accessoires','${r.id}',loadAccessoires)">✕</button></td>
-    </tr>`).join('');
+  tbody.innerHTML = data.map(function(r) {
+    return '<tr><td><strong>' + r.produit + '</strong></td><td><span class="badge badge-other">' + r.type_produit + '</span></td><td style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">' + (r.date_achat||'—') + '</td><td style="font-family:var(--font-mono)">' + r.quantite + '</td><td style="font-family:var(--font-mono)">' + parseFloat(r.prix_total_euros).toFixed(2) + '€</td><td style="font-family:var(--font-mono);color:var(--teal)">' + parseFloat(r.prix_unitaire||0).toFixed(4) + '€</td><td style="font-family:var(--font-mono)">' + (r.prix_par_impression!=null?parseFloat(r.prix_par_impression).toFixed(4)+'€':'—') + '</td><td><span class="badge ' + (r.inclure_dans_cout?'badge-yes':'badge-no') + '">' + (r.inclure_dans_cout?'Oui':'Non') + '</span></td><td style="font-size:13px;color:var(--text2)">' + ((r.fournisseurs&&r.fournisseurs.nom)||'—') + '</td><td><button class="btn btn-danger btn-sm" onclick="deleteRow(\'achats_accessoires\',\'' + r.id + '\',loadAccessoires)">✕</button></td></tr>';
+  }).join('');
 }
 
-// ---- FOURNISSEURS ----
 async function loadFournisseurs() {
-  const data = await api('GET', 'fournisseurs', null, '?order=nom');
+  var data = await api('GET', 'fournisseurs', null, '?order=nom');
   fournisseurs = data;
   renderFournisseurs(data);
   populateSelects();
 }
 
 function renderFournisseurs(data) {
-  const grid = document.getElementById('grid-fournisseurs');
+  var grid = document.getElementById('grid-fournisseurs');
   document.getElementById('count-fournisseurs').textContent = data.length;
   if (!data.length) { grid.innerHTML = '<div class="loading">Aucun fournisseur</div>'; return; }
-  grid.innerHTML = data.map(f => `
-    <div class="fournisseur-card">
-      <div class="fournisseur-nom">${f.nom}</div>
-      <div class="fournisseur-url">${f.site_web?`<a href="${f.site_web}" target="_blank">${f.site_web}</a>`:'<span>—</span>'}</div>
-      ${f.commentaire?`<div class="fournisseur-comment">${f.commentaire}</div>`:''}
-      <div style="margin-top:12px">
-        <button class="btn btn-danger btn-sm" onclick="deleteRow('fournisseurs','${f.id}',loadFournisseurs)">Supprimer</button>
-      </div>
-    </div>`).join('');
+  grid.innerHTML = data.map(function(f) {
+    return '<div class="fournisseur-card"><div class="fournisseur-nom">' + f.nom + '</div><div class="fournisseur-url">' + (f.site_web ? '<a href="' + f.site_web + '" target="_blank">' + f.site_web + '</a>' : '<span>—</span>') + '</div>' + (f.commentaire ? '<div class="fournisseur-comment">' + f.commentaire + '</div>' : '') + '<div style="margin-top:12px"><button class="btn btn-danger btn-sm" onclick="deleteRow(\'fournisseurs\',\'' + f.id + '\',loadFournisseurs)">Supprimer</button></div></div>';
+  }).join('');
 }
 
-// ---- SAVE ----
 async function saveFilament(e) {
   e.preventDefault();
-  const form = e.target, btn = document.getElementById('btn-save-fil');
+  var form = e.target, btn = document.getElementById('btn-save-fil');
   btn.textContent = '...'; btn.disabled = true;
   try {
     await api('POST', 'filaments', {
@@ -689,17 +582,17 @@ async function saveFilament(e) {
 
 async function saveAccessoire(e) {
   e.preventDefault();
-  const form = e.target, btn = document.getElementById('btn-save-acc');
+  var form = e.target, btn = document.getElementById('btn-save-acc');
   btn.textContent = '...'; btn.disabled = true;
   try {
-    const qte = parseFloat(form.quantite.value);
+    var qte = parseFloat(form.quantite.value);
     await api('POST', 'achats_accessoires', {
       produit: form.produit.value.trim(), type_produit: form.type_produit.value,
       date_achat: form.date_achat.value||null, quantite: qte,
       prix_total_euros: parseFloat(form.prix_total_euros.value),
       inclure_dans_cout: form.inclure_dans_cout.checked,
-      prix_par_impression: form.prix_par_impression.value?parseFloat(form.prix_par_impression.value):null,
-      stock_restant: form.stock_restant.value?parseFloat(form.stock_restant.value):qte,
+      prix_par_impression: form.prix_par_impression.value ? parseFloat(form.prix_par_impression.value) : null,
+      stock_restant: form.stock_restant.value ? parseFloat(form.stock_restant.value) : qte,
       fournisseur_id: form.fournisseur_id.value||null
     });
     closeModal('modal-accessoire'); form.reset();
@@ -710,7 +603,7 @@ async function saveAccessoire(e) {
 
 async function saveFournisseur(e) {
   e.preventDefault();
-  const form = e.target;
+  var form = e.target;
   try {
     await api('POST', 'fournisseurs', {
       nom: form.nom.value.trim(),
@@ -725,67 +618,66 @@ async function saveFournisseur(e) {
 async function deleteRow(table, id, reload) {
   if (!confirm('Supprimer cet élément ?')) return;
   try {
-    await api('DELETE', table, null, `?id=eq.${id}`);
+    await api('DELETE', table, null, '?id=eq.' + id);
     await reload(); toast('Supprimé ✓', 'success');
   } catch(err) { toast('Erreur : ' + err.message, 'error'); }
 }
 
-// ---- UI ----
 function showPage(name, e) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
   document.getElementById('page-' + name).classList.add('active');
-  if (e) e.target.classList.add('active');
+  if (e && e.target) e.target.classList.add('active');
 }
 
 function openModal(id) {
   document.getElementById(id).classList.add('open');
-  const today = new Date().toISOString().split('T')[0];
-  const ds = document.getElementById('date-stock');
-  const da = document.getElementById('date-achat');
+  var today = new Date().toISOString().split('T')[0];
+  var ds = document.getElementById('date-stock');
+  var da = document.getElementById('date-achat');
   if (ds) ds.value = today;
   if (da) da.value = today;
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-document.querySelectorAll('.modal-overlay').forEach(m => {
-  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+document.querySelectorAll('.modal-overlay').forEach(function(m) {
+  m.addEventListener('click', function(e) { if (e.target === m) m.classList.remove('open'); });
 });
 
 function calcPrixG() {
-  const poids = parseFloat(document.querySelector('[name=poids_g]')?.value)||0;
-  const prix = parseFloat(document.querySelector('[name=prix_euros]')?.value)||0;
-  const el = document.getElementById('preview-prix-g');
+  var poids = parseFloat(document.querySelector('[name=poids_g]').value)||0;
+  var prix = parseFloat(document.querySelector('[name=prix_euros]').value)||0;
+  var el = document.getElementById('preview-prix-g');
   if (el) el.value = poids > 0 ? (prix/poids).toFixed(4)+' €/g' : '';
 }
 
 function calcPrixUnit() {
-  const qte = parseFloat(document.querySelector('[name=quantite]')?.value)||0;
-  const prix = parseFloat(document.querySelector('[name=prix_total_euros]')?.value)||0;
-  const el = document.getElementById('preview-prix-unit');
+  var qte = parseFloat(document.querySelector('[name=quantite]').value)||0;
+  var prix = parseFloat(document.querySelector('[name=prix_total_euros]').value)||0;
+  var el = document.getElementById('preview-prix-unit');
   if (el) el.value = qte > 0 ? (prix/qte).toFixed(4)+' €/unité' : '';
 }
 
 function badgeMatiere(m) {
-  const map = {'PLA':'badge-pla','PLA+':'badge-pla','PETG':'badge-petg','ABS':'badge-abs','TPU':'badge-tpu'};
+  var map = {'PLA':'badge-pla','PLA+':'badge-pla','PETG':'badge-petg','ABS':'badge-abs','TPU':'badge-tpu'};
   return map[m]||'badge-other';
 }
 
 function colorHex(name) {
-  const map = {'Blanc':'#f0f0f0','Noir':'#1a1a1a','Gris':'#888','Rouge':'#e74c3c','Bleu':'#3498db','Vert':'#2ecc71','Jaune':'#f1c40f','Orange':'#e67e22','Rose':'#ff69b4','Violet':'#9b59b6','Marron':'#8B4513','Transparent':'rgba(255,255,255,0.3)','Or':'#FFD700','Argent':'#C0C0C0'};
-  return map[name]||'#666';
+  var map = {'Blanc':'#e0e0e0','Noir':'#1a1a1a','Gris':'#888','Rouge':'#e74c3c','Bleu':'#3498db','Vert':'#2ecc71','Jaune':'#f1c40f','Orange':'#e67e22','Rose':'#ff69b4','Violet':'#9b59b6','Marron':'#8B4513','Transparent':'rgba(0,0,0,0.1)','Or':'#FFD700','Argent':'#C0C0C0'};
+  return map[name]||'#aaa';
 }
 
-let toastTimer;
-function toast(msg, type='success') {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.className = `toast ${type} show`;
+var toastTimer;
+function toast(msg, type) {
+  type = type || 'success';
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast ' + type + ' show';
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+  toastTimer = setTimeout(function() { el.classList.remove('show'); }, 3000);
 }
 
-// Démarrage
 checkSession();
 </script>
 </body>
