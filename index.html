@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tadam-3D | Gestion filaments</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --bg2: #181818;
+      --bg3: #222222;
+      --border: #2a2a2a;
+      --accent: #e8ff47;
+      --accent2: #ff6b35;
+      --text: #f0f0f0;
+      --text2: #888;
+      --text3: #555;
+      --teal: #00d4aa;
+      --amber: #ffb347;
+      --red: #ff4757;
+      --radius: 10px;
+      --font-mono: 'Space Mono', monospace;
+      --font-sans: 'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 15px; min-height: 100vh; }
+
+    /* HEADER */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px; position: sticky; top: 0; z-index: 100;
+      background: var(--bg);
+    }
+    .logo { font-family: var(--font-mono); font-size: 16px; font-weight: 700; letter-spacing: -0.5px; }
+    .logo span { color: var(--accent); }
+    .header-status { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); font-family: var(--font-mono); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); }
+    .dot.online { background: var(--teal); box-shadow: 0 0 6px var(--teal); }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; gap: 0;
+    }
+    .nav-btn {
+      font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+      padding: 14px 20px; border: none; background: none; color: var(--text3);
+      cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s;
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .nav-btn:hover { color: var(--text); }
+    .nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* MAIN */
+    main { padding: 24px; max-width: 1200px; margin: 0 auto; }
+
+    /* SECTION TITLE */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .section-title { font-family: var(--font-mono); font-size: 13px; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; }
+    .count-badge {
+      font-family: var(--font-mono); font-size: 11px;
+      background: var(--bg3); border: 1px solid var(--border);
+      padding: 3px 10px; border-radius: 20px; color: var(--text2);
+    }
+
+    /* BTN */
+    .btn {
+      font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+      padding: 10px 18px; border-radius: var(--radius); cursor: pointer;
+      border: none; transition: all .15s; letter-spacing: 0.3px;
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    .btn-primary { background: var(--accent); color: #0f0f0f; }
+    .btn-primary:hover { background: #d4eb30; transform: translateY(-1px); }
+    .btn-ghost { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--text3); }
+    .btn-danger { background: transparent; color: var(--red); border: 1px solid var(--red); }
+    .btn-danger:hover { background: var(--red); color: white; }
+    .btn-sm { padding: 6px 12px; font-size: 11px; }
+
+    /* STATS ROW */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px;
+    }
+    .stat-label { font-family: var(--font-mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .stat-value { font-family: var(--font-mono); font-size: 22px; font-weight: 700; }
+    .stat-value.teal { color: var(--teal); }
+    .stat-value.amber { color: var(--amber); }
+    .stat-value.accent { color: var(--accent); }
+
+    /* TABLE */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--bg2); }
+    th {
+      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+      color: var(--text3); text-transform: uppercase; letter-spacing: 1px;
+      padding: 12px 16px; text-align: left; white-space: nowrap;
+    }
+    td { padding: 13px 16px; border-top: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
+    tr:hover td { background: var(--bg2); }
+    .empty-row td { text-align: center; color: var(--text3); font-family: var(--font-mono); font-size: 12px; padding: 40px; }
+
+    /* BADGES */
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+    }
+    .badge-pla { background: #1a3a2a; color: var(--teal); }
+    .badge-petg { background: #1a2a3a; color: #7ab8f5; }
+    .badge-abs { background: #3a1a1a; color: var(--red); }
+    .badge-tpu { background: #3a2a1a; color: var(--amber); }
+    .badge-other { background: var(--bg3); color: var(--text2); }
+    .badge-yes { background: #1a3a2a; color: var(--teal); }
+    .badge-no { background: var(--bg3); color: var(--text3); }
+
+    .color-dot {
+      display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.2); vertical-align: middle; margin-right: 7px;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 14px; width: 100%; max-width: 560px; max-height: 90vh;
+      overflow-y: auto; padding: 28px;
+      transform: translateY(20px); transition: transform .2s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-title { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 24px; letter-spacing: 0.5px; }
+
+    /* FORM */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-family: var(--font-mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
+    input, select, textarea {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 10px 13px;
+      font-family: var(--font-sans); font-size: 14px;
+      transition: border-color .15s; outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    input::placeholder { color: var(--text3); }
+    select option { background: var(--bg3); }
+    .calc-field {
+      background: #1a2a1a; border-color: #2a3a2a; color: var(--teal);
+      font-family: var(--font-mono); font-size: 13px;
+    }
+
+    .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+    /* TABS */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* LOADING */
+    .loading { text-align: center; padding: 40px; color: var(--text3); font-family: var(--font-mono); font-size: 12px; }
+    .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; margin-right: 10px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 300;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 20px;
+      font-family: var(--font-mono); font-size: 12px;
+      transform: translateY(80px); opacity: 0; transition: all .3s;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: var(--teal); color: var(--teal); }
+    .toast.error { border-color: var(--red); color: var(--red); }
+
+    /* FOURNISSEURS */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+    .fournisseur-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px;
+      transition: border-color .2s;
+    }
+    .fournisseur-card:hover { border-color: var(--text3); }
+    .fournisseur-nom { font-weight: 600; margin-bottom: 6px; }
+    .fournisseur-url { font-size: 12px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 10px; }
+    .fournisseur-url a { color: var(--teal); text-decoration: none; }
+    .fournisseur-url a:hover { text-decoration: underline; }
+    .fournisseur-comment { font-size: 13px; color: var(--text2); font-style: italic; }
+
+    @media (max-width: 600px) {
+      main { padding: 16px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      header { padding: 0 16px; }
+      nav { padding: 0 12px; overflow-x: auto; }
+      .nav-btn { padding: 12px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">TADAM<span>-3D</span></div>
+  <div class="header-status">
+    <div class="dot" id="status-dot"></div>
+    <span id="status-text">Connexion...</span>
+  </div>
+</header>
+
+<nav>
+  <button class="nav-btn active" onclick="showPage('filaments')">🧵 Filaments</button>
+  <button class="nav-btn" onclick="showPage('accessoires')">🛒 Accessoires</button>
+  <button class="nav-btn" onclick="showPage('fournisseurs')">🏪 Fournisseurs</button>
+</nav>
+
+<main>
+
+  <!-- PAGE FILAMENTS -->
+  <div class="page active" id="page-filaments">
+    <div class="stats-row" id="stats-filaments">
+      <div class="stat-card"><div class="stat-label">Bobines en stock</div><div class="stat-value accent" id="stat-total">—</div></div>
+      <div class="stat-card"><div class="stat-label">Valeur totale</div><div class="stat-value teal" id="stat-valeur">—</div></div>
+      <div class="stat-card"><div class="stat-label">Matières différentes</div><div class="stat-value amber" id="stat-matieres">—</div></div>
+      <div class="stat-card"><div class="stat-label">Bobines entamées</div><div class="stat-value" id="stat-entamees">—</div></div>
+    </div>
+    <div class="section-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="section-title">Stock filaments</span>
+        <span class="count-badge" id="count-filaments">0</span>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('modal-filament')">+ Ajouter</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID Bobine</th>
+            <th>Marque</th>
+            <th>Couleur</th>
+            <th>Matière</th>
+            <th>Poids (g)</th>
+            <th>Prix (€)</th>
+            <th>€/g</th>
+            <th>Qté</th>
+            <th>Entamé</th>
+            <th>Fournisseur</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-filaments">
+          <tr class="empty-row"><td colspan="11"><span class="spinner"></span>Chargement...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PAGE ACCESSOIRES -->
+  <div class="page" id="page-accessoires">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Produits référencés</div><div class="stat-value accent" id="stat-acc-total">—</div></div>
+      <div class="stat-card"><div class="stat-label">Total investi</div><div class="stat-value teal" id="stat-acc-valeur">—</div></div>
+      <div class="stat-card"><div class="stat-label">Inclus dans coût</div><div class="stat-value amber" id="stat-acc-inclus">—</div></div>
+    </div>
+    <div class="section-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="section-title">Achats accessoires</span>
+        <span class="count-badge" id="count-accessoires">0</span>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('modal-accessoire')">+ Ajouter</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>Type</th>
+            <th>Date achat</th>
+            <th>Qté</th>
+            <th>Prix total</th>
+            <th>Prix unitaire</th>
+            <th>€/impression</th>
+            <th>Dans coût</th>
+            <th>Fournisseur</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-accessoires">
+          <tr class="empty-row"><td colspan="10"><span class="spinner"></span>Chargement...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PAGE FOURNISSEURS -->
+  <div class="page" id="page-fournisseurs">
+    <div class="section-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="section-title">Fournisseurs</span>
+        <span class="count-badge" id="count-fournisseurs">0</span>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('modal-fournisseur')">+ Ajouter</button>
+    </div>
+    <div class="card-grid" id="grid-fournisseurs">
+      <div class="loading"><span class="spinner"></span>Chargement...</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODAL FILAMENT -->
+<div class="modal-overlay" id="modal-filament">
+  <div class="modal">
+    <div class="modal-title">+ NOUVEAU FILAMENT</div>
+    <form id="form-filament" onsubmit="saveFilament(event)">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>ID Bobine *</label>
+          <input type="text" name="id_bobine" placeholder="ex: PLA-BLK-001" required>
+        </div>
+        <div class="form-group">
+          <label>Marque *</label>
+          <select name="marque" required id="sel-marque"><option value="">Choisir...</option></select>
+        </div>
+        <div class="form-group">
+          <label>Couleur *</label>
+          <select name="couleur" required id="sel-couleur"><option value="">Choisir...</option></select>
+        </div>
+        <div class="form-group">
+          <label>Matière *</label>
+          <select name="type_matiere" required id="sel-matiere"><option value="">Choisir...</option></select>
+        </div>
+        <div class="form-group">
+          <label>Format bobine</label>
+          <select name="format_bobine">
+            <option value="Standard">Standard</option>
+            <option value="Refill">Refill</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Fournisseur</label>
+          <select name="fournisseur_id" id="sel-fourn-fil"><option value="">— Aucun —</option></select>
+        </div>
+        <div class="form-group">
+          <label>Poids total (g) *</label>
+          <input type="number" name="poids_g" placeholder="1000" min="1" required oninput="calcPrixG()">
+        </div>
+        <div class="form-group">
+          <label>Prix d'achat (€) *</label>
+          <input type="number" name="prix_euros" placeholder="24.90" step="0.01" min="0" required oninput="calcPrixG()">
+        </div>
+        <div class="form-group">
+          <label>Prix / gramme (calculé)</label>
+          <input type="text" class="calc-field" id="preview-prix-g" readonly placeholder="0.0000 €/g">
+        </div>
+        <div class="form-group">
+          <label>Quantité</label>
+          <input type="number" name="quantite" value="1" min="1">
+        </div>
+        <div class="form-group">
+          <label>Date mise en stock</label>
+          <input type="date" name="date_mise_en_stock" id="date-stock">
+        </div>
+        <div class="form-group" style="display:flex;flex-direction:row;align-items:center;gap:12px;padding-top:20px">
+          <input type="checkbox" name="refill" id="chk-refill" style="width:18px;height:18px;accent-color:var(--accent)">
+          <label for="chk-refill" style="text-transform:none;font-size:14px;cursor:pointer">Refill</label>
+          <input type="checkbox" name="entame" id="chk-entame" style="width:18px;height:18px;accent-color:var(--accent)">
+          <label for="chk-entame" style="text-transform:none;font-size:14px;cursor:pointer">Entamée</label>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-filament')">Annuler</button>
+        <button type="submit" class="btn btn-primary" id="btn-save-fil">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL ACCESSOIRE -->
+<div class="modal-overlay" id="modal-accessoire">
+  <div class="modal">
+    <div class="modal-title">+ NOUVEL ACCESSOIRE</div>
+    <form id="form-accessoire" onsubmit="saveAccessoire(event)">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Nom du produit *</label>
+          <input type="text" name="produit" placeholder="ex: Papier de verre 400" required>
+        </div>
+        <div class="form-group">
+          <label>Type *</label>
+          <select name="type_produit" required id="sel-type-acc"><option value="">Choisir...</option></select>
+        </div>
+        <div class="form-group">
+          <label>Fournisseur</label>
+          <select name="fournisseur_id" id="sel-fourn-acc"><option value="">— Aucun —</option></select>
+        </div>
+        <div class="form-group">
+          <label>Date d'achat</label>
+          <input type="date" name="date_achat" id="date-achat">
+        </div>
+        <div class="form-group">
+          <label>Quantité achetée *</label>
+          <input type="number" name="quantite" placeholder="10" min="0.01" step="0.01" required oninput="calcPrixUnit()">
+        </div>
+        <div class="form-group">
+          <label>Prix total (€) *</label>
+          <input type="number" name="prix_total_euros" placeholder="5.90" step="0.01" min="0" required oninput="calcPrixUnit()">
+        </div>
+        <div class="form-group">
+          <label>Prix unitaire (calculé)</label>
+          <input type="text" class="calc-field" id="preview-prix-unit" readonly placeholder="0.0000 €/unité">
+        </div>
+        <div class="form-group">
+          <label>Prix par impression (€)</label>
+          <input type="number" name="prix_par_impression" placeholder="0.05" step="0.0001" min="0">
+        </div>
+        <div class="form-group">
+          <label>Stock restant</label>
+          <input type="number" name="stock_restant" placeholder="Idem quantité" step="0.01" min="0">
+        </div>
+        <div class="form-group" style="display:flex;flex-direction:row;align-items:center;gap:12px;padding-top:20px">
+          <input type="checkbox" name="inclure_dans_cout" id="chk-inclure" checked style="width:18px;height:18px;accent-color:var(--accent)">
+          <label for="chk-inclure" style="text-transform:none;font-size:14px;cursor:pointer">Inclure dans coût d'impression</label>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-accessoire')">Annuler</button>
+        <button type="submit" class="btn btn-primary" id="btn-save-acc">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL FOURNISSEUR -->
+<div class="modal-overlay" id="modal-fournisseur">
+  <div class="modal">
+    <div class="modal-title">+ NOUVEAU FOURNISSEUR</div>
+    <form id="form-fournisseur" onsubmit="saveFournisseur(event)">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Nom *</label>
+          <input type="text" name="nom" placeholder="ex: 3DJake" required>
+        </div>
+        <div class="form-group full">
+          <label>Site web</label>
+          <input type="url" name="site_web" placeholder="https://...">
+        </div>
+        <div class="form-group full">
+          <label>Commentaire</label>
+          <textarea name="commentaire" rows="2" placeholder="Notes, délais de livraison..."></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-fournisseur')">Annuler</button>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://fyzgxkqplhlglnzrxqbf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5emd4a3FwbGhsZ2xuenJ4cWJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTY0NTMsImV4cCI6MjA5NDg3MjQ1M30.f4hWv64wfXgC8yy2-zkDoEbb2CCitCe4x5e5SDPHjL0';
+
+const headers = {
+  'apikey': SUPABASE_KEY,
+  'Authorization': `Bearer ${SUPABASE_KEY}`,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation'
+};
+
+async function api(method, table, body = null, query = '') {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${query}`, {
+    method, headers,
+    body: body ? JSON.stringify(body) : null
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || res.statusText);
+  }
+  return res.status === 204 ? null : res.json();
+}
+
+// Cache
+let fournisseurs = [], marques = [], couleurs = [], matieres = [], typesAcc = [];
+
+// ---- INIT ----
+async function init() {
+  try {
+    await Promise.all([loadRefs(), loadFilaments(), loadAccessoires(), loadFournisseurs()]);
+    setStatus(true);
+  } catch(e) {
+    setStatus(false);
+    toast('Erreur de connexion à Supabase', 'error');
+  }
+}
+
+function setStatus(ok) {
+  document.getElementById('status-dot').className = 'dot' + (ok ? ' online' : '');
+  document.getElementById('status-text').textContent = ok ? 'Connecté' : 'Hors ligne';
+}
+
+async function loadRefs() {
+  [marques, couleurs, matieres, typesAcc, fournisseurs] = await Promise.all([
+    api('GET', 'ref_marques', null, '?order=nom'),
+    api('GET', 'ref_couleurs', null, '?order=nom'),
+    api('GET', 'ref_matieres', null, '?order=nom'),
+    api('GET', 'ref_types_accessoires', null, '?order=nom'),
+    api('GET', 'fournisseurs', null, '?order=nom')
+  ]);
+  populateSelects();
+}
+
+function populateSelects() {
+  fillSelect('sel-marque', marques, 'nom', 'nom');
+  fillSelect('sel-couleur', couleurs, 'nom', 'nom');
+  fillSelect('sel-matiere', matieres, 'nom', 'nom');
+  fillSelect('sel-type-acc', typesAcc, 'nom', 'nom');
+  fillSelect('sel-fourn-fil', fournisseurs, 'id', 'nom', true);
+  fillSelect('sel-fourn-acc', fournisseurs, 'id', 'nom', true);
+}
+
+function fillSelect(id, data, valKey, labelKey, withEmpty = false) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = withEmpty ? '<option value="">— Aucun —</option>' : '<option value="">Choisir...</option>';
+  data.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d[valKey]; opt.textContent = d[labelKey];
+    sel.appendChild(opt);
+  });
+  if (current) sel.value = current;
+}
+
+// ---- FILAMENTS ----
+async function loadFilaments() {
+  const data = await api('GET', 'filaments', null,
+    '?select=*,fournisseurs(nom)&order=created_at.desc');
+  renderFilaments(data);
+}
+
+function renderFilaments(data) {
+  const tbody = document.getElementById('tbody-filaments');
+  document.getElementById('count-filaments').textContent = data.length;
+
+  // Stats
+  const totalQte = data.reduce((s, r) => s + (r.quantite || 1), 0);
+  const totalVal = data.reduce((s, r) => s + (r.prix_euros * (r.quantite || 1)), 0);
+  const matiereSet = new Set(data.map(r => r.type_matiere)).size;
+  const entamees = data.filter(r => r.entame).length;
+  document.getElementById('stat-total').textContent = totalQte;
+  document.getElementById('stat-valeur').textContent = totalVal.toFixed(2) + ' €';
+  document.getElementById('stat-matieres').textContent = matiereSet;
+  document.getElementById('stat-entamees').textContent = entamees;
+
+  if (!data.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="11">Aucun filament en stock — cliquez sur "+ Ajouter"</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(r => `
+    <tr>
+      <td><span style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">${r.id_bobine}</span></td>
+      <td>${r.marque}</td>
+      <td><span class="color-dot" style="background:${colorHex(r.couleur)}"></span>${r.couleur}</td>
+      <td><span class="badge ${badgeMatiere(r.type_matiere)}">${r.type_matiere}</span></td>
+      <td style="font-family:var(--font-mono)">${r.poids_g}g</td>
+      <td style="font-family:var(--font-mono)">${parseFloat(r.prix_euros).toFixed(2)}€</td>
+      <td style="font-family:var(--font-mono);color:var(--teal)">${parseFloat(r.prix_par_gramme || 0).toFixed(4)}</td>
+      <td style="font-family:var(--font-mono)">${r.quantite || 1}</td>
+      <td><span class="badge ${r.entame ? 'badge-yes' : 'badge-no'}">${r.entame ? 'Oui' : 'Non'}</span></td>
+      <td style="font-size:13px;color:var(--text2)">${r.fournisseurs?.nom || '—'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteRow('filaments','${r.id}',loadFilaments)">✕</button></td>
+    </tr>
+  `).join('');
+}
+
+// ---- ACCESSOIRES ----
+async function loadAccessoires() {
+  const data = await api('GET', 'achats_accessoires', null,
+    '?select=*,fournisseurs(nom)&order=created_at.desc');
+  renderAccessoires(data);
+}
+
+function renderAccessoires(data) {
+  const tbody = document.getElementById('tbody-accessoires');
+  document.getElementById('count-accessoires').textContent = data.length;
+  const totalVal = data.reduce((s,r) => s + parseFloat(r.prix_total_euros || 0), 0);
+  const inclus = data.filter(r => r.inclure_dans_cout).length;
+  document.getElementById('stat-acc-total').textContent = data.length;
+  document.getElementById('stat-acc-valeur').textContent = totalVal.toFixed(2) + ' €';
+  document.getElementById('stat-acc-inclus').textContent = inclus;
+
+  if (!data.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="10">Aucun accessoire — cliquez sur "+ Ajouter"</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(r => `
+    <tr>
+      <td><strong>${r.produit}</strong></td>
+      <td><span class="badge badge-other">${r.type_produit}</span></td>
+      <td style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">${r.date_achat || '—'}</td>
+      <td style="font-family:var(--font-mono)">${r.quantite}</td>
+      <td style="font-family:var(--font-mono)">${parseFloat(r.prix_total_euros).toFixed(2)}€</td>
+      <td style="font-family:var(--font-mono);color:var(--teal)">${parseFloat(r.prix_unitaire || 0).toFixed(4)}€</td>
+      <td style="font-family:var(--font-mono)">${r.prix_par_impression != null ? parseFloat(r.prix_par_impression).toFixed(4)+'€' : '—'}</td>
+      <td><span class="badge ${r.inclure_dans_cout ? 'badge-yes' : 'badge-no'}">${r.inclure_dans_cout ? 'Oui' : 'Non'}</span></td>
+      <td style="font-size:13px;color:var(--text2)">${r.fournisseurs?.nom || '—'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteRow('achats_accessoires','${r.id}',loadAccessoires)">✕</button></td>
+    </tr>
+  `).join('');
+}
+
+// ---- FOURNISSEURS ----
+async function loadFournisseurs() {
+  const data = await api('GET', 'fournisseurs', null, '?order=nom');
+  fournisseurs = data;
+  renderFournisseurs(data);
+  populateSelects();
+}
+
+function renderFournisseurs(data) {
+  const grid = document.getElementById('grid-fournisseurs');
+  document.getElementById('count-fournisseurs').textContent = data.length;
+  if (!data.length) {
+    grid.innerHTML = '<div class="loading">Aucun fournisseur</div>';
+    return;
+  }
+  grid.innerHTML = data.map(f => `
+    <div class="fournisseur-card">
+      <div class="fournisseur-nom">${f.nom}</div>
+      <div class="fournisseur-url">${f.site_web ? `<a href="${f.site_web}" target="_blank">${f.site_web}</a>` : '<span>—</span>'}</div>
+      ${f.commentaire ? `<div class="fournisseur-comment">${f.commentaire}</div>` : ''}
+      <div style="margin-top:12px">
+        <button class="btn btn-danger btn-sm" onclick="deleteRow('fournisseurs','${f.id}',loadFournisseurs)">Supprimer</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ---- SAVE ----
+async function saveFilament(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('btn-save-fil');
+  btn.textContent = '...'; btn.disabled = true;
+  try {
+    const body = {
+      id_bobine: form.id_bobine.value.trim(),
+      marque: form.marque.value,
+      couleur: form.couleur.value,
+      type_matiere: form.type_matiere.value,
+      format_bobine: form.format_bobine.value,
+      refill: form.refill.checked,
+      entame: form.entame.checked,
+      poids_g: parseFloat(form.poids_g.value),
+      prix_euros: parseFloat(form.prix_euros.value),
+      quantite: parseInt(form.quantite.value) || 1,
+      date_mise_en_stock: form.date_mise_en_stock.value || null,
+      fournisseur_id: form.fournisseur_id.value || null
+    };
+    await api('POST', 'filaments', body);
+    closeModal('modal-filament');
+    form.reset();
+    await loadFilaments();
+    toast('Filament ajouté ✓', 'success');
+  } catch(err) {
+    toast('Erreur : ' + err.message, 'error');
+  }
+  btn.textContent = 'Enregistrer'; btn.disabled = false;
+}
+
+async function saveAccessoire(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('btn-save-acc');
+  btn.textContent = '...'; btn.disabled = true;
+  try {
+    const qte = parseFloat(form.quantite.value);
+    const body = {
+      produit: form.produit.value.trim(),
+      type_produit: form.type_produit.value,
+      date_achat: form.date_achat.value || null,
+      quantite: qte,
+      prix_total_euros: parseFloat(form.prix_total_euros.value),
+      inclure_dans_cout: form.inclure_dans_cout.checked,
+      prix_par_impression: form.prix_par_impression.value ? parseFloat(form.prix_par_impression.value) : null,
+      stock_restant: form.stock_restant.value ? parseFloat(form.stock_restant.value) : qte,
+      fournisseur_id: form.fournisseur_id.value || null
+    };
+    await api('POST', 'achats_accessoires', body);
+    closeModal('modal-accessoire');
+    form.reset();
+    await loadAccessoires();
+    toast('Accessoire ajouté ✓', 'success');
+  } catch(err) {
+    toast('Erreur : ' + err.message, 'error');
+  }
+  btn.textContent = 'Enregistrer'; btn.disabled = false;
+}
+
+async function saveFournisseur(e) {
+  e.preventDefault();
+  const form = e.target;
+  try {
+    await api('POST', 'fournisseurs', {
+      nom: form.nom.value.trim(),
+      site_web: form.site_web.value || null,
+      commentaire: form.commentaire.value || null
+    });
+    closeModal('modal-fournisseur');
+    form.reset();
+    await loadFournisseurs();
+    toast('Fournisseur ajouté ✓', 'success');
+  } catch(err) {
+    toast('Erreur : ' + err.message, 'error');
+  }
+}
+
+async function deleteRow(table, id, reload) {
+  if (!confirm('Supprimer cet élément ?')) return;
+  try {
+    await api('DELETE', table, null, `?id=eq.${id}`);
+    await reload();
+    toast('Supprimé ✓', 'success');
+  } catch(err) {
+    toast('Erreur : ' + err.message, 'error');
+  }
+}
+
+// ---- UI HELPERS ----
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  const today = new Date().toISOString().split('T')[0];
+  const ds = document.getElementById('date-stock');
+  const da = document.getElementById('date-achat');
+  if (ds) ds.value = today;
+  if (da) da.value = today;
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+function calcPrixG() {
+  const poids = parseFloat(document.querySelector('[name=poids_g]')?.value) || 0;
+  const prix = parseFloat(document.querySelector('[name=prix_euros]')?.value) || 0;
+  const el = document.getElementById('preview-prix-g');
+  if (el) el.value = poids > 0 ? (prix / poids).toFixed(4) + ' €/g' : '';
+}
+
+function calcPrixUnit() {
+  const qte = parseFloat(document.querySelector('[name=quantite]')?.value) || 0;
+  const prix = parseFloat(document.querySelector('[name=prix_total_euros]')?.value) || 0;
+  const el = document.getElementById('preview-prix-unit');
+  if (el) el.value = qte > 0 ? (prix / qte).toFixed(4) + ' €/unité' : '';
+}
+
+function badgeMatiere(m) {
+  const map = { 'PLA': 'badge-pla', 'PLA+': 'badge-pla', 'PETG': 'badge-petg', 'ABS': 'badge-abs', 'TPU': 'badge-tpu' };
+  return map[m] || 'badge-other';
+}
+
+function colorHex(name) {
+  const map = {
+    'Blanc':'#f0f0f0','Noir':'#1a1a1a','Gris':'#888','Rouge':'#e74c3c',
+    'Bleu':'#3498db','Vert':'#2ecc71','Jaune':'#f1c40f','Orange':'#e67e22',
+    'Rose':'#ff69b4','Violet':'#9b59b6','Marron':'#8B4513',
+    'Transparent':'rgba(255,255,255,0.3)','Or':'#FFD700','Argent':'#C0C0C0'
+  };
+  return map[name] || '#666';
+}
+
+let toastTimer;
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// Start
+init();
+</script>
+</body>
+</html>
