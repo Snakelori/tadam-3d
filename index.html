@@ -137,13 +137,6 @@
     /* EDIT INLINE */
     .edit-input{padding:5px 8px;font-size:13px;border-radius:6px;border:1px solid var(--accent);background:#fff;color:var(--text);width:140px;}
 
-    /* EXPORT */
-    .export-wrap{position:relative;}
-    .export-menu{display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 16px rgba(0,0,0,0.1);z-index:150;min-width:180px;overflow:hidden;}
-    .export-menu.open{display:block;}
-    .export-menu button{display:block;width:100%;padding:10px 16px;background:none;border:none;text-align:left;font-family:var(--font-mono);font-size:12px;cursor:pointer;color:var(--text);}
-    .export-menu button:hover{background:var(--bg3);}
-
     /* IMPORT */
     .import-drop{border:2px dashed var(--border);border-radius:var(--radius);padding:32px;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--bg);}
     .import-drop:hover,.import-drop.dragover{border-color:var(--accent);background:#f0f5ff;}
@@ -209,6 +202,7 @@
     <button class="nav-btn active" onclick="showPage('filaments',event)">🧵 Filaments</button>
     <button class="nav-btn" onclick="showPage('accessoires',event)">🛒 Accessoires</button>
     <button class="nav-btn" onclick="showPage('parametres',event)">⚙️ Paramètres</button>
+    <button class="nav-btn" onclick="showPage('importexport',event)">📤 Import / Export</button>
   </nav>
   <main>
 
@@ -225,17 +219,7 @@
           <span class="section-title">Stock filaments</span>
           <span class="count-badge" id="count-filaments">0</span>
         </div>
-        <div style="display:flex;gap:8px">
-          <div class="export-wrap" id="export-wrap">
-            <button class="btn btn-ghost" onclick="toggleExportMenu(event)">⬇ Exporter ▾</button>
-            <div class="export-menu" id="export-menu">
-              <button onclick="exportAll('csv')">📄 CSV (2 fichiers)</button>
-              <button onclick="exportAll('xlsx')">📊 Excel (.xlsx)</button>
-            </div>
-          </div>
-          <button class="btn btn-ghost" onclick="openImportModal()">⬆ Importer</button>
-          <button class="btn btn-primary" onclick="openModal('modal-filament')">+ Ajouter</button>
-        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-filament')">+ Ajouter</button>
       </div>
       <div class="table-wrap">
         <table>
@@ -327,6 +311,51 @@
           <div class="settings-card-title">🏪 Fournisseurs</div>
           <div id="list-fournisseurs-params"><div class="loading"><span class="spinner"></span></div></div>
           <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="openModal('modal-fournisseur')">+ Ajouter un fournisseur</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- IMPORT / EXPORT -->
+    <div class="page" id="page-importexport">
+      <div class="section-header"><span class="section-title">Import / Export</span></div>
+      <div class="settings-grid">
+
+        <!-- EXPORT -->
+        <div class="settings-card">
+          <div class="settings-card-title">⬇ Exporter les données</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Sélectionnez les données à exporter, puis choisissez le format.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px">
+              <input type="checkbox" id="exp-filaments" checked style="width:16px;height:16px;accent-color:var(--accent)">
+              🧵 Filaments
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px">
+              <input type="checkbox" id="exp-accessoires" checked style="width:16px;height:16px;accent-color:var(--accent)">
+              🛒 Accessoires
+            </label>
+          </div>
+          <p style="font-size:11px;color:var(--text3);margin-bottom:16px;font-family:var(--font-mono)">Si les deux sont sélectionnés → 2 fichiers séparés</p>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="exportSelected('csv')">📄 CSV</button>
+            <button class="btn btn-primary" onclick="exportSelected('xlsx')">📊 Excel</button>
+          </div>
+        </div>
+
+        <!-- IMPORT -->
+        <div class="settings-card">
+          <div class="settings-card-title">⬆ Importer des filaments</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Importez votre stock depuis un fichier CSV ou Excel (.xlsx).</p>
+          <div style="margin-bottom:20px">
+            <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-bottom:8px">Colonnes attendues :</div>
+            <div style="font-family:var(--font-mono);font-size:11px;color:var(--text2);background:var(--bg3);border-radius:6px;padding:10px;line-height:1.8">
+              id_bobine, marque, couleur, type_matiere,<br>format_bobine, refill, entame, poids_g,<br>prix_euros, quantite, date_mise_en_stock
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="downloadImportTemplate()">⬇ Modèle CSV</button>
+            <button class="btn btn-primary" onclick="openImportModal()">⬆ Importer un fichier</button>
+          </div>
         </div>
 
       </div>
@@ -822,15 +851,6 @@ function toast(msg,type){
 }
 
 /* ======= MODULE EXPORT ======= */
-function toggleExportMenu(e) {
-  e.stopPropagation();
-  document.getElementById('export-menu').classList.toggle('open');
-}
-document.addEventListener('click', function() {
-  var m = document.getElementById('export-menu');
-  if (m) m.classList.remove('open');
-});
-
 function cleanFilament(r) {
   return {
     id_bobine: r.id_bobine||'', marque: r.marque||'', couleur: r.couleur||'',
@@ -860,7 +880,7 @@ function toCSVString(data) {
   var rows = data.map(function(r) {
     return headers.map(function(h) {
       var v = r[h] === null || r[h] === undefined ? '' : r[h];
-      return '"' + String(v).replace(/"/g, '""') + '"';
+      return '"' + String(v).replace(/"/g,'""') + '"';
     }).join(',');
   });
   return [headers.join(',')].concat(rows).join('\n');
@@ -875,29 +895,37 @@ function downloadBlob(content, filename, mime) {
   setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
 }
 
-async function exportAll(format) {
-  document.getElementById('export-menu').classList.remove('open');
+function exportXlsx(rows, filename) {
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows.length ? rows : [{}]), filename.replace('.xlsx',''));
+  XLSX.writeFile(wb, filename);
+}
+
+async function exportSelected(format) {
+  var doFil = document.getElementById('exp-filaments').checked;
+  var doAcc = document.getElementById('exp-accessoires').checked;
+  if (!doFil && !doAcc) { toast('Sélectionnez au moins un type de données', 'error'); return; }
   toast('Préparation de l\'export...', 'success');
   try {
-    var filData = await api('GET','filaments',null,'?select=*,fournisseurs(nom)&order=created_at.desc');
-    var accData = await api('GET','achats_accessoires',null,'?select=*,fournisseurs(nom)&order=created_at.desc');
-    var filRows = (filData||[]).map(cleanFilament);
-    var accRows = (accData||[]).map(cleanAccessoire);
     var date = new Date().toISOString().slice(0,10);
-
-    if (format === 'csv') {
-      downloadBlob('﻿'+toCSVString(filRows), 'tadam3d_filaments_'+date+'.csv', 'text/csv;charset=utf-8');
-      setTimeout(function(){
-        downloadBlob('﻿'+toCSVString(accRows), 'tadam3d_accessoires_'+date+'.csv', 'text/csv;charset=utf-8');
-      }, 300);
-      toast('Export CSV : 2 fichiers téléchargés ✓', 'success');
-    } else {
-      var wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(filRows), 'Filaments');
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(accRows), 'Accessoires');
-      XLSX.writeFile(wb, 'tadam3d_export_'+date+'.xlsx');
-      toast('Export Excel téléchargé ✓', 'success');
+    var delay = 0;
+    if (doFil) {
+      var filData = await api('GET','filaments',null,'?select=*,fournisseurs(nom)&order=created_at.desc');
+      var filRows = (filData||[]).map(cleanFilament);
+      if (format === 'csv') downloadBlob('﻿'+toCSVString(filRows), 'tadam3d_filaments_'+date+'.csv', 'text/csv;charset=utf-8');
+      else exportXlsx(filRows, 'tadam3d_filaments_'+date+'.xlsx');
+      delay = 400;
     }
+    if (doAcc) {
+      var accData = await api('GET','achats_accessoires',null,'?select=*,fournisseurs(nom)&order=created_at.desc');
+      var accRows = (accData||[]).map(cleanAccessoire);
+      setTimeout(function(){
+        if (format === 'csv') downloadBlob('﻿'+toCSVString(accRows), 'tadam3d_accessoires_'+date+'.csv', 'text/csv;charset=utf-8');
+        else exportXlsx(accRows, 'tadam3d_accessoires_'+date+'.xlsx');
+      }, delay);
+    }
+    var nb = (doFil?1:0)+(doAcc?1:0);
+    toast('Export '+format.toUpperCase()+' : '+nb+' fichier(s) téléchargé(s) ✓', 'success');
   } catch(err) { toast('Erreur export : '+err.message, 'error'); }
 }
 /* ======= FIN MODULE EXPORT ======= */
