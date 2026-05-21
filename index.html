@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tadam-3D</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root {
       --bg:#f0f2f5; --bg2:#ffffff; --bg3:#e8eaed; --border:#d0d4da;
@@ -136,6 +137,24 @@
     /* EDIT INLINE */
     .edit-input{padding:5px 8px;font-size:13px;border-radius:6px;border:1px solid var(--accent);background:#fff;color:var(--text);width:140px;}
 
+    /* IMPORT */
+    .import-drop{border:2px dashed var(--border);border-radius:var(--radius);padding:32px;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--bg);}
+    .import-drop:hover,.import-drop.dragover{border-color:var(--accent);background:#f0f5ff;}
+    .import-drop input[type=file]{display:none;}
+    .import-drop-icon{font-size:32px;margin-bottom:8px;}
+    .import-drop-label{font-family:var(--font-mono);font-size:12px;color:var(--text2);}
+    .import-drop-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+    .import-preview-wrap{max-height:220px;overflow-y:auto;border-radius:var(--radius);border:1px solid var(--border);margin-top:12px;}
+    .import-preview-wrap table{font-size:12px;}
+    .import-preview-wrap td,.import-preview-wrap th{padding:8px 12px;}
+    .import-dup-row{background:#fef3e2;}
+    .import-info{font-family:var(--font-mono);font-size:12px;color:var(--text2);margin-bottom:8px;}
+    .dup-box{background:#fef3e2;border:1px solid var(--amber);border-radius:8px;padding:12px 16px;margin-top:12px;}
+    .dup-box strong{color:var(--amber);}
+    .dup-actions{display:flex;gap:10px;margin-top:10px;}
+    .btn-dup-active-ignore{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important;}
+    .btn-dup-active-overwrite{background:var(--amber)!important;color:#fff!important;border-color:var(--amber)!important;}
+
     @media(max-width:600px){
       main{padding:16px;}
       .form-grid{grid-template-columns:1fr;}
@@ -199,7 +218,10 @@
           <span class="section-title">Stock filaments</span>
           <span class="count-badge" id="count-filaments">0</span>
         </div>
-        <button class="btn btn-primary" onclick="openModal('modal-filament')">+ Ajouter</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="openImportModal()">⬆ Importer</button>
+          <button class="btn btn-primary" onclick="openModal('modal-filament')">+ Ajouter</button>
+        </div>
       </div>
       <div class="table-wrap">
         <table>
@@ -392,6 +414,50 @@
     <div class="form-actions">
       <button type="button" class="btn btn-ghost" onclick="closeModal('modal-edit-item')">Annuler</button>
       <button type="button" class="btn btn-primary" onclick="saveEditItem()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL IMPORT FILAMENTS -->
+<div class="modal-overlay" id="modal-import">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-title">⬆ IMPORTER DES FILAMENTS</div>
+
+    <!-- ÉTAPE 1 : sélection fichier -->
+    <div id="import-step-1">
+      <label class="import-drop" id="import-drop" ondragover="importDragOver(event)" ondragleave="importDragLeave()" ondrop="importDrop(event)">
+        <input type="file" id="import-file" accept=".csv,.xlsx,.xls" onchange="handleImportFile(event)">
+        <div class="import-drop-icon">📂</div>
+        <div class="import-drop-label">Glissez un fichier ici ou cliquez pour choisir</div>
+        <div class="import-drop-sub">Formats acceptés : CSV, Excel (.xlsx / .xls)</div>
+      </label>
+      <div style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">Colonnes attendues : id_bobine, marque, couleur, type_matiere, poids_g, prix_euros…</span>
+        <button class="btn btn-ghost btn-sm" onclick="downloadImportTemplate()">⬇ Modèle CSV</button>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 2 : aperçu + confirmation -->
+    <div id="import-step-2" style="display:none">
+      <div class="import-info" id="import-info"></div>
+      <div class="import-preview-wrap">
+        <table>
+          <thead><tr><th>ID Bobine</th><th>Marque</th><th>Couleur</th><th>Matière</th><th>Poids (g)</th><th>Prix (€)</th><th>Qté</th></tr></thead>
+          <tbody id="import-preview-body"></tbody>
+        </table>
+      </div>
+      <div class="dup-box" id="import-dup-box" style="display:none">
+        <strong id="import-dup-count"></strong><br>
+        <span style="font-size:13px;color:var(--text2)">Que faire avec ces entrées déjà existantes ?</span>
+        <div class="dup-actions">
+          <button class="btn btn-ghost btn-sm" id="btn-dup-ignore" onclick="setDupAction('ignore')">Ignorer</button>
+          <button class="btn btn-warning btn-sm" id="btn-dup-overwrite" onclick="setDupAction('overwrite')">Écraser</button>
+        </div>
+      </div>
+      <div class="form-actions" style="margin-top:16px">
+        <button type="button" class="btn btn-ghost" onclick="resetImport()">← Retour</button>
+        <button type="button" class="btn btn-primary" id="btn-confirm-import" onclick="confirmImport()">Importer</button>
+      </div>
     </div>
   </div>
 </div>
@@ -740,6 +806,177 @@ function toast(msg,type){
   clearTimeout(toastTimer);
   toastTimer=setTimeout(function(){el.classList.remove('show');},3000);
 }
+
+/* ======= MODULE IMPORT FILAMENTS ======= */
+var importRows = [];
+var importDuplicateAction = null;
+
+function openImportModal() { resetImport(); openModal('modal-import'); }
+
+function importDragOver(e) { e.preventDefault(); document.getElementById('import-drop').classList.add('dragover'); }
+function importDragLeave() { document.getElementById('import-drop').classList.remove('dragover'); }
+function importDrop(e) {
+  e.preventDefault();
+  importDragLeave();
+  var file = e.dataTransfer.files[0];
+  if (file) processImportFile(file);
+}
+function handleImportFile(e) { var file = e.target.files[0]; if (file) processImportFile(file); }
+
+async function processImportFile(file) {
+  var ext = file.name.split('.').pop().toLowerCase();
+  var rows = [];
+  try {
+    if (ext === 'csv') {
+      var text = await file.text();
+      rows = parseCSVToObjects(text);
+    } else if (ext === 'xlsx' || ext === 'xls') {
+      var buf = await file.arrayBuffer();
+      var wb = XLSX.read(buf);
+      var ws = wb.Sheets[wb.SheetNames[0]];
+      rows = XLSX.utils.sheet_to_json(ws, {defval:''});
+    } else {
+      toast('Format non supporté (.csv, .xlsx, .xls)', 'error'); return;
+    }
+  } catch(err) { toast('Erreur lecture fichier', 'error'); return; }
+
+  importRows = rows.map(normalizeImportRow).filter(function(r){ return r.id_bobine; });
+  if (!importRows.length) { toast('Aucune ligne valide — vérifiez la colonne id_bobine', 'error'); return; }
+  showImportPreview();
+}
+
+function parseCSVToObjects(text) {
+  var lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) return [];
+  var sep = lines[0].indexOf(';') > -1 ? ';' : ',';
+  var headers = lines[0].split(sep).map(function(h){ return h.trim().replace(/^"|"$/g,''); });
+  return lines.slice(1).filter(function(l){ return l.trim(); }).map(function(line){
+    var vals = line.split(sep);
+    var obj = {};
+    headers.forEach(function(h,i){ obj[h] = (vals[i]||'').trim().replace(/^"|"$/g,''); });
+    return obj;
+  });
+}
+
+function normalizeImportRow(row) {
+  var map = {
+    id_bobine:['id_bobine','id bobine','idbobine','id'],
+    marque:['marque','brand'],
+    couleur:['couleur','color','colour'],
+    type_matiere:['type_matiere','matiere','material','type matiere'],
+    format_bobine:['format_bobine','format'],
+    refill:['refill','recharge'],
+    entame:['entame','entamé','opened'],
+    poids_g:['poids_g','poids','weight'],
+    prix_euros:['prix_euros','prix','price'],
+    quantite:['quantite','quantité','qty','quantity'],
+    date_mise_en_stock:['date_mise_en_stock','date','date stock']
+  };
+  var norm = {};
+  Object.keys(row).forEach(function(k){
+    var kl = k.toLowerCase().trim();
+    Object.keys(map).forEach(function(target){
+      if (!norm[target] && map[target].indexOf(kl) > -1) norm[target] = row[k];
+    });
+  });
+  ['refill','entame'].forEach(function(f){
+    norm[f] = ['oui','true','1','yes'].indexOf(String(norm[f]||'').toLowerCase().trim()) > -1;
+  });
+  ['poids_g','prix_euros'].forEach(function(f){
+    norm[f] = parseFloat(String(norm[f]||'').replace(',','.')) || 0;
+  });
+  norm.quantite = parseInt(norm.quantite) || 1;
+  return norm;
+}
+
+async function showImportPreview() {
+  var existing = await api('GET','filaments',null,'?select=id_bobine').catch(function(){ return []; });
+  var existingSet = new Set((existing||[]).map(function(r){ return r.id_bobine; }));
+  var dups = importRows.filter(function(r){ return existingSet.has(r.id_bobine); });
+
+  document.getElementById('import-step-1').style.display = 'none';
+  document.getElementById('import-step-2').style.display = 'block';
+  document.getElementById('import-info').textContent = importRows.length + ' ligne(s) détectée(s)' + (importRows.length > 10 ? ' — aperçu des 10 premières' : '');
+
+  var tbody = document.getElementById('import-preview-body');
+  tbody.innerHTML = importRows.slice(0,10).map(function(r){
+    var dup = existingSet.has(r.id_bobine);
+    return '<tr class="'+(dup?'import-dup-row':'')+'"><td style="font-family:var(--font-mono)">'+(r.id_bobine||'—')+(dup?' ⚠️':'')+'</td><td>'+(r.marque||'—')+'</td><td>'+(r.couleur||'—')+'</td><td>'+(r.type_matiere||'—')+'</td><td>'+r.poids_g+'g</td><td>'+r.prix_euros.toFixed(2)+'€</td><td>'+r.quantite+'</td></tr>';
+  }).join('');
+
+  var dupBox = document.getElementById('import-dup-box');
+  if (dups.length > 0) {
+    importDuplicateAction = null;
+    document.getElementById('import-dup-count').textContent = dups.length + ' doublon(s) détecté(s)';
+    dupBox.style.display = 'block';
+  } else {
+    importDuplicateAction = 'ignore';
+    dupBox.style.display = 'none';
+  }
+}
+
+function setDupAction(action) {
+  importDuplicateAction = action;
+  document.getElementById('btn-dup-ignore').className = 'btn btn-ghost btn-sm' + (action==='ignore'?' btn-dup-active-ignore':'');
+  document.getElementById('btn-dup-overwrite').className = 'btn btn-warning btn-sm' + (action==='overwrite'?' btn-dup-active-overwrite':'');
+}
+
+async function confirmImport() {
+  if (document.getElementById('import-dup-box').style.display !== 'none' && !importDuplicateAction) {
+    toast('Choisissez comment gérer les doublons', 'error'); return;
+  }
+  var btn = document.getElementById('btn-confirm-import');
+  btn.textContent = '...'; btn.disabled = true;
+  try {
+    var existing = await api('GET','filaments',null,'?select=id,id_bobine');
+    var existingMap = {};
+    (existing||[]).forEach(function(r){ existingMap[r.id_bobine] = r.id; });
+
+    var toInsert = [], toUpdate = [];
+    importRows.forEach(function(r){
+      var body = {
+        id_bobine: r.id_bobine, marque: r.marque||null, couleur: r.couleur||null,
+        type_matiere: r.type_matiere||null, format_bobine: r.format_bobine||'Standard',
+        refill: r.refill, entame: r.entame, poids_g: r.poids_g,
+        prix_euros: r.prix_euros, quantite: r.quantite,
+        date_mise_en_stock: r.date_mise_en_stock||null
+      };
+      if (existingMap[r.id_bobine]) {
+        if (importDuplicateAction === 'overwrite') toUpdate.push({id: existingMap[r.id_bobine], body: body});
+      } else {
+        toInsert.push(body);
+      }
+    });
+
+    var ops = [];
+    if (toInsert.length) ops.push(api('POST','filaments',toInsert));
+    toUpdate.forEach(function(u){ ops.push(api('PATCH','filaments',u.body,'?id=eq.'+u.id)); });
+    await Promise.all(ops);
+
+    closeModal('modal-import');
+    resetImport();
+    await loadFilaments();
+    toast('Import réussi : '+toInsert.length+' ajouté(s)'+(toUpdate.length?', '+toUpdate.length+' mis à jour':''), 'success');
+  } catch(err) { toast('Erreur import : '+err.message, 'error'); }
+  btn.textContent = 'Importer'; btn.disabled = false;
+}
+
+function resetImport() {
+  importRows = []; importDuplicateAction = null;
+  var fi = document.getElementById('import-file'); if (fi) fi.value = '';
+  document.getElementById('import-step-1').style.display = 'block';
+  document.getElementById('import-step-2').style.display = 'none';
+  document.getElementById('import-preview-body').innerHTML = '';
+  document.getElementById('import-dup-box').style.display = 'none';
+}
+
+function downloadImportTemplate() {
+  var csv = 'id_bobine,marque,couleur,type_matiere,format_bobine,refill,entame,poids_g,prix_euros,quantite,date_mise_en_stock\nPLA-BLK-001,Bambu Lab,Noir,PLA,Standard,non,non,1000,24.90,1,2025-01-15\nPETG-BLU-002,Sunlu,Bleu,PETG,Standard,non,oui,1000,19.99,2,2025-02-01\n';
+  var blob = new Blob([csv], {type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'modele_import_filaments.csv'; a.click();
+}
+/* ======= FIN MODULE IMPORT ======= */
 
 checkSession();
 </script>
