@@ -219,7 +219,7 @@
           <span class="section-title">Stock filaments</span>
           <span class="count-badge" id="count-filaments">0</span>
         </div>
-        <button class="btn btn-primary" onclick="openModal('modal-filament')">+ Ajouter</button>
+        <button class="btn btn-primary" onclick="openAddFilament()">+ Ajouter</button>
       </div>
       <div class="table-wrap">
         <table>
@@ -241,7 +241,7 @@
           <span class="section-title">Achats accessoires</span>
           <span class="count-badge" id="count-accessoires">0</span>
         </div>
-        <button class="btn btn-primary" onclick="openModal('modal-accessoire')">+ Ajouter</button>
+        <button class="btn btn-primary" onclick="openAddAccessoire()">+ Ajouter</button>
       </div>
       <div class="table-wrap">
         <table>
@@ -367,8 +367,9 @@
 <!-- MODAL FILAMENT -->
 <div class="modal-overlay" id="modal-filament">
   <div class="modal">
-    <div class="modal-title">+ NOUVEAU FILAMENT</div>
+    <div class="modal-title" id="modal-fil-title">+ NOUVEAU FILAMENT</div>
     <form id="form-filament" onsubmit="saveFilament(event)">
+      <input type="hidden" id="fil-edit-id">
       <div class="form-grid">
         <div class="form-group"><label>ID Bobine *</label><input type="text" name="id_bobine" placeholder="ex: PLA-BLK-001" required></div>
         <div class="form-group"><label>Marque *</label><select name="marque" required id="sel-marque"><option value="">Choisir...</option></select></div>
@@ -399,8 +400,9 @@
 <!-- MODAL ACCESSOIRE -->
 <div class="modal-overlay" id="modal-accessoire">
   <div class="modal">
-    <div class="modal-title">+ NOUVEL ACCESSOIRE</div>
+    <div class="modal-title" id="modal-acc-title">+ NOUVEL ACCESSOIRE</div>
     <form id="form-accessoire" onsubmit="saveAccessoire(event)">
+      <input type="hidden" id="acc-edit-id">
       <div class="form-grid">
         <div class="form-group full"><label>Nom du produit *</label><input type="text" name="produit" placeholder="ex: Papier de verre 400" required></div>
         <div class="form-group"><label>Type *</label><select name="type_produit" required id="sel-type-acc"><option value="">Choisir...</option></select></div>
@@ -733,7 +735,7 @@ function renderFilaments(data){
   document.getElementById('stat-entamees').textContent=en;
   if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="11">Aucun filament — cliquez sur "+ Ajouter"</td></tr>';return;}
   tbody.innerHTML=data.map(function(r){
-    return '<tr><td><span style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">'+r.id_bobine+'</span></td><td>'+r.marque+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur)+'"></span>'+r.couleur+'</td><td><span class="badge '+badgeMatiere(r.type_matiere)+'">'+r.type_matiere+'</span></td><td style="font-family:var(--font-mono)">'+r.poids_g+'g</td><td style="font-family:var(--font-mono)">'+parseFloat(r.prix_euros).toFixed(2)+'€</td><td style="font-family:var(--font-mono);color:var(--teal)">'+parseFloat(r.prix_par_gramme||0).toFixed(4)+'</td><td style="font-family:var(--font-mono)">'+(r.quantite||1)+'</td><td><span class="badge '+(r.entame?'badge-yes':'badge-no')+'">'+(r.entame?'Oui':'Non')+'</span></td><td style="font-size:13px;color:var(--text2)">'+((r.fournisseurs&&r.fournisseurs.nom)||'—')+'</td><td><button class="btn btn-danger btn-sm" onclick="deleteRow(\'filaments\',\''+r.id+'\',loadFilaments)">✕</button></td></tr>';
+    return '<tr><td><span style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">'+r.id_bobine+'</span></td><td>'+r.marque+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur)+'"></span>'+r.couleur+'</td><td><span class="badge '+badgeMatiere(r.type_matiere)+'">'+r.type_matiere+'</span></td><td style="font-family:var(--font-mono)">'+r.poids_g+'g</td><td style="font-family:var(--font-mono)">'+parseFloat(r.prix_euros).toFixed(2)+'€</td><td style="font-family:var(--font-mono);color:var(--teal)">'+parseFloat(r.prix_par_gramme||0).toFixed(4)+'</td><td style="font-family:var(--font-mono)">'+(r.quantite||1)+'</td><td><span class="badge '+(r.entame?'badge-yes':'badge-no')+'">'+(r.entame?'Oui':'Non')+'</span></td><td style="font-size:13px;color:var(--text2)">'+((r.fournisseurs&&r.fournisseurs.nom)||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditFilament(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'filaments\',\''+r.id+'\',loadFilaments)">✕</button></div></td></tr>';
   }).join('');
 }
 
@@ -753,32 +755,99 @@ function renderAccessoires(data){
   document.getElementById('stat-acc-inclus').textContent=inc;
   if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="10">Aucun accessoire — cliquez sur "+ Ajouter"</td></tr>';return;}
   tbody.innerHTML=data.map(function(r){
-    return '<tr><td><strong>'+r.produit+'</strong></td><td><span class="badge badge-other">'+r.type_produit+'</span></td><td style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">'+(r.date_achat||'—')+'</td><td style="font-family:var(--font-mono)">'+r.quantite+'</td><td style="font-family:var(--font-mono)">'+parseFloat(r.prix_total_euros).toFixed(2)+'€</td><td style="font-family:var(--font-mono);color:var(--teal)">'+parseFloat(r.prix_unitaire||0).toFixed(4)+'€</td><td style="font-family:var(--font-mono)">'+(r.prix_par_impression!=null?parseFloat(r.prix_par_impression).toFixed(4)+'€':'—')+'</td><td><span class="badge '+(r.inclure_dans_cout?'badge-yes':'badge-no')+'">'+(r.inclure_dans_cout?'Oui':'Non')+'</span></td><td style="font-size:13px;color:var(--text2)">'+((r.fournisseurs&&r.fournisseurs.nom)||'—')+'</td><td><button class="btn btn-danger btn-sm" onclick="deleteRow(\'achats_accessoires\',\''+r.id+'\',loadAccessoires)">✕</button></td></tr>';
+    return '<tr><td><strong>'+r.produit+'</strong></td><td><span class="badge badge-other">'+r.type_produit+'</span></td><td style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">'+(r.date_achat||'—')+'</td><td style="font-family:var(--font-mono)">'+r.quantite+'</td><td style="font-family:var(--font-mono)">'+parseFloat(r.prix_total_euros).toFixed(2)+'€</td><td style="font-family:var(--font-mono);color:var(--teal)">'+parseFloat(r.prix_unitaire||0).toFixed(4)+'€</td><td style="font-family:var(--font-mono)">'+(r.prix_par_impression!=null?parseFloat(r.prix_par_impression).toFixed(4)+'€':'—')+'</td><td><span class="badge '+(r.inclure_dans_cout?'badge-yes':'badge-no')+'">'+(r.inclure_dans_cout?'Oui':'Non')+'</span></td><td style="font-size:13px;color:var(--text2)">'+((r.fournisseurs&&r.fournisseurs.nom)||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditAccessoire(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'achats_accessoires\',\''+r.id+'\',loadAccessoires)">✕</button></div></td></tr>';
   }).join('');
 }
 
 /* ---- SAVE ---- */
+function openAddFilament(){
+  document.getElementById('fil-edit-id').value='';
+  document.getElementById('modal-fil-title').textContent='+ NOUVEAU FILAMENT';
+  document.getElementById('btn-save-fil').textContent='Enregistrer';
+  document.getElementById('form-filament').reset();
+  openModal('modal-filament');
+}
+async function openEditFilament(id){
+  try{
+    var data=await api('GET','filaments',null,'?id=eq.'+id+'&select=*');
+    if(!data||!data.length){toast('Filament introuvable','error');return;}
+    var r=data[0];
+    document.getElementById('fil-edit-id').value=r.id;
+    document.getElementById('modal-fil-title').textContent='✏️ MODIFIER FILAMENT';
+    document.getElementById('btn-save-fil').textContent='Enregistrer les modifications';
+    openModal('modal-filament');
+    var form=document.getElementById('form-filament');
+    form.id_bobine.value=r.id_bobine||'';
+    document.getElementById('sel-marque').value=r.marque||'';
+    document.getElementById('sel-couleur').value=r.couleur||'';
+    document.getElementById('sel-matiere').value=r.type_matiere||'';
+    document.getElementById('sel-format').value=r.format_bobine||'Standard';
+    document.getElementById('sel-fourn-fil').value=r.fournisseur_id||'';
+    form.poids_g.value=r.poids_g||'';
+    form.prix_euros.value=r.prix_euros||'';
+    form.quantite.value=r.quantite||1;
+    document.getElementById('date-stock').value=r.date_mise_en_stock||'';
+    document.getElementById('chk-refill').checked=r.refill||false;
+    document.getElementById('chk-entame').checked=r.entame||false;
+    calcPrixG();
+  }catch(err){toast('Erreur : '+err.message,'error');}
+}
 async function saveFilament(e){
   e.preventDefault();
   var form=e.target, btn=document.getElementById('btn-save-fil');
+  var editId=document.getElementById('fil-edit-id').value;
   btn.textContent='...'; btn.disabled=true;
   try{
-    await api('POST','filaments',{id_bobine:form.id_bobine.value.trim(),marque:form.marque.value,couleur:form.couleur.value,type_matiere:form.type_matiere.value,format_bobine:form.format_bobine.value,refill:form.refill.checked,entame:form.entame.checked,poids_g:parseFloat(form.poids_g.value),prix_euros:parseFloat(form.prix_euros.value),quantite:parseInt(form.quantite.value)||1,date_mise_en_stock:form.date_mise_en_stock.value||null,fournisseur_id:form.fournisseur_id.value||null});
+    var body={id_bobine:form.id_bobine.value.trim(),marque:form.marque.value,couleur:form.couleur.value,type_matiere:form.type_matiere.value,format_bobine:form.format_bobine.value,refill:form.refill.checked,entame:form.entame.checked,poids_g:parseFloat(form.poids_g.value),prix_euros:parseFloat(form.prix_euros.value),quantite:parseInt(form.quantite.value)||1,date_mise_en_stock:form.date_mise_en_stock.value||null,fournisseur_id:form.fournisseur_id.value||null};
+    if(editId){await api('PATCH','filaments',body,'?id=eq.'+editId);toast('Filament modifié ✓','success');}
+    else{await api('POST','filaments',body);toast('Filament ajouté ✓','success');}
     closeModal('modal-filament'); form.reset();
-    await loadFilaments(); toast('Filament ajouté ✓','success');
+    await loadFilaments();
   }catch(err){toast('Erreur : '+err.message,'error');}
   btn.textContent='Enregistrer'; btn.disabled=false;
 }
 
+function openAddAccessoire(){
+  document.getElementById('acc-edit-id').value='';
+  document.getElementById('modal-acc-title').textContent='+ NOUVEL ACCESSOIRE';
+  document.getElementById('btn-save-acc').textContent='Enregistrer';
+  document.getElementById('form-accessoire').reset();
+  openModal('modal-accessoire');
+}
+async function openEditAccessoire(id){
+  try{
+    var data=await api('GET','achats_accessoires',null,'?id=eq.'+id+'&select=*');
+    if(!data||!data.length){toast('Accessoire introuvable','error');return;}
+    var r=data[0];
+    document.getElementById('acc-edit-id').value=r.id;
+    document.getElementById('modal-acc-title').textContent='✏️ MODIFIER ACCESSOIRE';
+    document.getElementById('btn-save-acc').textContent='Enregistrer les modifications';
+    openModal('modal-accessoire');
+    var form=document.getElementById('form-accessoire');
+    form.produit.value=r.produit||'';
+    document.getElementById('sel-type-acc').value=r.type_produit||'';
+    document.getElementById('sel-fourn-acc').value=r.fournisseur_id||'';
+    document.getElementById('date-achat').value=r.date_achat||'';
+    form.quantite.value=r.quantite||'';
+    form.prix_total_euros.value=r.prix_total_euros||'';
+    form.prix_par_impression.value=r.prix_par_impression||'';
+    form.stock_restant.value=r.stock_restant||'';
+    document.getElementById('chk-inclure').checked=r.inclure_dans_cout||false;
+    calcPrixUnit();
+  }catch(err){toast('Erreur : '+err.message,'error');}
+}
 async function saveAccessoire(e){
   e.preventDefault();
   var form=e.target, btn=document.getElementById('btn-save-acc');
+  var editId=document.getElementById('acc-edit-id').value;
   btn.textContent='...'; btn.disabled=true;
   try{
     var qte=parseFloat(form.quantite.value);
-    await api('POST','achats_accessoires',{produit:form.produit.value.trim(),type_produit:form.type_produit.value,date_achat:form.date_achat.value||null,quantite:qte,prix_total_euros:parseFloat(form.prix_total_euros.value),inclure_dans_cout:form.inclure_dans_cout.checked,prix_par_impression:form.prix_par_impression.value?parseFloat(form.prix_par_impression.value):null,stock_restant:form.stock_restant.value?parseFloat(form.stock_restant.value):qte,fournisseur_id:form.fournisseur_id.value||null});
+    var body={produit:form.produit.value.trim(),type_produit:form.type_produit.value,date_achat:form.date_achat.value||null,quantite:qte,prix_total_euros:parseFloat(form.prix_total_euros.value),inclure_dans_cout:form.inclure_dans_cout.checked,prix_par_impression:form.prix_par_impression.value?parseFloat(form.prix_par_impression.value):null,stock_restant:form.stock_restant.value?parseFloat(form.stock_restant.value):qte,fournisseur_id:form.fournisseur_id.value||null};
+    if(editId){await api('PATCH','achats_accessoires',body,'?id=eq.'+editId);toast('Accessoire modifié ✓','success');}
+    else{await api('POST','achats_accessoires',body);toast('Accessoire ajouté ✓','success');}
     closeModal('modal-accessoire'); form.reset();
-    await loadAccessoires(); toast('Accessoire ajouté ✓','success');
+    await loadAccessoires();
   }catch(err){toast('Erreur : '+err.message,'error');}
   btn.textContent='Enregistrer'; btn.disabled=false;
 }
