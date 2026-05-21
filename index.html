@@ -137,6 +137,13 @@
     /* EDIT INLINE */
     .edit-input{padding:5px 8px;font-size:13px;border-radius:6px;border:1px solid var(--accent);background:#fff;color:var(--text);width:140px;}
 
+    /* EXPORT */
+    .export-wrap{position:relative;}
+    .export-menu{display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 16px rgba(0,0,0,0.1);z-index:150;min-width:180px;overflow:hidden;}
+    .export-menu.open{display:block;}
+    .export-menu button{display:block;width:100%;padding:10px 16px;background:none;border:none;text-align:left;font-family:var(--font-mono);font-size:12px;cursor:pointer;color:var(--text);}
+    .export-menu button:hover{background:var(--bg3);}
+
     /* IMPORT */
     .import-drop{border:2px dashed var(--border);border-radius:var(--radius);padding:32px;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--bg);}
     .import-drop:hover,.import-drop.dragover{border-color:var(--accent);background:#f0f5ff;}
@@ -219,6 +226,13 @@
           <span class="count-badge" id="count-filaments">0</span>
         </div>
         <div style="display:flex;gap:8px">
+          <div class="export-wrap" id="export-wrap">
+            <button class="btn btn-ghost" onclick="toggleExportMenu(event)">⬇ Exporter ▾</button>
+            <div class="export-menu" id="export-menu">
+              <button onclick="exportAll('csv')">📄 CSV (2 fichiers)</button>
+              <button onclick="exportAll('xlsx')">📊 Excel (.xlsx)</button>
+            </div>
+          </div>
           <button class="btn btn-ghost" onclick="openImportModal()">⬆ Importer</button>
           <button class="btn btn-primary" onclick="openModal('modal-filament')">+ Ajouter</button>
         </div>
@@ -806,6 +820,87 @@ function toast(msg,type){
   clearTimeout(toastTimer);
   toastTimer=setTimeout(function(){el.classList.remove('show');},3000);
 }
+
+/* ======= MODULE EXPORT ======= */
+function toggleExportMenu(e) {
+  e.stopPropagation();
+  document.getElementById('export-menu').classList.toggle('open');
+}
+document.addEventListener('click', function() {
+  var m = document.getElementById('export-menu');
+  if (m) m.classList.remove('open');
+});
+
+function cleanFilament(r) {
+  return {
+    id_bobine: r.id_bobine||'', marque: r.marque||'', couleur: r.couleur||'',
+    type_matiere: r.type_matiere||'', format_bobine: r.format_bobine||'',
+    refill: r.refill?'oui':'non', entame: r.entame?'oui':'non',
+    poids_g: r.poids_g||0, prix_euros: r.prix_euros||0,
+    prix_par_gramme: r.prix_par_gramme||0, quantite: r.quantite||1,
+    date_mise_en_stock: r.date_mise_en_stock||'',
+    fournisseur: (r.fournisseurs&&r.fournisseurs.nom)||''
+  };
+}
+function cleanAccessoire(r) {
+  return {
+    produit: r.produit||'', type_produit: r.type_produit||'',
+    date_achat: r.date_achat||'', quantite: r.quantite||0,
+    prix_total_euros: r.prix_total_euros||0, prix_unitaire: r.prix_unitaire||0,
+    prix_par_impression: r.prix_par_impression||'',
+    inclure_dans_cout: r.inclure_dans_cout?'oui':'non',
+    stock_restant: r.stock_restant||'',
+    fournisseur: (r.fournisseurs&&r.fournisseurs.nom)||''
+  };
+}
+
+function toCSVString(data) {
+  if (!data.length) return '';
+  var headers = Object.keys(data[0]);
+  var rows = data.map(function(r) {
+    return headers.map(function(h) {
+      var v = r[h] === null || r[h] === undefined ? '' : r[h];
+      return '"' + String(v).replace(/"/g, '""') + '"';
+    }).join(',');
+  });
+  return [headers.join(',')].concat(rows).join('\n');
+}
+
+function downloadBlob(content, filename, mime) {
+  var blob = new Blob([content], {type: mime});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+}
+
+async function exportAll(format) {
+  document.getElementById('export-menu').classList.remove('open');
+  toast('Préparation de l\'export...', 'success');
+  try {
+    var filData = await api('GET','filaments',null,'?select=*,fournisseurs(nom)&order=created_at.desc');
+    var accData = await api('GET','achats_accessoires',null,'?select=*,fournisseurs(nom)&order=created_at.desc');
+    var filRows = (filData||[]).map(cleanFilament);
+    var accRows = (accData||[]).map(cleanAccessoire);
+    var date = new Date().toISOString().slice(0,10);
+
+    if (format === 'csv') {
+      downloadBlob('﻿'+toCSVString(filRows), 'tadam3d_filaments_'+date+'.csv', 'text/csv;charset=utf-8');
+      setTimeout(function(){
+        downloadBlob('﻿'+toCSVString(accRows), 'tadam3d_accessoires_'+date+'.csv', 'text/csv;charset=utf-8');
+      }, 300);
+      toast('Export CSV : 2 fichiers téléchargés ✓', 'success');
+    } else {
+      var wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(filRows), 'Filaments');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(accRows), 'Accessoires');
+      XLSX.writeFile(wb, 'tadam3d_export_'+date+'.xlsx');
+      toast('Export Excel téléchargé ✓', 'success');
+    }
+  } catch(err) { toast('Erreur export : '+err.message, 'error'); }
+}
+/* ======= FIN MODULE EXPORT ======= */
 
 /* ======= MODULE IMPORT FILAMENTS ======= */
 var importRows = [];
