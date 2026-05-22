@@ -137,6 +137,9 @@
     /* EDIT INLINE */
     .edit-input{padding:5px 8px;font-size:13px;border-radius:6px;border:1px solid var(--accent);background:#fff;color:var(--text);width:140px;}
 
+    /* FORM SECTION TITLE */
+    .form-section-title{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin:16px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+
     /* IMPORT */
     .import-drop{border:2px dashed var(--border);border-radius:var(--radius);padding:32px;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--bg);}
     .import-drop:hover,.import-drop.dragover{border-color:var(--accent);background:#f0f5ff;}
@@ -202,6 +205,7 @@
     <button class="nav-btn active" onclick="showPage('filaments',event)">🧵 Filaments</button>
     <button class="nav-btn" onclick="showPage('accessoires',event)">🛒 Accessoires</button>
     <button class="nav-btn" onclick="showPage('parametres',event)">⚙️ Paramètres</button>
+    <button class="nav-btn" onclick="showPage('objets',event)">🛍️ Objets à vendre</button>
     <button class="nav-btn" onclick="showPage('importexport',event)">📤 Import / Export</button>
   </nav>
   <main>
@@ -313,6 +317,28 @@
           <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="openModal('modal-fournisseur')">+ Ajouter un fournisseur</button>
         </div>
 
+      </div>
+    </div>
+
+    <!-- OBJETS À VENDRE -->
+    <div class="page" id="page-objets">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Objets référencés</div><div class="stat-value accent" id="stat-obj-total">—</div></div>
+        <div class="stat-card"><div class="stat-label">Multi couleur</div><div class="stat-value teal" id="stat-obj-multi">—</div></div>
+        <div class="stat-card"><div class="stat-label">Catégories</div><div class="stat-value amber" id="stat-obj-cats">—</div></div>
+      </div>
+      <div class="section-header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="section-title">Objets à vendre</span>
+          <span class="count-badge" id="count-objets">0</span>
+        </div>
+        <button class="btn btn-primary" onclick="openAddObjet()">+ Ajouter</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nom</th><th>Catégorie</th><th>Couleur principale</th><th>Nb pièces</th><th>Multi couleur</th><th>Temps total</th><th></th></tr></thead>
+          <tbody id="tbody-objets"><tr class="empty-row"><td colspan="7">Cliquez sur "+ Ajouter" pour créer un objet</td></tr></tbody>
+        </table>
       </div>
     </div>
 
@@ -460,6 +486,106 @@
       <button type="button" class="btn btn-ghost" onclick="closeModal('modal-edit-item')">Annuler</button>
       <button type="button" class="btn btn-primary" onclick="saveEditItem()">Enregistrer</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL OBJET À VENDRE -->
+<div class="modal-overlay" id="modal-objet">
+  <div class="modal" style="max-width:660px">
+    <div class="modal-title" id="modal-obj-title">+ NOUVEL OBJET À VENDRE</div>
+    <form id="form-objet" onsubmit="saveObjet(event)">
+      <input type="hidden" id="obj-edit-id">
+
+      <div class="form-section-title">Informations produit</div>
+      <div class="form-grid">
+        <div class="form-group full"><label>Nom du produit *</label><input type="text" name="nom" required placeholder="ex: Vase géométrique"></div>
+        <div class="form-group"><label>Catégorie</label><input type="text" name="categorie" placeholder="ex: Décoration"></div>
+        <div class="form-group" style="display:flex;flex-direction:row;align-items:center;gap:10px;padding-top:20px">
+          <input type="checkbox" name="multi_couleur" id="chk-multi-couleur" style="width:16px;height:16px;accent-color:var(--accent)">
+          <label for="chk-multi-couleur" style="text-transform:none;font-size:14px;cursor:pointer">Multi couleur</label>
+        </div>
+        <div class="form-group full"><label>Description</label><textarea name="description" rows="2" placeholder="Description de l'objet..."></textarea></div>
+        <div class="form-group"><label>Couleur principale</label><select name="couleur_principale" id="sel-obj-couleur-0"><option value="">— Choisir —</option></select></div>
+        <div class="form-group"><label>Nb de pièce / module (0–6)</label><input type="number" name="nb_pieces" id="obj-nb-pieces" min="0" max="6" value="0" oninput="updateModules()"></div>
+      </div>
+
+      <div class="form-section-title">Impression</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Temps principal (HH:mm)</label><input type="text" name="temps_principal" id="obj-temps-0" placeholder="01:30" oninput="calcTempsTotal()"></div>
+        <div class="form-group"><label>Temps total (calculé)</label><input type="text" id="obj-temps-total" class="calc-field" readonly placeholder="HH:mm"></div>
+      </div>
+
+      <!-- MODULE 1 -->
+      <div id="obj-module-1" style="display:none">
+        <div class="form-section-title">📦 Pièce / Module 1</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Nom</label><input type="text" name="piece_1_nom"></div>
+          <div class="form-group"><label>Couleur</label><select name="piece_1_couleur" id="sel-obj-couleur-1"><option value="">— Choisir —</option></select></div>
+          <div class="form-group full"><label>Description</label><input type="text" name="piece_1_desc"></div>
+          <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_1_temps" id="obj-temps-1" placeholder="00:30" oninput="calcTempsTotal()"></div>
+        </div>
+      </div>
+
+      <!-- MODULE 2 -->
+      <div id="obj-module-2" style="display:none">
+        <div class="form-section-title">📦 Pièce / Module 2</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Nom</label><input type="text" name="piece_2_nom"></div>
+          <div class="form-group"><label>Couleur</label><select name="piece_2_couleur" id="sel-obj-couleur-2"><option value="">— Choisir —</option></select></div>
+          <div class="form-group full"><label>Description</label><input type="text" name="piece_2_desc"></div>
+          <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_2_temps" id="obj-temps-2" placeholder="00:30" oninput="calcTempsTotal()"></div>
+        </div>
+      </div>
+
+      <!-- MODULE 3 -->
+      <div id="obj-module-3" style="display:none">
+        <div class="form-section-title">📦 Pièce / Module 3</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Nom</label><input type="text" name="piece_3_nom"></div>
+          <div class="form-group"><label>Couleur</label><select name="piece_3_couleur" id="sel-obj-couleur-3"><option value="">— Choisir —</option></select></div>
+          <div class="form-group full"><label>Description</label><input type="text" name="piece_3_desc"></div>
+          <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_3_temps" id="obj-temps-3" placeholder="00:30" oninput="calcTempsTotal()"></div>
+        </div>
+      </div>
+
+      <!-- MODULE 4 -->
+      <div id="obj-module-4" style="display:none">
+        <div class="form-section-title">📦 Pièce / Module 4</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Nom</label><input type="text" name="piece_4_nom"></div>
+          <div class="form-group"><label>Couleur</label><select name="piece_4_couleur" id="sel-obj-couleur-4"><option value="">— Choisir —</option></select></div>
+          <div class="form-group full"><label>Description</label><input type="text" name="piece_4_desc"></div>
+          <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_4_temps" id="obj-temps-4" placeholder="00:30" oninput="calcTempsTotal()"></div>
+        </div>
+      </div>
+
+      <!-- MODULE 5 -->
+      <div id="obj-module-5" style="display:none">
+        <div class="form-section-title">📦 Pièce / Module 5</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Nom</label><input type="text" name="piece_5_nom"></div>
+          <div class="form-group"><label>Couleur</label><select name="piece_5_couleur" id="sel-obj-couleur-5"><option value="">— Choisir —</option></select></div>
+          <div class="form-group full"><label>Description</label><input type="text" name="piece_5_desc"></div>
+          <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_5_temps" id="obj-temps-5" placeholder="00:30" oninput="calcTempsTotal()"></div>
+        </div>
+      </div>
+
+      <!-- MODULE 6 -->
+      <div id="obj-module-6" style="display:none">
+        <div class="form-section-title">📦 Pièce / Module 6</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Nom</label><input type="text" name="piece_6_nom"></div>
+          <div class="form-group"><label>Couleur</label><select name="piece_6_couleur" id="sel-obj-couleur-6"><option value="">— Choisir —</option></select></div>
+          <div class="form-group full"><label>Description</label><input type="text" name="piece_6_desc"></div>
+          <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_6_temps" id="obj-temps-6" placeholder="00:30" oninput="calcTempsTotal()"></div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-objet')">Annuler</button>
+        <button type="submit" class="btn btn-primary" id="btn-save-obj">Enregistrer</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -881,6 +1007,7 @@ function showPage(name,e){
   document.getElementById('page-'+name).classList.add('active');
   if(e&&e.target) e.target.classList.add('active');
   if(name==='parametres') loadParamsPage();
+  if(name==='objets') loadObjets();
 }
 
 function openModal(id){
@@ -918,6 +1045,135 @@ function toast(msg,type){
   clearTimeout(toastTimer);
   toastTimer=setTimeout(function(){el.classList.remove('show');},3000);
 }
+
+/* ======= MODULE OBJETS À VENDRE ======= */
+var objets=[];
+
+async function loadObjets(){
+  try{
+    var data=await api('GET','objets_vente',null,'?order=created_at.desc');
+    objets=data||[];
+    renderObjets(objets);
+  }catch(err){
+    document.getElementById('tbody-objets').innerHTML='<tr class="empty-row"><td colspan="7">Table introuvable — créez-la dans Supabase</td></tr>';
+  }
+}
+
+function renderObjets(data){
+  var tbody=document.getElementById('tbody-objets');
+  document.getElementById('count-objets').textContent=data.length;
+  document.getElementById('stat-obj-total').textContent=data.length;
+  document.getElementById('stat-obj-multi').textContent=data.filter(function(r){return r.multi_couleur;}).length;
+  var cats=new Set(data.map(function(r){return r.categorie;}).filter(Boolean)).size;
+  document.getElementById('stat-obj-cats').textContent=cats;
+  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">Aucun objet — cliquez sur "+ Ajouter"</td></tr>';return;}
+  tbody.innerHTML=data.map(function(r){
+    return '<tr><td><strong>'+(r.nom||'—')+'</strong></td><td>'+(r.categorie||'—')+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur_principale)+'"></span>'+(r.couleur_principale||'—')+'</td><td style="font-family:var(--font-mono)">'+(r.nb_pieces||0)+'</td><td><span class="badge '+(r.multi_couleur?'badge-yes':'badge-no')+'">'+(r.multi_couleur?'Oui':'Non')+'</span></td><td style="font-family:var(--font-mono)">'+(r.temps_total||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditObjet(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'objets_vente\',\''+r.id+'\',loadObjets)">✕</button></div></td></tr>';
+  }).join('');
+}
+
+function populateObjCouleurs(){
+  for(var i=0;i<=6;i++){
+    var sel=document.getElementById('sel-obj-couleur-'+i);
+    if(!sel) continue;
+    sel.innerHTML='<option value="">— Choisir —</option>';
+    couleurs.forEach(function(c){var o=document.createElement('option');o.value=c.nom;o.textContent=c.nom;sel.appendChild(o);});
+  }
+}
+
+function openAddObjet(){
+  document.getElementById('obj-edit-id').value='';
+  document.getElementById('modal-obj-title').textContent='+ NOUVEL OBJET À VENDRE';
+  document.getElementById('btn-save-obj').textContent='Enregistrer';
+  document.getElementById('form-objet').reset();
+  document.getElementById('obj-nb-pieces').value='0';
+  updateModules();
+  populateObjCouleurs();
+  openModal('modal-objet');
+}
+
+async function openEditObjet(id){
+  try{
+    var data=await api('GET','objets_vente',null,'?id=eq.'+id+'&select=*');
+    if(!data||!data.length){toast('Objet introuvable','error');return;}
+    var r=data[0];
+    document.getElementById('obj-edit-id').value=r.id;
+    document.getElementById('modal-obj-title').textContent='✏️ MODIFIER OBJET';
+    document.getElementById('btn-save-obj').textContent='Enregistrer les modifications';
+    populateObjCouleurs();
+    openModal('modal-objet');
+    var form=document.getElementById('form-objet');
+    form.nom.value=r.nom||'';
+    form.categorie.value=r.categorie||'';
+    form.description.value=r.description||'';
+    document.getElementById('chk-multi-couleur').checked=r.multi_couleur||false;
+    document.getElementById('sel-obj-couleur-0').value=r.couleur_principale||'';
+    document.getElementById('obj-nb-pieces').value=r.nb_pieces||0;
+    document.getElementById('obj-temps-0').value=r.temps_principal||'';
+    for(var i=1;i<=6;i++){
+      if(form['piece_'+i+'_nom']) form['piece_'+i+'_nom'].value=r['piece_'+i+'_nom']||'';
+      if(form['piece_'+i+'_desc']) form['piece_'+i+'_desc'].value=r['piece_'+i+'_desc']||'';
+      var tel=document.getElementById('obj-temps-'+i); if(tel) tel.value=r['piece_'+i+'_temps']||'';
+      var cel=document.getElementById('sel-obj-couleur-'+i); if(cel) cel.value=r['piece_'+i+'_couleur']||'';
+    }
+    updateModules();
+    calcTempsTotal();
+  }catch(err){toast('Erreur : '+err.message,'error');}
+}
+
+async function saveObjet(e){
+  e.preventDefault();
+  var form=e.target, btn=document.getElementById('btn-save-obj');
+  var editId=document.getElementById('obj-edit-id').value;
+  btn.textContent='...'; btn.disabled=true;
+  try{
+    var body={
+      nom:form.nom.value.trim(), categorie:form.categorie.value||null,
+      description:form.description.value||null, multi_couleur:form.multi_couleur.checked,
+      couleur_principale:form.couleur_principale.value||null,
+      nb_pieces:parseInt(form.nb_pieces.value)||0,
+      temps_principal:form.temps_principal.value||null,
+      temps_total:document.getElementById('obj-temps-total').value||null
+    };
+    for(var i=1;i<=6;i++){
+      body['piece_'+i+'_nom']=form['piece_'+i+'_nom'].value||null;
+      body['piece_'+i+'_desc']=form['piece_'+i+'_desc'].value||null;
+      body['piece_'+i+'_temps']=document.getElementById('obj-temps-'+i).value||null;
+      body['piece_'+i+'_couleur']=form['piece_'+i+'_couleur'].value||null;
+    }
+    if(editId){await api('PATCH','objets_vente',body,'?id=eq.'+editId);toast('Objet modifié ✓','success');}
+    else{await api('POST','objets_vente',body);toast('Objet ajouté ✓','success');}
+    closeModal('modal-objet'); form.reset();
+    await loadObjets();
+  }catch(err){toast('Erreur : '+err.message,'error');}
+  btn.textContent='Enregistrer'; btn.disabled=false;
+}
+
+function updateModules(){
+  var nb=parseInt(document.getElementById('obj-nb-pieces').value)||0;
+  for(var i=1;i<=6;i++){
+    var s=document.getElementById('obj-module-'+i);
+    if(s) s.style.display=i<=nb?'block':'none';
+  }
+  calcTempsTotal();
+}
+
+function parseHHmm(str){
+  if(!str) return 0;
+  var p=str.split(':');
+  return (parseInt(p[0])||0)*60+(parseInt(p[1])||0);
+}
+function formatHHmm(mins){
+  if(!mins) return '';
+  return Math.floor(mins/60)+':'+String(mins%60).padStart(2,'0');
+}
+function calcTempsTotal(){
+  var nb=parseInt(document.getElementById('obj-nb-pieces').value)||0;
+  var total=parseHHmm(document.getElementById('obj-temps-0').value);
+  for(var i=1;i<=nb;i++){var el=document.getElementById('obj-temps-'+i);if(el) total+=parseHHmm(el.value);}
+  document.getElementById('obj-temps-total').value=total>0?formatHHmm(total):'';
+}
+/* ======= FIN MODULE OBJETS ======= */
 
 /* ======= MODULE EXPORT ======= */
 function cleanFilament(r) {
