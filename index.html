@@ -403,45 +403,17 @@
 
             <div class="settings-card">
               <div class="settings-card-title">📋 Coûts fixes</div>
-              <div class="form-group" style="margin-bottom:10px"><label>Coût fiche produit (€)</label><input type="number" name="cout_fiche_produit" step="0.01" placeholder="0.00"></div>
-              <div class="form-group" style="margin-bottom:10px"><label>Nb produits pour rentabilité</label><input type="number" name="nb_produit_rentabilite" step="1" placeholder="100"></div>
-              <div class="form-group" style="margin-bottom:10px">
-                <label>Coût unitaire fiche produit (calculé)</label>
-                <input type="text" id="preview-cout-fiche" class="calc-field" readonly>
-              </div>
               <div class="form-group"><label>Coût logistique unitaire (€)</label><input type="number" name="cout_logistique_unitaire" step="0.01" placeholder="0.50"></div>
             </div>
 
             <div class="settings-card">
-              <div class="settings-card-title">🧴 Consommables inclus</div>
-              <div style="margin-bottom:10px">
-                <label style="font-family:var(--font-mono);font-size:10px;color:var(--text3);text-transform:uppercase">Consommable 1</label>
-                <div style="display:flex;gap:8px;margin-top:6px">
-                  <select id="param-conso-1" style="flex:2" onchange="updateParamConsoPrice(1)"><option value="">— Choisir —</option></select>
-                  <input type="number" id="param-conso-1-qte" placeholder="Qté" step="0.01" min="0" style="flex:1">
-                  <input type="text" id="param-conso-1-prix" class="calc-field" readonly placeholder="€" style="flex:1">
-                </div>
-              </div>
-              <div style="margin-bottom:10px">
-                <label style="font-family:var(--font-mono);font-size:10px;color:var(--text3);text-transform:uppercase">Consommable 2</label>
-                <div style="display:flex;gap:8px;margin-top:6px">
-                  <select id="param-conso-2" style="flex:2" onchange="updateParamConsoPrice(2)"><option value="">— Choisir —</option></select>
-                  <input type="number" id="param-conso-2-qte" placeholder="Qté" step="0.01" min="0" style="flex:1">
-                  <input type="text" id="param-conso-2-prix" class="calc-field" readonly placeholder="€" style="flex:1">
-                </div>
-              </div>
-              <div>
-                <label style="font-family:var(--font-mono);font-size:10px;color:var(--text3);text-transform:uppercase">Consommable 3</label>
-                <div style="display:flex;gap:8px;margin-top:6px">
-                  <select id="param-conso-3" style="flex:2" onchange="updateParamConsoPrice(3)"><option value="">— Choisir —</option></select>
-                  <input type="number" id="param-conso-3-qte" placeholder="Qté" step="0.01" min="0" style="flex:1">
-                  <input type="text" id="param-conso-3-prix" class="calc-field" readonly placeholder="€" style="flex:1">
-                </div>
-              </div>
-            </div>
-
-            <div class="settings-card">
               <div class="settings-card-title">🛒 Frais vente en ligne</div>
+              <div class="form-group" style="margin-bottom:10px"><label>Coût fiche produit (€)</label><input type="number" name="cout_fiche_produit" step="0.01" placeholder="0.00" oninput="updateCoutFichePreview()"></div>
+              <div class="form-group" style="margin-bottom:10px"><label>Nb produits pour rentabilité</label><input type="number" name="nb_produit_rentabilite" step="1" placeholder="100" oninput="updateCoutFichePreview()"></div>
+              <div class="form-group" style="margin-bottom:10px">
+                <label>Coût unitaire fiche produit (calculé)</label>
+                <input type="text" id="preview-cout-fiche" class="calc-field" readonly>
+              </div>
               <div class="form-group" style="margin-bottom:10px"><label>Site de mise en vente</label><input type="text" name="site_vente" placeholder="ex: Etsy, Leboncoin..."></div>
               <div class="form-group" style="margin-bottom:10px"><label>Coût mise en vente d'un produit (€)</label><input type="number" name="cout_mise_en_vente" step="0.01" placeholder="0.20"></div>
               <div class="form-group"><label>% charge de vente en ligne</label><input type="number" name="pct_charge_vente" step="0.01" placeholder="0.20" value="0.20"></div>
@@ -671,7 +643,7 @@
       <div class="form-section-title">Impression</div>
       <div class="form-grid">
         <div class="form-group"><label>Temps principal (HH:mm)</label><input type="text" name="temps_principal" id="obj-temps-0" placeholder="01:30" oninput="calcTempsTotal()"></div>
-        <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="qte_matiere" id="obj-qte-0" placeholder="0" step="0.1" min="0"></div>
+        <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="qte_matiere" id="obj-qte-0" placeholder="0" step="0.01" min="0"></div>
         <div class="form-group"><label>Temps total (calculé)</label><input type="text" id="obj-temps-total" class="calc-field" readonly placeholder="HH:mm"></div>
       </div>
 
@@ -683,7 +655,7 @@
           <div class="form-group"><label>Couleur</label><select name="piece_1_couleur" id="sel-obj-couleur-1"><option value="">— Choisir —</option></select></div>
           <div class="form-group full"><label>Description</label><input type="text" name="piece_1_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_1_temps" id="obj-temps-1" placeholder="00:30" oninput="calcTempsTotal()"></div>
-          <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_1_qte" id="obj-qte-1" placeholder="0" step="0.1" min="0"></div>
+          <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_1_qte" id="obj-qte-1" placeholder="0" step="0.01" min="0"></div>
         </div>
       </div>
 
@@ -695,7 +667,7 @@
           <div class="form-group"><label>Couleur</label><select name="piece_2_couleur" id="sel-obj-couleur-2"><option value="">— Choisir —</option></select></div>
           <div class="form-group full"><label>Description</label><input type="text" name="piece_2_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_2_temps" id="obj-temps-2" placeholder="00:30" oninput="calcTempsTotal()"></div>
-          <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_2_qte" id="obj-qte-2" placeholder="0" step="0.1" min="0"></div>
+          <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_2_qte" id="obj-qte-2" placeholder="0" step="0.01" min="0"></div>
         </div>
       </div>
 
@@ -707,7 +679,7 @@
           <div class="form-group"><label>Couleur</label><select name="piece_3_couleur" id="sel-obj-couleur-3"><option value="">— Choisir —</option></select></div>
           <div class="form-group full"><label>Description</label><input type="text" name="piece_3_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_3_temps" id="obj-temps-3" placeholder="00:30" oninput="calcTempsTotal()"></div>
-          <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_3_qte" id="obj-qte-3" placeholder="0" step="0.1" min="0"></div>
+          <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_3_qte" id="obj-qte-3" placeholder="0" step="0.01" min="0"></div>
         </div>
       </div>
 
@@ -719,7 +691,7 @@
           <div class="form-group"><label>Couleur</label><select name="piece_4_couleur" id="sel-obj-couleur-4"><option value="">— Choisir —</option></select></div>
           <div class="form-group full"><label>Description</label><input type="text" name="piece_4_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_4_temps" id="obj-temps-4" placeholder="00:30" oninput="calcTempsTotal()"></div>
-          <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_4_qte" id="obj-qte-4" placeholder="0" step="0.1" min="0"></div>
+          <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_4_qte" id="obj-qte-4" placeholder="0" step="0.01" min="0"></div>
         </div>
       </div>
 
@@ -731,7 +703,7 @@
           <div class="form-group"><label>Couleur</label><select name="piece_5_couleur" id="sel-obj-couleur-5"><option value="">— Choisir —</option></select></div>
           <div class="form-group full"><label>Description</label><input type="text" name="piece_5_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_5_temps" id="obj-temps-5" placeholder="00:30" oninput="calcTempsTotal()"></div>
-          <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_5_qte" id="obj-qte-5" placeholder="0" step="0.1" min="0"></div>
+          <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_5_qte" id="obj-qte-5" placeholder="0" step="0.01" min="0"></div>
         </div>
       </div>
 
@@ -743,7 +715,7 @@
           <div class="form-group"><label>Couleur</label><select name="piece_6_couleur" id="sel-obj-couleur-6"><option value="">— Choisir —</option></select></div>
           <div class="form-group full"><label>Description</label><input type="text" name="piece_6_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_6_temps" id="obj-temps-6" placeholder="00:30" oninput="calcTempsTotal()"></div>
-          <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_6_qte" id="obj-qte-6" placeholder="0" step="0.1" min="0"></div>
+          <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_6_qte" id="obj-qte-6" placeholder="0" step="0.01" min="0"></div>
         </div>
       </div>
 
@@ -1480,10 +1452,6 @@ async function saveParamCalcul(e){
     taux_ursaff:parseFloat(form.taux_ursaff.value)||null,
     taux_impot:parseFloat(form.taux_impot.value)||null
   };
-  [1,2,3].forEach(function(i){
-    body['conso_'+i+'_id']=document.getElementById('param-conso-'+i).value||null;
-    body['conso_'+i+'_qte']=parseFloat(document.getElementById('param-conso-'+i+'-qte').value)||null;
-  });
   try{
     if(editId){await api('PATCH','param_calcul_prix',body,'?id=eq.'+editId);paramCalcul={id:editId,...body};}
     else{var res=await api('POST','param_calcul_prix',body);paramCalcul=Array.isArray(res)?res[0]:res;document.getElementById('param-edit-id').value=paramCalcul.id;}
