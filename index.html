@@ -881,6 +881,7 @@
       <div class="calc-section">
         <div class="calc-section-title">📋 Coûts fixes</div>
         <div class="form-grid">
+          <div class="form-group"><label>Nb produits / modules sélectionnés</label><input type="text" id="calc-nb-modules-selec" class="calc-field" readonly placeholder="0"></div>
           <div class="form-group"><label>Coût fiche produit (€)</label><input type="text" id="calc-cout-fiche" class="calc-field" readonly></div>
           <div class="form-group"><label>Coût logistique (€)</label><input type="text" id="calc-cout-logistique" class="calc-field" readonly></div>
         </div>
@@ -2153,8 +2154,9 @@ async function openAddCalculPrix(){
     var pct=document.getElementById('calc-pct-charge');
     if(pct) pct.value=paramCalcul.pct_charge_vente||0.2;
     var cfiche=document.getElementById('calc-cout-fiche');
-    if(cfiche&&paramCalcul.cout_fiche_produit&&paramCalcul.nb_produit_rentabilite)
-      cfiche.value=(paramCalcul.cout_fiche_produit/paramCalcul.nb_produit_rentabilite).toFixed(4)+' €';
+    if(cfiche) cfiche.value='0.00 €'; // recalculé par calcModulesTotal() selon les modules cochés
+    var eNbMod=document.getElementById('calc-nb-modules-selec');
+    if(eNbMod) eNbMod.value='0';
     var clog=document.getElementById('calc-cout-logistique');
     if(clog) clog.value=paramCalcul.cout_logistique_unitaire?paramCalcul.cout_logistique_unitaire.toFixed(2)+' €':'';
     var cusure=document.getElementById('calc-cout-usure');
@@ -2190,16 +2192,30 @@ function onObjetChange(){
 }
 
 function calcModulesTotal(){
-  var totalMins=0, totalQte=0;
+  var totalMins=0, totalQte=0, nbSelec=0;
   var couleurs=new Set();
   document.querySelectorAll('#calc-modules-list input[type=checkbox]:checked').forEach(function(cb){
     totalMins+=parseHHmm(cb.dataset.temps);
     totalQte+=parseFloat(cb.dataset.qte)||0;
     if(cb.dataset.couleur) couleurs.add(cb.dataset.couleur);
+    nbSelec++;
   });
   var tt=document.getElementById('calc-temps-total'); if(tt) tt.value=totalMins>0?formatHHmm(totalMins):'';
   var qt=document.getElementById('calc-qte-total'); if(qt) qt.value=totalQte.toFixed(1)+' g';
   var nc=document.getElementById('calc-nb-couleurs'); if(nc) nc.value=couleurs.size||'';
+  // Compteur produits/modules sélectionnés
+  var eNbMod=document.getElementById('calc-nb-modules-selec');
+  if(eNbMod) eNbMod.value=nbSelec;
+  // Coût fiche produit = (coût fiche / nb rentabilité) × nb modules sélectionnés
+  var cfiche=document.getElementById('calc-cout-fiche');
+  if(cfiche){
+    if(paramCalcul&&paramCalcul.cout_fiche_produit&&paramCalcul.nb_produit_rentabilite&&nbSelec>0){
+      var unitFiche=paramCalcul.cout_fiche_produit/paramCalcul.nb_produit_rentabilite;
+      cfiche.value=(unitFiche*nbSelec).toFixed(4)+' €';
+    } else {
+      cfiche.value='0.00 €';
+    }
+  }
   // Pré-remplir le champ "Total heure d'impression" avec le total des modules
   var nh=document.getElementById('calc-nb-heures'); if(nh) nh.value=totalMins>0?formatHHmm(totalMins):'';
   calcTotalElec();
