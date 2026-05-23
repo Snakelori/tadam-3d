@@ -391,12 +391,14 @@
 
             <div class="settings-card">
               <div class="settings-card-title">⚡ Consommation électrique</div>
-              <div class="form-group"><label>Prix KW/h (€)</label><input type="number" name="prix_kwh" step="0.001" placeholder="0.18"></div>
+              <div class="form-group" style="margin-bottom:10px"><label>Prix moyen KWh opérateur (€)</label><input type="number" name="prix_kwh" step="0.001" placeholder="0.18" oninput="updateTotalCoutHeure()"></div>
+              <div class="form-group" style="margin-bottom:10px"><label>Consommation moyenne Imprimante (KWh)</label><input type="number" name="conso_imprimante" step="0.01" min="0" placeholder="0.15" oninput="updateTotalCoutHeure()"></div>
+              <div class="form-group"><label>Total coût heure (calculé €/h)</label><input type="text" id="preview-cout-heure-elec" class="calc-field" readonly placeholder="€/h"></div>
             </div>
 
             <div class="settings-card">
               <div class="settings-card-title">🖨️ Utilisation imprimante</div>
-              <div class="form-group" style="margin-bottom:10px"><label>Usure par produit (€)</label><input type="number" name="usure_par_produit" step="0.01" placeholder="0.10"></div>
+              <div class="form-group" style="margin-bottom:10px"><label>Coût moyen d'usure par produit (€)</label><input type="number" name="usure_par_produit" step="0.01" placeholder="0.10"></div>
               <div class="form-group" style="margin-bottom:10px"><label>Coût maintenance par produit (€)</label><input type="number" name="cout_maintenance" step="0.01" placeholder="0.05"></div>
               <div class="form-group"><label>Taux horaire main d'œuvre (€/h)</label><input type="number" name="taux_horaire_mo" step="0.01" placeholder="15.00"></div>
             </div>
@@ -817,6 +819,35 @@
       <!-- Résultats -->
       <div class="calc-section" style="background:#f0f5ff;border-color:#b3caff">
         <div class="calc-section-title" style="color:var(--accent)">📊 Résultats</div>
+
+        <!-- Bulle méthode de calcul -->
+        <details style="margin-bottom:14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;cursor:pointer">
+          <summary style="font-family:var(--font-mono);font-weight:700;color:var(--accent);letter-spacing:0.3px;list-style:none;display:flex;align-items:center;gap:6px">
+            <span style="font-size:14px">ℹ️</span> Méthode de calcul <span style="font-size:10px;color:var(--text3);margin-left:4px">(cliquer pour développer)</span>
+          </summary>
+          <div style="margin-top:10px;display:grid;gap:6px;line-height:1.7">
+            <div style="background:var(--bg2);border-radius:6px;padding:8px 12px">
+              <span style="font-family:var(--font-mono);font-weight:700;color:var(--text)">Coût produit réel</span>
+              <span style="color:var(--text2)"> = filaments + accessoires + logistique + fiche + électricité + usure + maintenance + main d'œuvre + mise en vente</span>
+            </div>
+            <div style="background:var(--bg2);border-radius:6px;padding:8px 12px">
+              <span style="font-family:var(--font-mono);font-weight:700;color:var(--accent)">Coût produit avec échec</span>
+              <span style="color:var(--text2)"> = Coût réel × (1 + taux d'échec %)</span>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px">→ Intègre le risque d'impression ratée dans le coût unitaire</div>
+            </div>
+            <div style="background:var(--bg2);border-radius:6px;padding:8px 12px">
+              <span style="font-family:var(--font-mono);font-weight:700;color:var(--text)">Coût fabrication</span>
+              <span style="color:var(--text2)"> = Coût produit × (1 + % charge vente)</span>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px">→ Deux variantes : sans échec (coût réel) et avec échec</div>
+            </div>
+            <div style="background:var(--bg2);border-radius:6px;padding:8px 12px">
+              <span style="font-family:var(--font-mono);font-weight:700;color:var(--teal)">Prix de vente</span>
+              <span style="color:var(--text2)"> = Coût fabrication × taux de marge</span>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px">→ Taux de marge défini dans Paramètres de calcul (ex : 3 = ×3 = marge 200%)</div>
+            </div>
+          </div>
+        </details>
+
         <div class="form-grid">
           <div class="form-group"><label>Coût produit réel (€)</label><input type="text" id="calc-cout-reel" class="result-field" readonly></div>
           <div class="form-group"><label>Coût produit avec échec (€)</label><input type="text" id="calc-cout-echec" class="result-field" readonly></div>
@@ -1416,10 +1447,11 @@ function fillParamForm(r){
   var form=document.getElementById('form-paramcalcul');
   if(!form) return;
   document.getElementById('param-edit-id').value=r.id||'';
-  ['prix_kwh','usure_par_produit','cout_maintenance','taux_horaire_mo','cout_fiche_produit','nb_produit_rentabilite','cout_logistique_unitaire','site_vente','cout_mise_en_vente','pct_charge_vente','taux_marge_vente','taux_ursaff','taux_impot'].forEach(function(f){
+  ['prix_kwh','conso_imprimante','usure_par_produit','cout_maintenance','taux_horaire_mo','cout_fiche_produit','nb_produit_rentabilite','cout_logistique_unitaire','site_vente','cout_mise_en_vente','pct_charge_vente','taux_marge_vente','taux_ursaff','taux_impot'].forEach(function(f){
     if(form[f]) form[f].value=r[f]!=null?r[f]:'';
   });
   updateCoutFichePreview();
+  updateTotalCoutHeure();
   [1,2,3].forEach(function(i){
     var sel=document.getElementById('param-conso-'+i);
     if(sel&&r['conso_'+i+'_id']) sel.value=r['conso_'+i+'_id'];
@@ -1427,6 +1459,14 @@ function fillParamForm(r){
     if(qte) qte.value=r['conso_'+i+'_qte']||'';
     updateParamConsoPrice(i);
   });
+}
+function updateTotalCoutHeure(){
+  var form=document.getElementById('form-paramcalcul');
+  if(!form) return;
+  var prix=parseFloat(form.prix_kwh&&form.prix_kwh.value)||0;
+  var conso=parseFloat(form.conso_imprimante&&form.conso_imprimante.value)||0;
+  var el=document.getElementById('preview-cout-heure-elec');
+  if(el) el.value=prix&&conso?(prix*conso).toFixed(4)+' €/h':'';
 }
 function updateCoutFichePreview(){
   var form=document.getElementById('form-paramcalcul');
@@ -1442,6 +1482,7 @@ async function saveParamCalcul(e){
   var editId=document.getElementById('param-edit-id').value;
   var body={
     prix_kwh:parseFloat(form.prix_kwh.value)||null,
+    conso_imprimante:parseFloat(form.conso_imprimante.value)||null,
     usure_par_produit:parseFloat(form.usure_par_produit.value)||null,
     cout_maintenance:parseFloat(form.cout_maintenance.value)||null,
     taux_horaire_mo:parseFloat(form.taux_horaire_mo.value)||null,
@@ -1769,7 +1810,8 @@ function calcTotalElec(){
   if(!paramCalcul) return;
   var heures=parseHHmm(document.getElementById('calc-nb-heures').value)/60;
   var prix=paramCalcul.prix_kwh||0;
-  var cout=(heures*prix).toFixed(4);
+  var conso=paramCalcul.conso_imprimante||1;
+  var cout=(heures*prix*conso).toFixed(4);
   var el=document.getElementById('calc-cout-elec'); if(el) el.value=cout+' €';
   calcResultats();
 }
