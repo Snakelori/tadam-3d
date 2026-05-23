@@ -1620,6 +1620,7 @@ async function openEditObjet(id){
       var tel=document.getElementById('obj-temps-'+i); if(tel) tel.value=r['piece_'+i+'_temps']||'';
       var cel=document.getElementById('sel-obj-couleur-'+i); if(cel) cel.value=r['piece_'+i+'_couleur']||'';
       var qel=document.getElementById('obj-qte-'+i); if(qel) qel.value=r['piece_'+i+'_qte']||'';
+      var sel=document.getElementById('obj-piece-'+i+'-stock'); if(sel) sel.value=r['piece_'+i+'_stock']!=null?r['piece_'+i+'_stock']:0;
     }
     updateModules();
     calcTempsTotal();
