@@ -1461,12 +1461,13 @@ function fillParamForm(r){
   });
 }
 function updateTotalCoutHeure(){
-  var form=document.getElementById('form-paramcalcul');
-  if(!form) return;
-  var prix=parseFloat(form.prix_kwh&&form.prix_kwh.value)||0;
-  var conso=parseFloat(form.conso_imprimante&&form.conso_imprimante.value)||0;
+  var prixEl=document.querySelector('#form-paramcalcul [name="prix_kwh"]');
+  var consoEl=document.querySelector('#form-paramcalcul [name="conso_imprimante"]');
   var el=document.getElementById('preview-cout-heure-elec');
-  if(el) el.value=prix&&conso?(prix*conso).toFixed(4)+' €/h':'';
+  if(!el) return;
+  var prix=parseFloat(prixEl&&prixEl.value)||0;
+  var conso=parseFloat(consoEl&&consoEl.value)||0;
+  el.value=(prix>0&&conso>0)?(prix*conso).toFixed(4)+' €/h':'';
 }
 function updateCoutFichePreview(){
   var form=document.getElementById('form-paramcalcul');
