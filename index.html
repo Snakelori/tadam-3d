@@ -1864,7 +1864,8 @@ function calcTempsTotal(){
 /* ======= MODULE OBJETS VENDUS ======= */
 async function loadObjetsVendus(){
   try{
-    var data=await api('GET','objets_vendus',null,'?select=*,objets_vente(nom,stock)&order=date_vente.desc,created_at.desc');
+    var sel='*,objets_vente(nom,stock,piece_1_nom,piece_1_stock,piece_2_nom,piece_2_stock,piece_3_nom,piece_3_stock,piece_4_nom,piece_4_stock,piece_5_nom,piece_5_stock,piece_6_nom,piece_6_stock)';
+    var data=await api('GET','objets_vendus',null,'?select='+sel+'&order=date_vente.desc,created_at.desc');
     renderObjetsVendus(data||[]);
   }catch(err){
     document.getElementById('tbody-ventes').innerHTML='<tr class="empty-row"><td colspan="6">Erreur : '+esc(err.message)+'</td></tr>';
@@ -1879,27 +1880,68 @@ function renderObjetsVendus(data){
   var lastDate=data.length?data[0].date_vente||'—':'—';
   document.getElementById('stat-ventes-last').textContent=lastDate;
   if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="6">Aucune vente — cliquez sur "+ Enregistrer une vente"</td></tr>';return;}
+  var lieuMap={'Etsy':'🏪 Etsy','Bamboulab':'🐼 Bamboulab','Amazon':'📦 Amazon','Direct':'🤝 Direct','Leboncoin':'🟠 Leboncoin','Autre':'📌 Autre'};
   tbody.innerHTML=data.map(function(r){
-    var nomObjet=r.objets_vente?esc(r.objets_vente.nom||'—'):'<span style="color:var(--text3)">Objet supprimé</span>';
-    var stockRestant=r.objets_vente!=null?r.objets_vente.stock:'—';
+    var ov=r.objets_vente;
+    var modIdx=r.module_index||0;
+    // Libellé vendu : module ou objet complet
+    var nomVendu;
+    if(!ov){
+      nomVendu='<span style="color:var(--text3)">Objet supprimé</span>';
+    }else if(modIdx>0&&r.module_nom){
+      nomVendu='<span style="font-size:12px;color:var(--text3)">'+esc(ov.nom)+'</span><br><strong>↳ '+esc(r.module_nom)+'</strong>';
+    }else{
+      nomVendu='<strong>'+esc(ov.nom||'—')+'</strong>';
+    }
+    // Stock actuel (du bon champ)
+    var stockRestant;
+    if(!ov){ stockRestant='—'; }
+    else if(modIdx>0){ stockRestant=ov['piece_'+modIdx+'_stock']!=null?ov['piece_'+modIdx+'_stock']:'—'; }
+    else{ stockRestant=ov.stock!=null?ov.stock:'—'; }
     var stockBadge=stockRestant!=='—'?'<span class="badge '+(stockRestant>0?'badge-yes':'badge-no')+'">'+stockRestant+'</span>':'—';
-    var lieuMap={'Etsy':'🏪 Etsy','Bamboulab':'🐼 Bamboulab','Amazon':'📦 Amazon','Direct':'🤝 Direct','Leboncoin':'🟠 Leboncoin','Autre':'📌 Autre'};
-    return '<tr><td><strong>'+nomObjet+'</strong></td><td style="font-family:var(--font-mono)">'+(r.nombre_vendus||0)+'</td><td>'+stockBadge+'</td><td style="font-family:var(--font-mono);font-size:13px;color:var(--text2)">'+(r.date_vente||'—')+'</td><td>'+(lieuMap[r.lieu_vente]||esc(r.lieu_vente||'—'))+'</td><td><button class="btn btn-danger btn-sm" onclick="deleteVente(\''+r.id+'\',\''+r.objet_id+'\','+r.nombre_vendus+')">✕</button></td></tr>';
+    return '<tr><td>'+nomVendu+'</td><td style="font-family:var(--font-mono)">'+(r.nombre_vendus||0)+'</td><td>'+stockBadge+'</td><td style="font-family:var(--font-mono);font-size:13px;color:var(--text2)">'+(r.date_vente||'—')+'</td><td>'+(lieuMap[r.lieu_vente]||esc(r.lieu_vente||'—'))+'</td><td><button class="btn btn-danger btn-sm" onclick="deleteVente(\''+r.id+'\',\''+r.objet_id+'\','+r.nombre_vendus+','+modIdx+')">✕</button></td></tr>';
   }).join('');
 }
 async function openAddVente(){
   var sel=document.getElementById('vente-objet-id');
-  sel.innerHTML='<option value="">— Choisir un objet —</option>';
-  if(!objets||!objets.length){
-    var od=await api('GET','objets_vente',null,'?select=id,nom,stock&order=nom');
-    objets=od||[];
-  }
+  sel.innerHTML='<option value="">— Choisir un objet ou un module —</option>';
+  // Toujours recharger avec toutes les données de pièces
+  var od=await api('GET','objets_vente',null,'?select=id,nom,stock,piece_1_nom,piece_1_stock,piece_2_nom,piece_2_stock,piece_3_nom,piece_3_stock,piece_4_nom,piece_4_stock,piece_5_nom,piece_5_stock,piece_6_nom,piece_6_stock&order=nom');
+  objets=od||[];
+  // --- Groupe : Objets complets ---
+  var grpObj=document.createElement('optgroup');
+  grpObj.label='📦 Objets complets';
   objets.forEach(function(o){
     var opt=document.createElement('option');
-    opt.value=o.id; opt.textContent=o.nom+(o.stock!=null?' (stock: '+o.stock+')':'');
+    opt.value=o.id+'|0';
+    opt.textContent=o.nom+(o.stock!=null?' (stock: '+o.stock+')':'');
     opt.dataset.stock=o.stock!=null?o.stock:0;
-    sel.appendChild(opt);
+    opt.dataset.moduleIdx=0;
+    opt.dataset.moduleNom='';
+    grpObj.appendChild(opt);
   });
+  sel.appendChild(grpObj);
+  // --- Groupe : Modules individuels ---
+  var grpMod=document.createElement('optgroup');
+  grpMod.label='🧩 Modules individuels';
+  var hasModules=false;
+  objets.forEach(function(o){
+    for(var i=1;i<=6;i++){
+      var nomPiece=o['piece_'+i+'_nom'];
+      var stockPiece=o['piece_'+i+'_stock'];
+      if(nomPiece){
+        hasModules=true;
+        var opt=document.createElement('option');
+        opt.value=o.id+'|'+i;
+        opt.textContent=o.nom+' → '+nomPiece+(stockPiece!=null?' (stock: '+stockPiece+')':'');
+        opt.dataset.stock=stockPiece!=null?stockPiece:0;
+        opt.dataset.moduleIdx=i;
+        opt.dataset.moduleNom=nomPiece;
+        grpMod.appendChild(opt);
+      }
+    }
+  });
+  if(hasModules) sel.appendChild(grpMod);
   document.getElementById('vente-stock-actuel').value='';
   document.getElementById('vente-nb').value=1;
   document.getElementById('vente-stock-warning').style.display='none';
@@ -1926,44 +1968,52 @@ function onVenteNbChange(){
 }
 async function saveVente(e){
   e.preventDefault();
-  var objetId=document.getElementById('vente-objet-id').value;
+  var selEl=document.getElementById('vente-objet-id');
+  var rawVal=selEl.value; // "UUID|moduleIndex"
+  if(!rawVal){toast('Choisir un objet ou un module','error');return;}
+  var parts=rawVal.split('|');
+  var objetId=parts[0];
+  var moduleIdx=parseInt(parts[1])||0;
+  var opt=selEl.options[selEl.selectedIndex];
+  var moduleNom=opt?opt.dataset.moduleNom||'':'';
+  var stock=opt&&opt.dataset.stock!==undefined?parseInt(opt.dataset.stock):null;
   var nb=parseInt(document.getElementById('vente-nb').value)||0;
   var dateVente=document.getElementById('vente-date').value;
   var lieu=document.getElementById('vente-lieu').value;
-  var sel=document.getElementById('vente-objet-id');
-  var opt=sel.options[sel.selectedIndex];
-  var stock=opt&&opt.dataset.stock!==undefined?parseInt(opt.dataset.stock):null;
-  if(!objetId){toast('Choisir un objet','error');return;}
   if(nb<1){toast('Quantité invalide','error');return;}
   if(stock!=null&&nb>stock){toast('Quantité supérieure au stock !','error');return;}
   if(!lieu){toast('Choisir un lieu de vente','error');return;}
   try{
     // Enregistrer la vente
-    await api('POST','objets_vendus',{objet_id:objetId,nombre_vendus:nb,date_vente:dateVente,lieu_vente:lieu});
-    // Décrémenter le stock
+    await api('POST','objets_vendus',{objet_id:objetId,module_index:moduleIdx,module_nom:moduleNom||null,nombre_vendus:nb,date_vente:dateVente,lieu_vente:lieu});
+    // Décrémenter le bon champ de stock
     var newStock=stock!=null?Math.max(0,stock-nb):null;
-    if(newStock!=null) await api('PATCH','objets_vente',{stock:newStock},'?id=eq.'+objetId);
-    // Mettre à jour le cache local
-    var o=objets.find(function(x){return x.id===objetId;});
-    if(o&&newStock!=null) o.stock=newStock;
+    if(newStock!=null){
+      var patch={};
+      patch[moduleIdx>0?'piece_'+moduleIdx+'_stock':'stock']=newStock;
+      await api('PATCH','objets_vente',patch,'?id=eq.'+objetId);
+    }
     toast('Vente enregistrée ✓ — stock mis à jour','success');
     closeModal('modal-vente');
+    objets=[]; // forcer rechargement complet au prochain openAddVente
     await loadObjetsVendus();
   }catch(err){toast('Erreur : '+err.message,'error');}
 }
-async function deleteVente(id,objetId,nb){
+async function deleteVente(id,objetId,nb,moduleIdx){
+  moduleIdx=moduleIdx||0;
   if(!confirm('Supprimer cette vente ? Le stock sera restauré (+'+nb+' pièce(s)).')) return;
   try{
     await api('DELETE','objets_vendus',null,'?id=eq.'+id);
-    // Restaurer le stock
-    var objetData=await api('GET','objets_vente',null,'?id=eq.'+objetId+'&select=stock');
+    // Restaurer le bon champ de stock
+    var stockField=moduleIdx>0?'piece_'+moduleIdx+'_stock':'stock';
+    var objetData=await api('GET','objets_vente',null,'?id=eq.'+objetId+'&select='+stockField);
     if(objetData&&objetData.length){
-      var currentStock=objetData[0].stock||0;
-      await api('PATCH','objets_vente',{stock:currentStock+nb},'?id=eq.'+objetId);
-      var o=objets.find(function(x){return x.id===objetId;});
-      if(o) o.stock=currentStock+nb;
+      var currentStock=objetData[0][stockField]||0;
+      var patch={}; patch[stockField]=currentStock+nb;
+      await api('PATCH','objets_vente',patch,'?id=eq.'+objetId);
     }
     toast('Vente supprimée ✓ — stock restauré','success');
+    objets=[];
     await loadObjetsVendus();
   }catch(err){toast('Erreur : '+err.message,'error');}
 }
