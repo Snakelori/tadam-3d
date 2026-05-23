@@ -1425,6 +1425,7 @@ function updateParamConsoPrice(i){
 
 /* ======= PARAMÈTRES DE CALCUL ======= */
 var paramCalcul=null;
+var filaments=[];
 async function loadParamCalcul(){
   try{
     var data=await api('GET','param_calcul_prix',null,'?limit=1');
@@ -1628,16 +1629,22 @@ function calcTempsTotal(){
 var calculsData=[];
 async function loadCalculsPrix(){
   try{
-    var data=await api('GET','calculs_prix',null,'?select=*,objets_vente(nom)&order=created_at.desc');
+    // Charger objets si besoin (pour lookup nom côté client, pas de FK join)
+    if(!objets||!objets.length){var od=await api('GET','objets_vente',null,'?select=id,nom&order=nom');objets=od||[];}
+    var data=await api('GET','calculs_prix',null,'?select=*&order=created_at.desc');
     calculsData=data||[];
     renderCalculsPrix(calculsData);
-  }catch(err){document.getElementById('tbody-calculprix').innerHTML='<tr class="empty-row"><td colspan="8">Erreur de chargement</td></tr>';}
+  }catch(err){
+    var tb=document.getElementById('tbody-calculprix');
+    if(tb) tb.innerHTML='<tr class="empty-row"><td colspan="8">Erreur : '+err.message+'</td></tr>';
+  }
 }
 function renderCalculsPrix(data){
   var tbody=document.getElementById('tbody-calculprix');
-  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="8">Cliquez sur "+ Nouveau calcul"</td></tr>';return;}
+  if(!data||!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="8">Cliquez sur "+ Nouveau calcul"</td></tr>';return;}
   tbody.innerHTML=data.map(function(r){
-    return '<tr><td><strong>'+((r.objets_vente&&r.objets_vente.nom)||'—')+'</strong></td><td style="font-family:var(--font-mono)">'+(r.cout_produit_reel!=null?r.cout_produit_reel.toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono)">'+(r.cout_produit_echec!=null?r.cout_produit_echec.toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_sans_echec!=null?r.prix_vente_sans_echec.toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_avec_echec!=null?r.prix_vente_avec_echec.toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono)">'+(r.prix_moyen_constate!=null?r.prix_moyen_constate.toFixed(2)+' €':'—')+'</td><td style="font-size:12px;color:var(--text2)">'+(r.date_prix_moyen||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditCalculPrix(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'calculs_prix\',\''+r.id+'\',loadCalculsPrix)">✕</button></div></td></tr>';
+    var objNom=r.objet_id?(objets.find(function(o){return o.id===r.objet_id;})||{}).nom||'—':'—';
+    return '<tr><td><strong>'+objNom+'</strong></td><td style="font-family:var(--font-mono)">'+(r.cout_produit_reel!=null?parseFloat(r.cout_produit_reel).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono)">'+(r.cout_produit_echec!=null?parseFloat(r.cout_produit_echec).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_sans_echec!=null?parseFloat(r.prix_vente_sans_echec).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_avec_echec!=null?parseFloat(r.prix_vente_avec_echec).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono)">'+(r.prix_moyen_constate!=null?parseFloat(r.prix_moyen_constate).toFixed(2)+' €':'—')+'</td><td style="font-size:12px;color:var(--text2)">'+(r.date_prix_moyen||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditCalculPrix(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'calculs_prix\',\''+r.id+'\',loadCalculsPrix)">✕</button></div></td></tr>';
   }).join('');
 }
 
@@ -1716,6 +1723,7 @@ function calcTotalAccessoires(){
 
 var achatsAccessoires=[];
 async function openAddCalculPrix(){
+  try{
   document.getElementById('calc-edit-id').value='';
   document.getElementById('modal-calc-title').textContent='💰 NOUVEAU CALCUL DE PRIX';
   document.getElementById('btn-save-calc').textContent='💾 Enregistrer';
@@ -1724,7 +1732,7 @@ async function openAddCalculPrix(){
   // Charger paramètres
   if(!paramCalcul) await loadParamCalcul();
   // Charger filaments
-  if(!filaments||!filaments.length){var fd=await api('GET','filaments',null,'?order=marque');filaments=fd||[];}
+  if(!filaments.length){var fd=await api('GET','filaments',null,'?order=marque');filaments=fd||[];}
   populateCalcFilaments();
   // Charger accessoires
   var ad=await api('GET','achats_accessoires',null,'?order=produit');
@@ -1734,7 +1742,6 @@ async function openAddCalculPrix(){
   if(paramCalcul){
     var pct=document.getElementById('calc-pct-charge');
     if(pct) pct.value=paramCalcul.pct_charge_vente||0.2;
-    // coûts fixes
     var cfiche=document.getElementById('calc-cout-fiche');
     if(cfiche&&paramCalcul.cout_fiche_produit&&paramCalcul.nb_produit_rentabilite)
       cfiche.value=(paramCalcul.cout_fiche_produit/paramCalcul.nb_produit_rentabilite).toFixed(4)+' €';
@@ -1750,9 +1757,10 @@ async function openAddCalculPrix(){
   // Peupler select objet
   var sel=document.getElementById('sel-calc-objet');
   sel.innerHTML='<option value="">— Choisir un objet —</option>';
-  if(!objets||!objets.length){var od=await api('GET','objets_vente',null,'?order=nom');objets=od||[];}
+  if(!objets.length){var od=await api('GET','objets_vente',null,'?order=nom');objets=od||[];}
   objets.forEach(function(o){var opt=document.createElement('option');opt.value=o.id;opt.textContent=o.nom;sel.appendChild(opt);});
   openModal('modal-calculprix');
+  }catch(err){toast('Erreur ouverture formulaire : '+err.message,'error');}
 }
 
 function onObjetChange(){
