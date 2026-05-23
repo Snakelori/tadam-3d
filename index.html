@@ -137,6 +137,20 @@
     /* EDIT INLINE */
     .edit-input{padding:5px 8px;font-size:13px;border-radius:6px;border:1px solid var(--accent);background:#fff;color:var(--text);width:140px;}
 
+    /* SOUS-ONGLETS */
+    .subnav{display:flex;border-bottom:2px solid var(--border);margin-bottom:24px;gap:0;overflow-x:auto;}
+    .subnav-btn{font-family:var(--font-mono);font-size:12px;font-weight:700;padding:10px 18px;border:none;background:none;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;}
+    .subnav-btn:hover{color:var(--text);}
+    .subnav-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+    .subpage{display:none;}
+    .subpage.active{display:block;}
+
+    /* CALCUL PRIX */
+    .calc-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+    .calc-section-title{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+    .result-field{background:#e8f5f0;border:1px solid #a0dcc8;color:#0a7a5a;font-family:var(--font-mono);font-size:13px;font-weight:700;}
+    .result-highlight{background:#1a6bff;color:#fff;border-radius:var(--radius);padding:14px 18px;font-family:var(--font-mono);font-size:14px;font-weight:700;margin-top:6px;}
+
     /* FORM SECTION TITLE */
     .form-section-title{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin:16px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
 
@@ -322,24 +336,145 @@
 
     <!-- OBJETS À VENDRE -->
     <div class="page" id="page-objets">
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-label">Objets référencés</div><div class="stat-value accent" id="stat-obj-total">—</div></div>
-        <div class="stat-card"><div class="stat-label">Multi couleur</div><div class="stat-value teal" id="stat-obj-multi">—</div></div>
-        <div class="stat-card"><div class="stat-label">Catégories</div><div class="stat-value amber" id="stat-obj-cats">—</div></div>
+      <div class="subnav">
+        <button class="subnav-btn active" onclick="showSubPage('objets','catalogue',event)">📦 Catalogue</button>
+        <button class="subnav-btn" onclick="showSubPage('objets','consommables',event)">🧴 Consommables</button>
+        <button class="subnav-btn" onclick="showSubPage('objets','paramcalcul',event)">⚙️ Paramètres de calcul</button>
+        <button class="subnav-btn" onclick="showSubPage('objets','calculprix',event)">💰 Calcul du prix</button>
       </div>
-      <div class="section-header">
-        <div style="display:flex;align-items:center;gap:12px">
-          <span class="section-title">Objets à vendre</span>
-          <span class="count-badge" id="count-objets">0</span>
+
+      <!-- SOUS-PAGE : CATALOGUE -->
+      <div class="subpage active" id="subpage-catalogue">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Objets référencés</div><div class="stat-value accent" id="stat-obj-total">—</div></div>
+          <div class="stat-card"><div class="stat-label">Multi couleur</div><div class="stat-value teal" id="stat-obj-multi">—</div></div>
+          <div class="stat-card"><div class="stat-label">Catégories</div><div class="stat-value amber" id="stat-obj-cats">—</div></div>
         </div>
-        <button class="btn btn-primary" onclick="openAddObjet()">+ Ajouter</button>
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="section-title">Objets à vendre</span>
+            <span class="count-badge" id="count-objets">0</span>
+          </div>
+          <button class="btn btn-primary" onclick="openAddObjet()">+ Ajouter</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nom</th><th>Catégorie</th><th>Couleur principale</th><th>Nb pièces</th><th>Multi couleur</th><th>Temps total</th><th></th></tr></thead>
+            <tbody id="tbody-objets"><tr class="empty-row"><td colspan="7">Cliquez sur "+ Ajouter" pour créer un objet</td></tr></tbody>
+          </table>
+        </div>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Nom</th><th>Catégorie</th><th>Couleur principale</th><th>Nb pièces</th><th>Multi couleur</th><th>Temps total</th><th></th></tr></thead>
-          <tbody id="tbody-objets"><tr class="empty-row"><td colspan="7">Cliquez sur "+ Ajouter" pour créer un objet</td></tr></tbody>
-        </table>
+
+      <!-- SOUS-PAGE : CONSOMMABLES -->
+      <div class="subpage" id="subpage-consommables">
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="section-title">Consommables</span>
+            <span class="count-badge" id="count-consommables">0</span>
+          </div>
+          <button class="btn btn-primary" onclick="openAddConsommable()">+ Ajouter</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Produit</th><th>Fournisseur</th><th>Date achat</th><th>Qté</th><th>Prix unitaire (€)</th><th>Coûts/produit (€)</th><th></th></tr></thead>
+            <tbody id="tbody-consommables"><tr class="empty-row"><td colspan="7">Cliquez sur "+ Ajouter"</td></tr></tbody>
+          </table>
+        </div>
       </div>
+
+      <!-- SOUS-PAGE : PARAMÈTRES DE CALCUL -->
+      <div class="subpage" id="subpage-paramcalcul">
+        <div class="section-header"><span class="section-title">Paramètres de calcul du prix</span></div>
+        <form id="form-paramcalcul" onsubmit="saveParamCalcul(event)">
+          <input type="hidden" id="param-edit-id">
+          <div class="settings-grid">
+
+            <div class="settings-card">
+              <div class="settings-card-title">⚡ Consommation électrique</div>
+              <div class="form-group"><label>Prix KW/h (€)</label><input type="number" name="prix_kwh" step="0.001" placeholder="0.18"></div>
+            </div>
+
+            <div class="settings-card">
+              <div class="settings-card-title">🖨️ Utilisation imprimante</div>
+              <div class="form-group" style="margin-bottom:10px"><label>Usure par produit (€)</label><input type="number" name="usure_par_produit" step="0.01" placeholder="0.10"></div>
+              <div class="form-group" style="margin-bottom:10px"><label>Coût maintenance par produit (€)</label><input type="number" name="cout_maintenance" step="0.01" placeholder="0.05"></div>
+              <div class="form-group"><label>Taux horaire main d'œuvre (€/h)</label><input type="number" name="taux_horaire_mo" step="0.01" placeholder="15.00"></div>
+            </div>
+
+            <div class="settings-card">
+              <div class="settings-card-title">📋 Coûts fixes</div>
+              <div class="form-group" style="margin-bottom:10px"><label>Coût fiche produit (€)</label><input type="number" name="cout_fiche_produit" step="0.01" placeholder="0.00"></div>
+              <div class="form-group" style="margin-bottom:10px"><label>Nb produits pour rentabilité</label><input type="number" name="nb_produit_rentabilite" step="1" placeholder="100"></div>
+              <div class="form-group" style="margin-bottom:10px">
+                <label>Coût unitaire fiche produit (calculé)</label>
+                <input type="text" id="preview-cout-fiche" class="calc-field" readonly>
+              </div>
+              <div class="form-group"><label>Coût logistique unitaire (€)</label><input type="number" name="cout_logistique_unitaire" step="0.01" placeholder="0.50"></div>
+            </div>
+
+            <div class="settings-card">
+              <div class="settings-card-title">🧴 Consommables inclus</div>
+              <div style="margin-bottom:10px">
+                <label style="font-family:var(--font-mono);font-size:10px;color:var(--text3);text-transform:uppercase">Consommable 1</label>
+                <div style="display:flex;gap:8px;margin-top:6px">
+                  <select id="param-conso-1" style="flex:2" onchange="updateParamConsoPrice(1)"><option value="">— Choisir —</option></select>
+                  <input type="number" id="param-conso-1-qte" placeholder="Qté" step="0.01" min="0" style="flex:1">
+                  <input type="text" id="param-conso-1-prix" class="calc-field" readonly placeholder="€" style="flex:1">
+                </div>
+              </div>
+              <div style="margin-bottom:10px">
+                <label style="font-family:var(--font-mono);font-size:10px;color:var(--text3);text-transform:uppercase">Consommable 2</label>
+                <div style="display:flex;gap:8px;margin-top:6px">
+                  <select id="param-conso-2" style="flex:2" onchange="updateParamConsoPrice(2)"><option value="">— Choisir —</option></select>
+                  <input type="number" id="param-conso-2-qte" placeholder="Qté" step="0.01" min="0" style="flex:1">
+                  <input type="text" id="param-conso-2-prix" class="calc-field" readonly placeholder="€" style="flex:1">
+                </div>
+              </div>
+              <div>
+                <label style="font-family:var(--font-mono);font-size:10px;color:var(--text3);text-transform:uppercase">Consommable 3</label>
+                <div style="display:flex;gap:8px;margin-top:6px">
+                  <select id="param-conso-3" style="flex:2" onchange="updateParamConsoPrice(3)"><option value="">— Choisir —</option></select>
+                  <input type="number" id="param-conso-3-qte" placeholder="Qté" step="0.01" min="0" style="flex:1">
+                  <input type="text" id="param-conso-3-prix" class="calc-field" readonly placeholder="€" style="flex:1">
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-card">
+              <div class="settings-card-title">🛒 Frais vente en ligne</div>
+              <div class="form-group" style="margin-bottom:10px"><label>Site de mise en vente</label><input type="text" name="site_vente" placeholder="ex: Etsy, Leboncoin..."></div>
+              <div class="form-group" style="margin-bottom:10px"><label>Coût mise en vente d'un produit (€)</label><input type="number" name="cout_mise_en_vente" step="0.01" placeholder="0.20"></div>
+              <div class="form-group"><label>% charge de vente en ligne</label><input type="number" name="pct_charge_vente" step="0.01" placeholder="0.20" value="0.20"></div>
+            </div>
+
+            <div class="settings-card">
+              <div class="settings-card-title">💰 Vente & Fiscalité</div>
+              <div class="form-group" style="margin-bottom:10px"><label>Taux de marge de vente (ex: 3 = 300%)</label><input type="number" name="taux_marge_vente" step="0.01" placeholder="3.00" value="3.00"></div>
+              <div class="form-group" style="margin-bottom:10px"><label>URSSAF (%)</label><input type="number" name="taux_ursaff" step="0.001" placeholder="0.123" value="0.123"></div>
+              <div class="form-group"><label>Impôt (%)</label><input type="number" name="taux_impot" step="0.01" placeholder="0.29" value="0.29"></div>
+            </div>
+
+          </div>
+          <div style="margin-top:20px;display:flex;justify-content:flex-end">
+            <button type="submit" class="btn btn-primary">💾 Enregistrer les paramètres</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- SOUS-PAGE : CALCUL DU PRIX -->
+      <div class="subpage" id="subpage-calculprix">
+        <div class="section-header">
+          <span class="section-title">Calcul du prix des produits</span>
+          <button class="btn btn-primary" onclick="openAddCalculPrix()">+ Nouveau calcul</button>
+        </div>
+        <div class="table-wrap" style="margin-bottom:20px">
+          <table>
+            <thead><tr><th>Produit</th><th>Coût réel</th><th>Coût avec échec</th><th>Prix vente (sans échec)</th><th>Prix vente (avec échec)</th><th>Prix moyen constaté</th><th>Date</th><th></th></tr></thead>
+            <tbody id="tbody-calculprix"><tr class="empty-row"><td colspan="8">Cliquez sur "+ Nouveau calcul"</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
     <!-- IMPORT / EXPORT -->
@@ -439,6 +574,8 @@
         <div class="form-group"><label>Prix unitaire (calculé)</label><input type="text" class="calc-field" id="preview-prix-unit" readonly placeholder="0.0000 €/unité"></div>
         <div class="form-group"><label>Prix par impression (€)</label><input type="number" name="prix_par_impression" placeholder="0.05" step="0.0001" min="0"></div>
         <div class="form-group"><label>Stock restant</label><input type="number" name="stock_restant" placeholder="Idem quantité" step="0.01" min="0"></div>
+        <div class="form-group"><label>Durée de vie (HH:mm)</label><input type="text" name="duree_vie" id="acc-duree-vie" placeholder="ex: 200:00" oninput="calcCoutHeure()"></div>
+        <div class="form-group"><label>Coûts/h (calculé)</label><input type="text" id="acc-cout-heure" class="calc-field" readonly placeholder="€/h"></div>
         <div class="form-group" style="display:flex;flex-direction:row;align-items:center;gap:12px;padding-top:20px">
           <input type="checkbox" name="inclure_dans_cout" id="chk-inclure" checked style="width:18px;height:18px;accent-color:var(--accent)">
           <label for="chk-inclure" style="text-transform:none;font-size:14px;cursor:pointer">Inclure dans coût d'impression</label>
@@ -486,6 +623,28 @@
       <button type="button" class="btn btn-ghost" onclick="closeModal('modal-edit-item')">Annuler</button>
       <button type="button" class="btn btn-primary" onclick="saveEditItem()">Enregistrer</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL CONSOMMABLE -->
+<div class="modal-overlay" id="modal-consommable">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title" id="modal-conso-title">+ NOUVEAU CONSOMMABLE</div>
+    <form id="form-consommable" onsubmit="saveConsommable(event)">
+      <input type="hidden" id="conso-edit-id">
+      <div class="form-grid">
+        <div class="form-group full"><label>Produit *</label><input type="text" name="produit" required placeholder="ex: Alcool isopropylique"></div>
+        <div class="form-group full"><label>Fournisseur</label><input type="text" name="fournisseur" placeholder="ex: Amazon"></div>
+        <div class="form-group"><label>Date d'achat</label><input type="date" name="date_achat" id="conso-date-achat"></div>
+        <div class="form-group"><label>Quantité</label><input type="number" name="quantite" step="0.01" min="0" placeholder="1"></div>
+        <div class="form-group"><label>Prix unitaire (€)</label><input type="number" name="prix_unitaire" step="0.01" min="0" placeholder="0.00"></div>
+        <div class="form-group"><label>Coûts par produit (€)</label><input type="number" name="cout_par_produit" step="0.01" min="0" placeholder="0.00"></div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-consommable')">Annuler</button>
+        <button type="submit" class="btn btn-primary" id="btn-save-conso">Enregistrer</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -591,6 +750,114 @@
       <div class="form-actions">
         <button type="button" class="btn btn-ghost" onclick="closeModal('modal-objet')">Annuler</button>
         <button type="submit" class="btn btn-primary" id="btn-save-obj">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL CALCUL DU PRIX -->
+<div class="modal-overlay" id="modal-calculprix">
+  <div class="modal" style="max-width:720px">
+    <div class="modal-title" id="modal-calc-title">💰 NOUVEAU CALCUL DE PRIX</div>
+    <form id="form-calculprix" onsubmit="saveCalculPrix(event)">
+      <input type="hidden" id="calc-edit-id">
+
+      <!-- Produit -->
+      <div class="calc-section">
+        <div class="calc-section-title">🛍️ Produit à imprimer</div>
+        <div class="form-grid">
+          <div class="form-group full"><label>Produit *</label><select name="objet_id" id="sel-calc-objet" onchange="onObjetChange()" required><option value="">— Choisir un objet —</option></select></div>
+          <div class="form-group full">
+            <label>Modules à imprimer</label>
+            <div id="calc-modules-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;min-height:32px;padding:10px;background:var(--bg3);border-radius:8px;font-size:13px;color:var(--text3)">Sélectionnez d'abord un produit</div>
+          </div>
+          <div class="form-group"><label>Temps d'impression total (calculé)</label><input type="text" id="calc-temps-total" class="calc-field" readonly></div>
+          <div class="form-group"><label>Quantité matière totale (g) (calculé)</label><input type="text" id="calc-qte-total" class="calc-field" readonly></div>
+          <div class="form-group"><label>Nb de couleurs (calculé)</label><input type="text" id="calc-nb-couleurs" class="calc-field" readonly></div>
+        </div>
+      </div>
+
+      <!-- Filaments -->
+      <div class="calc-section">
+        <div class="calc-section-title">🧵 Filaments utilisés</div>
+        <div id="calc-filaments-container">
+          <!-- Généré dynamiquement pour 10 filaments -->
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;font-family:var(--font-mono);font-size:12px">
+          <span style="color:var(--text2)">Total matière :</span>
+          <strong id="calc-total-matiere">0 g</strong>
+          <span style="color:var(--text2);margin-left:12px">Total coût filaments :</span>
+          <strong id="calc-total-fil-cout" style="color:var(--teal)">0.00 €</strong>
+        </div>
+      </div>
+
+      <!-- Accessoires -->
+      <div class="calc-section">
+        <div class="calc-section-title">🛒 Accessoires à prendre en compte</div>
+        <div id="calc-accessoires-list" style="display:flex;flex-wrap:wrap;gap:8px;min-height:40px;padding:10px;background:var(--bg3);border-radius:8px;font-size:13px;color:var(--text3)">Chargement...</div>
+        <div style="margin-top:10px;font-family:var(--font-mono);font-size:12px">
+          <span style="color:var(--text2)">Total coût accessoires :</span>
+          <strong id="calc-total-acc-cout" style="color:var(--teal)">0.00 €</strong>
+        </div>
+      </div>
+
+      <!-- Coûts fixes -->
+      <div class="calc-section">
+        <div class="calc-section-title">📋 Coûts fixes</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Coût fiche produit (€)</label><input type="text" id="calc-cout-fiche" class="calc-field" readonly></div>
+          <div class="form-group"><label>Coût logistique (€)</label><input type="text" id="calc-cout-logistique" class="calc-field" readonly></div>
+        </div>
+      </div>
+
+      <!-- Électrique -->
+      <div class="calc-section">
+        <div class="calc-section-title">⚡ Électricité</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Nb d'heures d'impression (HH:mm)</label><input type="text" name="nb_heures_impression" id="calc-nb-heures" placeholder="02:30" oninput="calcTotalElec()"></div>
+          <div class="form-group"><label>Total coût électrique (€)</label><input type="text" id="calc-cout-elec" class="calc-field" readonly></div>
+        </div>
+      </div>
+
+      <!-- Main d'oeuvre -->
+      <div class="calc-section">
+        <div class="calc-section-title">👷 Main d'œuvre & Imprimante</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Usure par produit (€)</label><input type="text" id="calc-cout-usure" class="calc-field" readonly></div>
+          <div class="form-group"><label>Coût maintenance (€)</label><input type="text" id="calc-cout-maintenance" class="calc-field" readonly></div>
+          <div class="form-group"><label>Nb heures main d'œuvre</label><input type="number" name="nb_heures_mo" id="calc-nb-mo" step="0.25" min="0" placeholder="0" oninput="calcTotalMO()"></div>
+          <div class="form-group"><label>Total coût main d'œuvre (€)</label><input type="text" id="calc-cout-mo" class="calc-field" readonly></div>
+        </div>
+      </div>
+
+      <!-- Taux d'échec -->
+      <div class="calc-section">
+        <div class="calc-section-title">❌ Taux d'échec</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Taux d'échec (%)</label><input type="number" name="taux_echec" id="calc-taux-echec" step="0.01" min="0" max="100" placeholder="0" oninput="calcResultats()"></div>
+          <div class="form-group"><label>Frais mise en vente (€)</label><input type="text" id="calc-cout-vente" class="calc-field" readonly></div>
+        </div>
+      </div>
+
+      <!-- Résultats -->
+      <div class="calc-section" style="background:#f0f5ff;border-color:#b3caff">
+        <div class="calc-section-title" style="color:var(--accent)">📊 Résultats</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Coût produit réel (€)</label><input type="text" id="calc-cout-reel" class="result-field" readonly></div>
+          <div class="form-group"><label>Coût produit avec échec (€)</label><input type="text" id="calc-cout-echec" class="result-field" readonly></div>
+          <div class="form-group"><label>% charge vente (modifiable)</label><input type="number" name="pct_charge_vente" id="calc-pct-charge" step="0.01" min="0" oninput="calcResultats()"></div>
+          <div class="form-group"><label>Coût fabrication réel (€)</label><input type="text" id="calc-fab-reel" class="result-field" readonly></div>
+          <div class="form-group"><label>Coût fabrication avec échec (€)</label><input type="text" id="calc-fab-echec" class="result-field" readonly></div>
+          <div class="form-group"><label>Prix vente sans échec (€)</label><input type="text" id="calc-prix-sans" class="result-field" readonly></div>
+          <div class="form-group"><label>Prix vente avec échec (€)</label><input type="text" id="calc-prix-avec" class="result-field" readonly></div>
+          <div class="form-group"><label>Prix moyen constaté (€)</label><input type="number" name="prix_moyen_constate" step="0.01" min="0" placeholder="0.00"></div>
+          <div class="form-group"><label>Date du prix constaté</label><input type="date" name="date_prix_moyen"></div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-calculprix')">Annuler</button>
+        <button type="submit" class="btn btn-primary" id="btn-save-calc">💾 Enregistrer</button>
       </div>
     </form>
   </div>
@@ -966,7 +1233,9 @@ async function openEditAccessoire(id){
     form.prix_par_impression.value=r.prix_par_impression||'';
     form.stock_restant.value=r.stock_restant||'';
     document.getElementById('chk-inclure').checked=r.inclure_dans_cout||false;
+    document.getElementById('acc-duree-vie').value=r.duree_vie||'';
     calcPrixUnit();
+    calcCoutHeure();
   }catch(err){toast('Erreur : '+err.message,'error');}
 }
 async function saveAccessoire(e){
@@ -976,7 +1245,9 @@ async function saveAccessoire(e){
   btn.textContent='...'; btn.disabled=true;
   try{
     var qte=parseFloat(form.quantite.value);
-    var body={produit:form.produit.value.trim(),type_produit:form.type_produit.value,date_achat:form.date_achat.value||null,quantite:qte,prix_total_euros:parseFloat(form.prix_total_euros.value),inclure_dans_cout:form.inclure_dans_cout.checked,prix_par_impression:form.prix_par_impression.value?parseFloat(form.prix_par_impression.value):null,stock_restant:form.stock_restant.value?parseFloat(form.stock_restant.value):qte,fournisseur_id:form.fournisseur_id.value||null};
+    var coutHStr=document.getElementById('acc-cout-heure').value;
+    var coutHVal=coutHStr?parseFloat(coutHStr):null;
+    var body={produit:form.produit.value.trim(),type_produit:form.type_produit.value,date_achat:form.date_achat.value||null,quantite:qte,prix_total_euros:parseFloat(form.prix_total_euros.value),inclure_dans_cout:form.inclure_dans_cout.checked,prix_par_impression:form.prix_par_impression.value?parseFloat(form.prix_par_impression.value):null,stock_restant:form.stock_restant.value?parseFloat(form.stock_restant.value):qte,fournisseur_id:form.fournisseur_id.value||null,duree_vie:form.duree_vie.value||null,cout_heure:isNaN(coutHVal)?null:coutHVal};
     if(editId){await api('PATCH','achats_accessoires',body,'?id=eq.'+editId);toast('Accessoire modifié ✓','success');}
     else{await api('POST','achats_accessoires',body);toast('Accessoire ajouté ✓','success');}
     closeModal('modal-accessoire'); form.reset();
@@ -1052,6 +1323,173 @@ function toast(msg,type){
   clearTimeout(toastTimer);
   toastTimer=setTimeout(function(){el.classList.remove('show');},3000);
 }
+
+/* ======= SOUS-ONGLETS ======= */
+function showSubPage(pageId, subName, e) {
+  var page = document.getElementById('page-'+pageId);
+  page.querySelectorAll('.subpage').forEach(function(p){p.classList.remove('active');});
+  page.querySelectorAll('.subnav-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('subpage-'+subName).classList.add('active');
+  if(e&&e.target) e.target.classList.add('active');
+  if(subName==='consommables') loadConsommables();
+  if(subName==='paramcalcul') loadParamCalcul();
+  if(subName==='calculprix') loadCalculsPrix();
+}
+
+/* ======= ACCESSOIRES : DURÉE DE VIE ======= */
+function calcCoutHeure() {
+  var duree = document.getElementById('acc-duree-vie').value;
+  var pu = parseFloat(document.querySelector('#form-accessoire [name=prix_total_euros]')&&document.querySelector('#form-accessoire [name=prix_total_euros]').value)||0;
+  var qte = parseFloat(document.querySelector('#form-accessoire [name=quantite]')&&document.querySelector('#form-accessoire [name=quantite]').value)||1;
+  var prixUnit = qte>0 ? pu/qte : 0;
+  var heures = parseHHmm(duree)/60;
+  var cout = document.getElementById('acc-cout-heure');
+  if(cout) cout.value = heures>0 ? (prixUnit/heures).toFixed(4)+' €/h' : '';
+}
+
+/* ======= CONSOMMABLES ======= */
+var consommables=[];
+async function loadConsommables(){
+  try{
+    var data=await api('GET','consommables',null,'?order=created_at.desc');
+    consommables=data||[];
+    renderConsommables(consommables);
+    populateConsoSelects();
+  }catch(err){document.getElementById('tbody-consommables').innerHTML='<tr class="empty-row"><td colspan="7">Erreur de chargement</td></tr>';}
+}
+function renderConsommables(data){
+  document.getElementById('count-consommables').textContent=data.length;
+  var tbody=document.getElementById('tbody-consommables');
+  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">Aucun consommable — cliquez sur "+ Ajouter"</td></tr>';return;}
+  tbody.innerHTML=data.map(function(r){
+    return '<tr><td><strong>'+(r.produit||'—')+'</strong></td><td>'+(r.fournisseur||'—')+'</td><td style="font-family:var(--font-mono);font-size:12px">'+(r.date_achat||'—')+'</td><td style="font-family:var(--font-mono)">'+(r.quantite||'—')+'</td><td style="font-family:var(--font-mono)">'+(r.prix_unitaire!=null?parseFloat(r.prix_unitaire).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono)">'+(r.cout_par_produit!=null?parseFloat(r.cout_par_produit).toFixed(2)+' €':'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditConsommable(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'consommables\',\''+r.id+'\',loadConsommables)">✕</button></div></td></tr>';
+  }).join('');
+}
+function openAddConsommable(){
+  document.getElementById('conso-edit-id').value='';
+  document.getElementById('modal-conso-title').textContent='+ NOUVEAU CONSOMMABLE';
+  document.getElementById('btn-save-conso').textContent='Enregistrer';
+  document.getElementById('form-consommable').reset();
+  var d=new Date().toISOString().split('T')[0];
+  document.getElementById('conso-date-achat').value=d;
+  openModal('modal-consommable');
+}
+async function openEditConsommable(id){
+  try{
+    var data=await api('GET','consommables',null,'?id=eq.'+id+'&select=*');
+    if(!data||!data.length){toast('Introuvable','error');return;}
+    var r=data[0];
+    document.getElementById('conso-edit-id').value=r.id;
+    document.getElementById('modal-conso-title').textContent='✏️ MODIFIER CONSOMMABLE';
+    document.getElementById('btn-save-conso').textContent='Enregistrer les modifications';
+    openModal('modal-consommable');
+    var form=document.getElementById('form-consommable');
+    form.produit.value=r.produit||''; form.fournisseur.value=r.fournisseur||'';
+    document.getElementById('conso-date-achat').value=r.date_achat||'';
+    form.quantite.value=r.quantite||''; form.prix_unitaire.value=r.prix_unitaire||'';
+    form.cout_par_produit.value=r.cout_par_produit||'';
+  }catch(err){toast('Erreur : '+err.message,'error');}
+}
+async function saveConsommable(e){
+  e.preventDefault();
+  var form=e.target, btn=document.getElementById('btn-save-conso');
+  var editId=document.getElementById('conso-edit-id').value;
+  btn.textContent='...'; btn.disabled=true;
+  try{
+    var body={produit:form.produit.value.trim(),fournisseur:form.fournisseur.value||null,date_achat:form.date_achat.value||null,quantite:parseFloat(form.quantite.value)||null,prix_unitaire:parseFloat(form.prix_unitaire.value)||null,cout_par_produit:parseFloat(form.cout_par_produit.value)||null};
+    if(editId){await api('PATCH','consommables',body,'?id=eq.'+editId);toast('Modifié ✓','success');}
+    else{await api('POST','consommables',body);toast('Ajouté ✓','success');}
+    closeModal('modal-consommable'); form.reset();
+    await loadConsommables();
+  }catch(err){toast('Erreur : '+err.message,'error');}
+  btn.textContent='Enregistrer'; btn.disabled=false;
+}
+function populateConsoSelects(){
+  [1,2,3].forEach(function(i){
+    var sel=document.getElementById('param-conso-'+i);
+    if(!sel) return;
+    var cur=sel.value;
+    sel.innerHTML='<option value="">— Choisir —</option>';
+    consommables.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.produit;o.dataset.prix=c.prix_unitaire||0;sel.appendChild(o);});
+    sel.value=cur;
+  });
+}
+function updateParamConsoPrice(i){
+  var sel=document.getElementById('param-conso-'+i);
+  var opt=sel.options[sel.selectedIndex];
+  var prix=parseFloat(opt&&opt.dataset.prix)||0;
+  var qte=parseFloat(document.getElementById('param-conso-'+i+'-qte').value)||0;
+  var el=document.getElementById('param-conso-'+i+'-prix');
+  if(el) el.value=(prix*qte).toFixed(2)+' €';
+}
+
+/* ======= PARAMÈTRES DE CALCUL ======= */
+var paramCalcul=null;
+async function loadParamCalcul(){
+  try{
+    var data=await api('GET','param_calcul_prix',null,'?limit=1');
+    if(data&&data.length){
+      paramCalcul=data[0];
+      fillParamForm(paramCalcul);
+    }
+    if(consommables.length===0) await loadConsommables();
+    else populateConsoSelects();
+  }catch(err){toast('Erreur chargement paramètres','error');}
+}
+function fillParamForm(r){
+  var form=document.getElementById('form-paramcalcul');
+  if(!form) return;
+  document.getElementById('param-edit-id').value=r.id||'';
+  ['prix_kwh','usure_par_produit','cout_maintenance','taux_horaire_mo','cout_fiche_produit','nb_produit_rentabilite','cout_logistique_unitaire','site_vente','cout_mise_en_vente','pct_charge_vente','taux_marge_vente','taux_ursaff','taux_impot'].forEach(function(f){
+    if(form[f]) form[f].value=r[f]!=null?r[f]:'';
+  });
+  updateCoutFichePreview();
+  [1,2,3].forEach(function(i){
+    var sel=document.getElementById('param-conso-'+i);
+    if(sel&&r['conso_'+i+'_id']) sel.value=r['conso_'+i+'_id'];
+    var qte=document.getElementById('param-conso-'+i+'-qte');
+    if(qte) qte.value=r['conso_'+i+'_qte']||'';
+    updateParamConsoPrice(i);
+  });
+}
+function updateCoutFichePreview(){
+  var form=document.getElementById('form-paramcalcul');
+  if(!form) return;
+  var cout=parseFloat(form.cout_fiche_produit&&form.cout_fiche_produit.value)||0;
+  var nb=parseInt(form.nb_produit_rentabilite&&form.nb_produit_rentabilite.value)||1;
+  var el=document.getElementById('preview-cout-fiche');
+  if(el) el.value=nb>0?(cout/nb).toFixed(4)+' €':'';
+}
+async function saveParamCalcul(e){
+  e.preventDefault();
+  var form=e.target;
+  var editId=document.getElementById('param-edit-id').value;
+  var body={
+    prix_kwh:parseFloat(form.prix_kwh.value)||null,
+    usure_par_produit:parseFloat(form.usure_par_produit.value)||null,
+    cout_maintenance:parseFloat(form.cout_maintenance.value)||null,
+    taux_horaire_mo:parseFloat(form.taux_horaire_mo.value)||null,
+    cout_fiche_produit:parseFloat(form.cout_fiche_produit.value)||null,
+    nb_produit_rentabilite:parseInt(form.nb_produit_rentabilite.value)||null,
+    cout_logistique_unitaire:parseFloat(form.cout_logistique_unitaire.value)||null,
+    site_vente:form.site_vente.value||null,
+    cout_mise_en_vente:parseFloat(form.cout_mise_en_vente.value)||null,
+    pct_charge_vente:parseFloat(form.pct_charge_vente.value)||null,
+    taux_marge_vente:parseFloat(form.taux_marge_vente.value)||null,
+    taux_ursaff:parseFloat(form.taux_ursaff.value)||null,
+    taux_impot:parseFloat(form.taux_impot.value)||null
+  };
+  [1,2,3].forEach(function(i){
+    body['conso_'+i+'_id']=document.getElementById('param-conso-'+i).value||null;
+    body['conso_'+i+'_qte']=parseFloat(document.getElementById('param-conso-'+i+'-qte').value)||null;
+  });
+  try{
+    if(editId){await api('PATCH','param_calcul_prix',body,'?id=eq.'+editId);paramCalcul={id:editId,...body};}
+    else{var res=await api('POST','param_calcul_prix',body);paramCalcul=Array.isArray(res)?res[0]:res;document.getElementById('param-edit-id').value=paramCalcul.id;}
+    toast('Paramètres enregistrés ✓','success');
+  }catch(err){toast('Erreur : '+err.message,'error');}
+}
+/* ======= FIN PARAMÈTRES ======= */
 
 /* ======= MODULE OBJETS À VENDRE ======= */
 var objets=[];
@@ -1185,6 +1623,301 @@ function calcTempsTotal(){
   document.getElementById('obj-temps-total').value=total>0?formatHHmm(total):'';
 }
 /* ======= FIN MODULE OBJETS ======= */
+
+/* ======= CALCUL DU PRIX ======= */
+var calculsData=[];
+async function loadCalculsPrix(){
+  try{
+    var data=await api('GET','calculs_prix',null,'?select=*,objets_vente(nom)&order=created_at.desc');
+    calculsData=data||[];
+    renderCalculsPrix(calculsData);
+  }catch(err){document.getElementById('tbody-calculprix').innerHTML='<tr class="empty-row"><td colspan="8">Erreur de chargement</td></tr>';}
+}
+function renderCalculsPrix(data){
+  var tbody=document.getElementById('tbody-calculprix');
+  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="8">Cliquez sur "+ Nouveau calcul"</td></tr>';return;}
+  tbody.innerHTML=data.map(function(r){
+    return '<tr><td><strong>'+((r.objets_vente&&r.objets_vente.nom)||'—')+'</strong></td><td style="font-family:var(--font-mono)">'+(r.cout_produit_reel!=null?r.cout_produit_reel.toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono)">'+(r.cout_produit_echec!=null?r.cout_produit_echec.toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_sans_echec!=null?r.prix_vente_sans_echec.toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_avec_echec!=null?r.prix_vente_avec_echec.toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono)">'+(r.prix_moyen_constate!=null?r.prix_moyen_constate.toFixed(2)+' €':'—')+'</td><td style="font-size:12px;color:var(--text2)">'+(r.date_prix_moyen||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditCalculPrix(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'calculs_prix\',\''+r.id+'\',loadCalculsPrix)">✕</button></div></td></tr>';
+  }).join('');
+}
+
+function buildFilamentsUI(){
+  var html='';
+  for(var i=1;i<=10;i++){
+    html+='<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;align-items:center">';
+    html+='<select id="calc-fil-'+i+'" onchange="onFilamentChange('+i+')" style="font-size:13px"><option value="">— Filament '+i+' —</option></select>';
+    html+='<input type="number" id="calc-fil-'+i+'-qte" placeholder="g" step="0.1" min="0" oninput="calcTotalFilaments()" style="font-size:13px">';
+    html+='<input type="text" id="calc-fil-'+i+'-temps" placeholder="HH:mm" oninput="calcTotalFilaments()" style="font-size:13px">';
+    html+='<input type="text" id="calc-fil-'+i+'-prix" class="calc-field" readonly placeholder="0.00 €" style="font-size:12px">';
+    html+='</div>';
+  }
+  var container=document.getElementById('calc-filaments-container');
+  if(container) container.innerHTML=html;
+}
+
+function populateCalcFilaments(){
+  for(var i=1;i<=10;i++){
+    var sel=document.getElementById('calc-fil-'+i);
+    if(!sel) continue;
+    var cur=sel.value;
+    sel.innerHTML='<option value="">— Filament '+i+' —</option>';
+    filaments.forEach(function(f){
+      var o=document.createElement('option');
+      o.value=f.id; o.textContent=f.id_bobine+' – '+f.marque+' '+f.couleur+' ('+f.type_matiere+')';
+      o.dataset.prixg=f.prix_par_gramme||0;
+      sel.appendChild(o);
+    });
+    sel.value=cur;
+  }
+}
+
+function onFilamentChange(i){
+  var sel=document.getElementById('calc-fil-'+i);
+  var opt=sel.options[sel.selectedIndex];
+  var prixG=parseFloat(opt&&opt.dataset.prixg)||0;
+  document.getElementById('calc-fil-'+i+'-prixg')||(function(){})(); // skip if not present
+  calcTotalFilaments();
+}
+
+function calcTotalFilaments(){
+  var totalQte=0, totalCout=0;
+  for(var i=1;i<=10;i++){
+    var sel=document.getElementById('calc-fil-'+i); if(!sel) continue;
+    var opt=sel.options[sel.selectedIndex];
+    var prixG=parseFloat(opt&&opt.dataset.prixg)||0;
+    var qte=parseFloat(document.getElementById('calc-fil-'+i+'-qte').value)||0;
+    var cout=prixG*qte;
+    var prixEl=document.getElementById('calc-fil-'+i+'-prix');
+    if(prixEl) prixEl.value=cout>0?cout.toFixed(4)+' €':'';
+    totalQte+=qte; totalCout+=cout;
+  }
+  var tm=document.getElementById('calc-total-matiere'); if(tm) tm.textContent=totalQte.toFixed(1)+' g';
+  var tc=document.getElementById('calc-total-fil-cout'); if(tc) tc.textContent=totalCout.toFixed(4)+' €';
+  calcResultats();
+}
+
+function buildAccessoiresCheckboxes(){
+  var el=document.getElementById('calc-accessoires-list');
+  if(!el) return;
+  if(!achatsAccessoires||!achatsAccessoires.length){el.innerHTML='<span style="color:var(--text3)">Aucun accessoire en base</span>';return;}
+  el.innerHTML=achatsAccessoires.map(function(a){
+    return '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px 8px;background:var(--bg2);border-radius:6px;font-size:13px"><input type="checkbox" value="'+a.id+'" data-cout="'+(a.prix_par_impression||0)+'" onchange="calcTotalAccessoires()" style="accent-color:var(--accent)">'+a.produit+'<span style="font-family:var(--font-mono);font-size:11px;color:var(--text3)"> ('+parseFloat(a.prix_par_impression||0).toFixed(4)+'€/imp)</span></label>';
+  }).join('');
+}
+
+function calcTotalAccessoires(){
+  var total=0;
+  document.querySelectorAll('#calc-accessoires-list input[type=checkbox]:checked').forEach(function(cb){
+    total+=parseFloat(cb.dataset.cout)||0;
+  });
+  var el=document.getElementById('calc-total-acc-cout'); if(el) el.textContent=total.toFixed(4)+' €';
+  calcResultats();
+}
+
+var achatsAccessoires=[];
+async function openAddCalculPrix(){
+  document.getElementById('calc-edit-id').value='';
+  document.getElementById('modal-calc-title').textContent='💰 NOUVEAU CALCUL DE PRIX';
+  document.getElementById('btn-save-calc').textContent='💾 Enregistrer';
+  document.getElementById('form-calculprix').reset();
+  buildFilamentsUI();
+  // Charger paramètres
+  if(!paramCalcul) await loadParamCalcul();
+  // Charger filaments
+  if(!filaments||!filaments.length){var fd=await api('GET','filaments',null,'?order=marque');filaments=fd||[];}
+  populateCalcFilaments();
+  // Charger accessoires
+  var ad=await api('GET','achats_accessoires',null,'?order=produit');
+  achatsAccessoires=ad||[];
+  buildAccessoiresCheckboxes();
+  // Pré-remplir depuis params
+  if(paramCalcul){
+    var pct=document.getElementById('calc-pct-charge');
+    if(pct) pct.value=paramCalcul.pct_charge_vente||0.2;
+    // coûts fixes
+    var cfiche=document.getElementById('calc-cout-fiche');
+    if(cfiche&&paramCalcul.cout_fiche_produit&&paramCalcul.nb_produit_rentabilite)
+      cfiche.value=(paramCalcul.cout_fiche_produit/paramCalcul.nb_produit_rentabilite).toFixed(4)+' €';
+    var clog=document.getElementById('calc-cout-logistique');
+    if(clog) clog.value=paramCalcul.cout_logistique_unitaire?paramCalcul.cout_logistique_unitaire.toFixed(2)+' €':'';
+    var cusure=document.getElementById('calc-cout-usure');
+    if(cusure) cusure.value=paramCalcul.usure_par_produit?paramCalcul.usure_par_produit.toFixed(2)+' €':'';
+    var cmaint=document.getElementById('calc-cout-maintenance');
+    if(cmaint) cmaint.value=paramCalcul.cout_maintenance?paramCalcul.cout_maintenance.toFixed(2)+' €':'';
+    var cvente=document.getElementById('calc-cout-vente');
+    if(cvente) cvente.value=paramCalcul.cout_mise_en_vente?paramCalcul.cout_mise_en_vente.toFixed(2)+' €':'';
+  }
+  // Peupler select objet
+  var sel=document.getElementById('sel-calc-objet');
+  sel.innerHTML='<option value="">— Choisir un objet —</option>';
+  if(!objets||!objets.length){var od=await api('GET','objets_vente',null,'?order=nom');objets=od||[];}
+  objets.forEach(function(o){var opt=document.createElement('option');opt.value=o.id;opt.textContent=o.nom;sel.appendChild(opt);});
+  openModal('modal-calculprix');
+}
+
+function onObjetChange(){
+  var sel=document.getElementById('sel-calc-objet');
+  var objet=objets.find(function(o){return o.id===sel.value;});
+  var container=document.getElementById('calc-modules-list');
+  if(!objet){container.innerHTML='<span style="color:var(--text3)">Sélectionnez d\'abord un produit</span>';return;}
+  var items=[{label:'Produit principal',temps:objet.temps_principal,qte:objet.qte_matiere,couleur:objet.couleur_principale,idx:'0'}];
+  for(var i=1;i<=objet.nb_pieces;i++){
+    if(objet['piece_'+i+'_nom']) items.push({label:objet['piece_'+i+'_nom'],temps:objet['piece_'+i+'_temps'],qte:objet['piece_'+i+'_qte'],couleur:objet['piece_'+i+'_couleur'],idx:String(i)});
+  }
+  container.innerHTML=items.map(function(it){
+    return '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 10px;background:var(--bg2);border-radius:6px;font-size:13px"><input type="checkbox" value="'+it.idx+'" data-temps="'+(it.temps||'')+'" data-qte="'+(it.qte||0)+'" data-couleur="'+(it.couleur||'')+'" onchange="calcModulesTotal()" style="accent-color:var(--accent)" checked>'+it.label+(it.temps?' <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">('+it.temps+')</span>':'')+'</label>';
+  }).join('');
+  calcModulesTotal();
+}
+
+function calcModulesTotal(){
+  var totalMins=0, totalQte=0;
+  var couleurs=new Set();
+  document.querySelectorAll('#calc-modules-list input[type=checkbox]:checked').forEach(function(cb){
+    totalMins+=parseHHmm(cb.dataset.temps);
+    totalQte+=parseFloat(cb.dataset.qte)||0;
+    if(cb.dataset.couleur) couleurs.add(cb.dataset.couleur);
+  });
+  var tt=document.getElementById('calc-temps-total'); if(tt) tt.value=totalMins>0?formatHHmm(totalMins):'';
+  var qt=document.getElementById('calc-qte-total'); if(qt) qt.value=totalQte.toFixed(1)+' g';
+  var nc=document.getElementById('calc-nb-couleurs'); if(nc) nc.value=couleurs.size||'';
+  calcResultats();
+}
+
+function calcTotalElec(){
+  if(!paramCalcul) return;
+  var heures=parseHHmm(document.getElementById('calc-nb-heures').value)/60;
+  var prix=paramCalcul.prix_kwh||0;
+  var cout=(heures*prix).toFixed(4);
+  var el=document.getElementById('calc-cout-elec'); if(el) el.value=cout+' €';
+  calcResultats();
+}
+
+function calcTotalMO(){
+  if(!paramCalcul) return;
+  var nb=parseFloat(document.getElementById('calc-nb-mo').value)||0;
+  var taux=paramCalcul.taux_horaire_mo||0;
+  var cout=(nb*taux).toFixed(2);
+  var el=document.getElementById('calc-cout-mo'); if(el) el.value=cout+' €';
+  calcResultats();
+}
+
+function getFieldVal(id){return parseFloat((document.getElementById(id)||{}).value)||0;}
+
+function calcResultats(){
+  // Collecter tous les coûts
+  var filCout=parseFloat((document.getElementById('calc-total-fil-cout')||{}).textContent)||0;
+  var accCout=parseFloat((document.getElementById('calc-total-acc-cout')||{}).textContent)||0;
+  var ficheCout=getFieldVal('calc-cout-fiche')||0; // remove € unit
+  var ficheTxt=((document.getElementById('calc-cout-fiche')||{}).value||'').replace(' €','');
+  ficheCout=parseFloat(ficheTxt)||0;
+  var logTxt=((document.getElementById('calc-cout-logistique')||{}).value||'').replace(' €','');
+  var logCout=parseFloat(logTxt)||0;
+  var elecTxt=((document.getElementById('calc-cout-elec')||{}).value||'').replace(' €','');
+  var elecCout=parseFloat(elecTxt)||0;
+  var usureTxt=((document.getElementById('calc-cout-usure')||{}).value||'').replace(' €','');
+  var usureCout=parseFloat(usureTxt)||0;
+  var maintTxt=((document.getElementById('calc-cout-maintenance')||{}).value||'').replace(' €','');
+  var maintCout=parseFloat(maintTxt)||0;
+  var moTxt=((document.getElementById('calc-cout-mo')||{}).value||'').replace(' €','');
+  var moCout=parseFloat(moTxt)||0;
+  var venteTxt=((document.getElementById('calc-cout-vente')||{}).value||'').replace(' €','');
+  var venteCout=parseFloat(venteTxt)||0;
+
+  var coutReel=filCout+accCout+ficheCout+logCout+elecCout+usureCout+maintCout+moCout+venteCout;
+  var taux=(parseFloat(document.getElementById('calc-taux-echec')&&document.getElementById('calc-taux-echec').value)||0)/100;
+  var coutEchec=coutReel*(1+taux);
+  var pct=parseFloat(document.getElementById('calc-pct-charge')&&document.getElementById('calc-pct-charge').value)||0;
+  var fabReel=coutReel*(1+pct);
+  var fabEchec=coutEchec*(1+pct);
+  var marge=(paramCalcul&&paramCalcul.taux_marge_vente)||3;
+  var prixSans=fabReel*marge;
+  var prixAvec=fabEchec*marge;
+
+  function setR(id,val){var el=document.getElementById(id);if(el) el.value=val.toFixed(2)+' €';}
+  setR('calc-cout-reel',coutReel);
+  setR('calc-cout-echec',coutEchec);
+  setR('calc-fab-reel',fabReel);
+  setR('calc-fab-echec',fabEchec);
+  setR('calc-prix-sans',prixSans);
+  setR('calc-prix-avec',prixAvec);
+}
+
+async function saveCalculPrix(e){
+  e.preventDefault();
+  var form=e.target, btn=document.getElementById('btn-save-calc');
+  var editId=document.getElementById('calc-edit-id').value;
+  btn.textContent='...'; btn.disabled=true;
+  try{
+    var modulesChecked=[];
+    document.querySelectorAll('#calc-modules-list input[type=checkbox]:checked').forEach(function(cb){modulesChecked.push(cb.value);});
+    var accIds=[];
+    document.querySelectorAll('#calc-accessoires-list input[type=checkbox]:checked').forEach(function(cb){accIds.push(cb.value);});
+    var body={
+      objet_id:form.objet_id.value||null,
+      modules_selectionnes:modulesChecked.join(','),
+      accessoires_ids:accIds.join(','),
+      nb_heures_impression:form.nb_heures_impression.value||null,
+      nb_heures_mo:parseFloat(form.nb_heures_mo.value)||null,
+      taux_echec:parseFloat(form.taux_echec.value)||null,
+      pct_charge_vente:parseFloat(form.pct_charge_vente.value)||null,
+      prix_moyen_constate:parseFloat(form.prix_moyen_constate.value)||null,
+      date_prix_moyen:form.date_prix_moyen.value||null,
+      cout_produit_reel:parseFloat(((document.getElementById('calc-cout-reel')||{}).value||'').replace(' €',''))||null,
+      cout_produit_echec:parseFloat(((document.getElementById('calc-cout-echec')||{}).value||'').replace(' €',''))||null,
+      cout_fabrication_reel:parseFloat(((document.getElementById('calc-fab-reel')||{}).value||'').replace(' €',''))||null,
+      cout_fabrication_echec:parseFloat(((document.getElementById('calc-fab-echec')||{}).value||'').replace(' €',''))||null,
+      prix_vente_sans_echec:parseFloat(((document.getElementById('calc-prix-sans')||{}).value||'').replace(' €',''))||null,
+      prix_vente_avec_echec:parseFloat(((document.getElementById('calc-prix-avec')||{}).value||'').replace(' €',''))||null
+    };
+    for(var i=1;i<=10;i++){
+      var sel=document.getElementById('calc-fil-'+i);
+      body['fil_'+i+'_id']=(sel&&sel.value)||null;
+      body['fil_'+i+'_qte']=parseFloat((document.getElementById('calc-fil-'+i+'-qte')||{}).value)||null;
+      body['fil_'+i+'_temps']=(document.getElementById('calc-fil-'+i+'-temps')||{}).value||null;
+      var opt=sel&&sel.options[sel.selectedIndex];
+      body['fil_'+i+'_prix_g']=parseFloat(opt&&opt.dataset.prixg)||null;
+    }
+    body.total_cout_filaments=parseFloat(((document.getElementById('calc-total-fil-cout')||{}).textContent||'').replace(' €',''))||null;
+    body.total_cout_accessoires=parseFloat(((document.getElementById('calc-total-acc-cout')||{}).textContent||'').replace(' €',''))||null;
+
+    if(editId){await api('PATCH','calculs_prix',body,'?id=eq.'+editId);toast('Calcul modifié ✓','success');}
+    else{await api('POST','calculs_prix',body);toast('Calcul enregistré ✓','success');}
+    closeModal('modal-calculprix'); form.reset();
+    await loadCalculsPrix();
+  }catch(err){toast('Erreur : '+err.message,'error');}
+  btn.textContent='💾 Enregistrer'; btn.disabled=false;
+}
+
+async function openEditCalculPrix(id){
+  await openAddCalculPrix();
+  try{
+    var data=await api('GET','calculs_prix',null,'?id=eq.'+id+'&select=*');
+    if(!data||!data.length) return;
+    var r=data[0];
+    document.getElementById('calc-edit-id').value=r.id;
+    document.getElementById('modal-calc-title').textContent='✏️ MODIFIER CALCUL';
+    var form=document.getElementById('form-calculprix');
+    form.objet_id.value=r.objet_id||'';
+    onObjetChange();
+    form.nb_heures_impression.value=r.nb_heures_impression||'';
+    form.nb_heures_mo.value=r.nb_heures_mo||'';
+    form.taux_echec.value=r.taux_echec||'';
+    form.pct_charge_vente.value=r.pct_charge_vente||'';
+    form.prix_moyen_constate.value=r.prix_moyen_constate||'';
+    form.date_prix_moyen.value=r.date_prix_moyen||'';
+    for(var i=1;i<=10;i++){
+      var sel=document.getElementById('calc-fil-'+i);
+      if(sel&&r['fil_'+i+'_id']){sel.value=r['fil_'+i+'_id'];}
+      var qte=document.getElementById('calc-fil-'+i+'-qte');
+      if(qte) qte.value=r['fil_'+i+'_qte']||'';
+      var temps=document.getElementById('calc-fil-'+i+'-temps');
+      if(temps) temps.value=r['fil_'+i+'_temps']||'';
+    }
+    calcTotalFilaments(); calcResultats();
+  }catch(err){toast('Erreur : '+err.message,'error');}
+}
+/* ======= FIN CALCUL DU PRIX ======= */
 
 /* ======= MODULE EXPORT ======= */
 function cleanFilament(r) {
