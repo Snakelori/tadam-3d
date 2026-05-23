@@ -1808,21 +1808,19 @@ function calcModulesTotal(){
 }
 
 function calcTotalElec(){
-  if(!paramCalcul) return;
-  var heures=parseHHmm(document.getElementById('calc-nb-heures').value)/60;
-  var prix=paramCalcul.prix_kwh||0;
-  var conso=paramCalcul.conso_imprimante||1;
-  var cout=(heures*prix*conso).toFixed(4);
-  var el=document.getElementById('calc-cout-elec'); if(el) el.value=cout+' €';
+  var heures=parseHHmm((document.getElementById('calc-nb-heures')||{}).value||'')/60;
+  var prix=(paramCalcul&&paramCalcul.prix_kwh)||0;
+  var conso=(paramCalcul&&paramCalcul.conso_imprimante)||1;
+  var el=document.getElementById('calc-cout-elec');
+  if(el) el.value=heures>0?(heures*prix*conso).toFixed(4)+' €':'';
   calcResultats();
 }
 
 function calcTotalMO(){
-  if(!paramCalcul) return;
-  var nb=parseFloat(document.getElementById('calc-nb-mo').value)||0;
-  var taux=paramCalcul.taux_horaire_mo||0;
-  var cout=(nb*taux).toFixed(2);
-  var el=document.getElementById('calc-cout-mo'); if(el) el.value=cout+' €';
+  var nb=parseFloat((document.getElementById('calc-nb-mo')||{}).value)||0;
+  var taux=(paramCalcul&&paramCalcul.taux_horaire_mo)||0;
+  var el=document.getElementById('calc-cout-mo');
+  if(el) el.value=nb>0?(nb*taux).toFixed(2)+' €':'';
   calcResultats();
 }
 
