@@ -2006,18 +2006,35 @@ async function openEditCalculPrix(id){
     document.getElementById('modal-calc-title').textContent='✏️ MODIFIER CALCUL';
     var form=document.getElementById('form-calculprix');
     form.objet_id.value=r.objet_id||'';
-    onObjetChange();
+    onObjetChange(); // crée les cases cochées par défaut
+
+    // Restaurer les modules sélectionnés (décocher ceux non sauvegardés)
+    if(r.modules_selectionnes!=null&&r.modules_selectionnes!==''){
+      var saved=r.modules_selectionnes.split(',').map(function(v){return v.trim();});
+      document.querySelectorAll('#calc-modules-list input[type=checkbox]').forEach(function(cb){
+        cb.checked=saved.indexOf(cb.value)!==-1;
+      });
+      calcModulesTotal(); // recalcule avec la sélection restaurée
+    }
+
     form.nb_heures_impression.value=r.nb_heures_impression||'';
+    calcTotalElec();
     form.nb_heures_mo.value=r.nb_heures_mo||'';
     form.taux_echec.value=r.taux_echec||'';
     form.pct_charge_vente.value=r.pct_charge_vente||'';
     form.prix_moyen_constate.value=r.prix_moyen_constate||'';
     form.date_prix_moyen.value=r.date_prix_moyen||'';
+
+    // Restaurer les filaments via selectedIndex (plus fiable que sel.value=)
     for(var i=1;i<=10;i++){
       var sel=document.getElementById('calc-fil-'+i);
-      if(sel&&r['fil_'+i+'_id']){sel.value=r['fil_'+i+'_id'];}
       var qte=document.getElementById('calc-fil-'+i+'-qte');
       if(qte) qte.value=r['fil_'+i+'_qte']||'';
+      if(sel&&r['fil_'+i+'_id']){
+        for(var oi=0;oi<sel.options.length;oi++){
+          if(sel.options[oi].value===String(r['fil_'+i+'_id'])){sel.selectedIndex=oi;break;}
+        }
+      }
     }
     calcTotalFilaments(); calcResultats();
   }catch(err){toast('Erreur : '+err.message,'error');}
