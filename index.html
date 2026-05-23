@@ -1804,7 +1804,44 @@ function calcModulesTotal(){
   var tt=document.getElementById('calc-temps-total'); if(tt) tt.value=totalMins>0?formatHHmm(totalMins):'';
   var qt=document.getElementById('calc-qte-total'); if(qt) qt.value=totalQte.toFixed(1)+' g';
   var nc=document.getElementById('calc-nb-couleurs'); if(nc) nc.value=couleurs.size||'';
+  prefillFilamentsFromModules();
   calcResultats();
+}
+
+function prefillFilamentsFromModules(){
+  // Collecter les modules cochés dans l'ordre
+  var modules=[];
+  document.querySelectorAll('#calc-modules-list input[type=checkbox]:checked').forEach(function(cb){
+    modules.push({couleur:(cb.dataset.couleur||'').toLowerCase(),qte:cb.dataset.qte||'',temps:cb.dataset.temps||''});
+  });
+  // Remplir les lignes filaments
+  for(var i=1;i<=10;i++){
+    var sel=document.getElementById('calc-fil-'+i);
+    var qteEl=document.getElementById('calc-fil-'+i+'-qte');
+    var tempsEl=document.getElementById('calc-fil-'+i+'-temps');
+    var prixEl=document.getElementById('calc-fil-'+i+'-prix');
+    if(!sel) continue;
+    var m=modules[i-1];
+    if(m){
+      // Chercher le filament par couleur (insensible à la casse)
+      var match=null;
+      if(m.couleur) match=filaments.find(function(f){return f.couleur&&f.couleur.toLowerCase()===m.couleur;});
+      sel.value=match?match.id:'';
+      if(qteEl) qteEl.value=m.qte||'';
+      if(tempsEl) tempsEl.value=m.temps||'';
+      // Calculer le coût filament
+      var prixG=match?(match.prix_par_gramme||0):0;
+      var qte=parseFloat(m.qte)||0;
+      if(prixEl) prixEl.value=(prixG&&qte)?(prixG*qte).toFixed(4)+' €':'';
+    } else {
+      // Ligne non utilisée : vider
+      sel.value='';
+      if(qteEl) qteEl.value='';
+      if(tempsEl) tempsEl.value='';
+      if(prixEl) prixEl.value='';
+    }
+  }
+  calcTotalFilaments();
 }
 
 function calcTotalElec(){
