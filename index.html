@@ -1818,28 +1818,50 @@ function prefillFilamentsFromModules(){
   // Collecter les modules cochés dans l'ordre
   var modules=[];
   document.querySelectorAll('#calc-modules-list input[type=checkbox]:checked').forEach(function(cb){
-    modules.push({couleur:(cb.dataset.couleur||'').toLowerCase(),qte:cb.dataset.qte||'',temps:cb.dataset.temps||''});
+    modules.push({
+      couleur:(cb.dataset.couleur||'').trim().toLowerCase(),
+      qte:cb.dataset.qte||''
+    });
   });
-  // Remplir les lignes filaments
+
   for(var i=1;i<=10;i++){
     var sel=document.getElementById('calc-fil-'+i);
     var qteEl=document.getElementById('calc-fil-'+i+'-qte');
     var prixEl=document.getElementById('calc-fil-'+i+'-prix');
     if(!sel) continue;
-    var m=modules[i-1];
-    if(m){
-      // Chercher le filament par couleur (insensible à la casse)
-      var match=null;
-      if(m.couleur) match=filaments.find(function(f){return f.couleur&&f.couleur.toLowerCase()===m.couleur;});
-      sel.value=match?match.id:'';
-      if(qteEl) qteEl.value=m.qte||'';
-      // Calculer le coût filament
-      var prixG=match?(match.prix_par_gramme||0):0;
-      var qte=parseFloat(m.qte)||0;
-      if(prixEl) prixEl.value=(prixG&&qte)?(prixG*qte).toFixed(4)+' €':'';
+
+    var mod=modules[i-1];
+    if(mod){
+      // Chercher le filament correspondant par couleur (boucle explicite)
+      var filamentTrouve=null;
+      var coul=mod.couleur;
+      if(coul){
+        for(var fi=0;fi<filaments.length;fi++){
+          if(filaments[fi].couleur&&filaments[fi].couleur.trim().toLowerCase()===coul){
+            filamentTrouve=filaments[fi];
+            break;
+          }
+        }
+      }
+
+      // Sélectionner l'option via selectedIndex (plus fiable que sel.value=id)
+      sel.selectedIndex=0;
+      if(filamentTrouve){
+        for(var oi=0;oi<sel.options.length;oi++){
+          if(sel.options[oi].value===String(filamentTrouve.id)){
+            sel.selectedIndex=oi;
+            break;
+          }
+        }
+      }
+
+      if(qteEl) qteEl.value=mod.qte||'';
+
+      var prixG=filamentTrouve?(parseFloat(filamentTrouve.prix_par_gramme)||0):0;
+      var qte=parseFloat(mod.qte)||0;
+      if(prixEl) prixEl.value=(prixG>0&&qte>0)?(prixG*qte).toFixed(4)+' €':'';
     } else {
-      // Ligne non utilisée : vider
-      sel.value='';
+      sel.selectedIndex=0;
       if(qteEl) qteEl.value='';
       if(prixEl) prixEl.value='';
     }
