@@ -220,7 +220,6 @@
     <button class="nav-btn active" onclick="showPage('filaments',event)">🧵 Filaments</button>
     <button class="nav-btn" onclick="showPage('accessoires',event)">🛒 Accessoires</button>
     <button class="nav-btn" onclick="showPage('objets',event)">🛍️ Objets à vendre</button>
-    <button class="nav-btn" onclick="showPage('importexport',event)">📤 Import / Export</button>
   </nav>
   <main>
 
@@ -271,66 +270,117 @@
 
     <!-- PARAMETRES -->
     <div class="page" id="page-parametres">
-      <div class="section-header"><span class="section-title">Paramètres — Listes de référence</span></div>
-      <div class="settings-grid">
+      <div class="subnav">
+        <button class="subnav-btn active" onclick="showSubPage('parametres','listes',event)">⚙️ Listes de référence</button>
+        <button class="subnav-btn" onclick="showSubPage('parametres','importexport',event)">📤 Import / Export</button>
+      </div>
 
-        <!-- MARQUES -->
-        <div class="settings-card">
-          <div class="settings-card-title">🏷️ Marques de filament</div>
-          <div id="list-marques"><div class="loading"><span class="spinner"></span></div></div>
-          <div class="add-item-row">
-            <input type="text" id="new-marque" placeholder="Nouvelle marque...">
-            <button class="btn btn-primary btn-sm" onclick="addItem('ref_marques','new-marque','list-marques',loadMarques)">+ Ajouter</button>
+      <div class="subpage active" id="subpage-listes">
+        <div class="section-header"><span class="section-title">Paramètres — Listes de référence</span></div>
+        <div class="settings-grid">
+
+          <!-- MARQUES -->
+          <div class="settings-card">
+            <div class="settings-card-title">🏷️ Marques de filament</div>
+            <div id="list-marques"><div class="loading"><span class="spinner"></span></div></div>
+            <div class="add-item-row">
+              <input type="text" id="new-marque" placeholder="Nouvelle marque...">
+              <button class="btn btn-primary btn-sm" onclick="addItem('ref_marques','new-marque','list-marques',loadMarques)">+ Ajouter</button>
+            </div>
           </div>
-        </div>
 
-        <!-- COULEURS -->
-        <div class="settings-card">
-          <div class="settings-card-title">🎨 Couleurs</div>
-          <div id="list-couleurs"><div class="loading"><span class="spinner"></span></div></div>
-          <div class="add-item-row">
-            <input type="text" id="new-couleur" placeholder="Nouvelle couleur...">
-            <button class="btn btn-primary btn-sm" onclick="addItem('ref_couleurs','new-couleur','list-couleurs',loadCouleurs)">+ Ajouter</button>
+          <!-- COULEURS -->
+          <div class="settings-card">
+            <div class="settings-card-title">🎨 Couleurs</div>
+            <div id="list-couleurs"><div class="loading"><span class="spinner"></span></div></div>
+            <div class="add-item-row">
+              <input type="text" id="new-couleur" placeholder="Nouvelle couleur...">
+              <button class="btn btn-primary btn-sm" onclick="addItem('ref_couleurs','new-couleur','list-couleurs',loadCouleurs)">+ Ajouter</button>
+            </div>
           </div>
-        </div>
 
-        <!-- MATIERES -->
-        <div class="settings-card">
-          <div class="settings-card-title">🧪 Matières</div>
-          <div id="list-matieres"><div class="loading"><span class="spinner"></span></div></div>
-          <div class="add-item-row">
-            <input type="text" id="new-matiere" placeholder="Nouvelle matière...">
-            <button class="btn btn-primary btn-sm" onclick="addItem('ref_matieres','new-matiere','list-matieres',loadMatieres)">+ Ajouter</button>
+          <!-- MATIERES -->
+          <div class="settings-card">
+            <div class="settings-card-title">🧪 Matières</div>
+            <div id="list-matieres"><div class="loading"><span class="spinner"></span></div></div>
+            <div class="add-item-row">
+              <input type="text" id="new-matiere" placeholder="Nouvelle matière...">
+              <button class="btn btn-primary btn-sm" onclick="addItem('ref_matieres','new-matiere','list-matieres',loadMatieres)">+ Ajouter</button>
+            </div>
           </div>
-        </div>
 
-        <!-- FORMATS BOBINES -->
-        <div class="settings-card">
-          <div class="settings-card-title">🎡 Formats de bobines</div>
-          <div id="list-formats"><div class="loading"><span class="spinner"></span></div></div>
-          <div class="add-item-row">
-            <input type="text" id="new-format" placeholder="Nouveau format...">
-            <button class="btn btn-primary btn-sm" onclick="addItem('ref_formats_bobines','new-format','list-formats',loadFormats)">+ Ajouter</button>
+          <!-- FORMATS BOBINES -->
+          <div class="settings-card">
+            <div class="settings-card-title">🎡 Formats de bobines</div>
+            <div id="list-formats"><div class="loading"><span class="spinner"></span></div></div>
+            <div class="add-item-row">
+              <input type="text" id="new-format" placeholder="Nouveau format...">
+              <button class="btn btn-primary btn-sm" onclick="addItem('ref_formats_bobines','new-format','list-formats',loadFormats)">+ Ajouter</button>
+            </div>
           </div>
-        </div>
 
-        <!-- TYPES ACCESSOIRES -->
-        <div class="settings-card">
-          <div class="settings-card-title">📦 Types d'accessoires</div>
-          <div id="list-types-acc"><div class="loading"><span class="spinner"></span></div></div>
-          <div class="add-item-row">
-            <input type="text" id="new-type-acc" placeholder="Nouveau type...">
-            <button class="btn btn-primary btn-sm" onclick="addItem('ref_types_accessoires','new-type-acc','list-types-acc',loadTypesAcc)">+ Ajouter</button>
+          <!-- TYPES ACCESSOIRES -->
+          <div class="settings-card">
+            <div class="settings-card-title">📦 Types d'accessoires</div>
+            <div id="list-types-acc"><div class="loading"><span class="spinner"></span></div></div>
+            <div class="add-item-row">
+              <input type="text" id="new-type-acc" placeholder="Nouveau type...">
+              <button class="btn btn-primary btn-sm" onclick="addItem('ref_types_accessoires','new-type-acc','list-types-acc',loadTypesAcc)">+ Ajouter</button>
+            </div>
           </div>
-        </div>
 
-        <!-- FOURNISSEURS -->
-        <div class="settings-card">
-          <div class="settings-card-title">🏪 Fournisseurs</div>
-          <div id="list-fournisseurs-params"><div class="loading"><span class="spinner"></span></div></div>
-          <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="openModal('modal-fournisseur')">+ Ajouter un fournisseur</button>
-        </div>
+          <!-- FOURNISSEURS -->
+          <div class="settings-card">
+            <div class="settings-card-title">🏪 Fournisseurs</div>
+            <div id="list-fournisseurs-params"><div class="loading"><span class="spinner"></span></div></div>
+            <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="openModal('modal-fournisseur')">+ Ajouter un fournisseur</button>
+          </div>
 
+        </div>
+      </div>
+
+      <div class="subpage" id="subpage-importexport">
+        <div class="section-header"><span class="section-title">Import / Export</span></div>
+        <div class="settings-grid">
+
+          <!-- EXPORT -->
+          <div class="settings-card">
+            <div class="settings-card-title">⬇ Exporter les données</div>
+            <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Sélectionnez les données à exporter, puis choisissez le format.</p>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px">
+                <input type="checkbox" id="exp-filaments" checked style="width:16px;height:16px;accent-color:var(--accent)">
+                🧵 Filaments
+              </label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px">
+                <input type="checkbox" id="exp-accessoires" checked style="width:16px;height:16px;accent-color:var(--accent)">
+                🛒 Accessoires
+              </label>
+            </div>
+            <p style="font-size:11px;color:var(--text3);margin-bottom:16px;font-family:var(--font-mono)">Si les deux sont sélectionnés → 2 fichiers séparés</p>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost" onclick="exportSelected('csv')">📄 CSV</button>
+              <button class="btn btn-primary" onclick="exportSelected('xlsx')">📊 Excel</button>
+            </div>
+          </div>
+
+          <!-- IMPORT -->
+          <div class="settings-card">
+            <div class="settings-card-title">⬆ Importer des filaments</div>
+            <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Importez votre stock depuis un fichier CSV ou Excel (.xlsx).</p>
+            <div style="margin-bottom:20px">
+              <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-bottom:8px">Colonnes attendues :</div>
+              <div style="font-family:var(--font-mono);font-size:11px;color:var(--text2);background:var(--bg3);border-radius:6px;padding:10px;line-height:1.8">
+                id_bobine, marque, couleur, type_matiere,<br>format_bobine, refill, entame, poids_g,<br>prix_euros, quantite, date_mise_en_stock
+              </div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost" onclick="downloadImportTemplate()">⬇ Modèle CSV</button>
+              <button class="btn btn-primary" onclick="openImportModal()">⬆ Importer un fichier</button>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
 
@@ -452,49 +502,6 @@
     </div>
 
     <!-- IMPORT / EXPORT -->
-    <div class="page" id="page-importexport">
-      <div class="section-header"><span class="section-title">Import / Export</span></div>
-      <div class="settings-grid">
-
-        <!-- EXPORT -->
-        <div class="settings-card">
-          <div class="settings-card-title">⬇ Exporter les données</div>
-          <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Sélectionnez les données à exporter, puis choisissez le format.</p>
-          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px">
-              <input type="checkbox" id="exp-filaments" checked style="width:16px;height:16px;accent-color:var(--accent)">
-              🧵 Filaments
-            </label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px">
-              <input type="checkbox" id="exp-accessoires" checked style="width:16px;height:16px;accent-color:var(--accent)">
-              🛒 Accessoires
-            </label>
-          </div>
-          <p style="font-size:11px;color:var(--text3);margin-bottom:16px;font-family:var(--font-mono)">Si les deux sont sélectionnés → 2 fichiers séparés</p>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="exportSelected('csv')">📄 CSV</button>
-            <button class="btn btn-primary" onclick="exportSelected('xlsx')">📊 Excel</button>
-          </div>
-        </div>
-
-        <!-- IMPORT -->
-        <div class="settings-card">
-          <div class="settings-card-title">⬆ Importer des filaments</div>
-          <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Importez votre stock depuis un fichier CSV ou Excel (.xlsx).</p>
-          <div style="margin-bottom:20px">
-            <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-bottom:8px">Colonnes attendues :</div>
-            <div style="font-family:var(--font-mono);font-size:11px;color:var(--text2);background:var(--bg3);border-radius:6px;padding:10px;line-height:1.8">
-              id_bobine, marque, couleur, type_matiere,<br>format_bobine, refill, entame, poids_g,<br>prix_euros, quantite, date_mise_en_stock
-            </div>
-          </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="downloadImportTemplate()">⬇ Modèle CSV</button>
-            <button class="btn btn-primary" onclick="openImportModal()">⬆ Importer un fichier</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
 
   </main>
 </div>
