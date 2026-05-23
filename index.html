@@ -409,8 +409,8 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Nom</th><th>Catégorie</th><th>Couleur principale</th><th>Nb pièces</th><th>Multi couleur</th><th>Temps total</th><th></th></tr></thead>
-            <tbody id="tbody-objets"><tr class="empty-row"><td colspan="7">Cliquez sur "+ Ajouter" pour créer un objet</td></tr></tbody>
+            <thead><tr><th>Nom</th><th>Catégorie</th><th>Couleur principale</th><th>Nb pièces</th><th>Multi couleur</th><th>Temps total</th><th>Stock</th><th></th></tr></thead>
+            <tbody id="tbody-objets"><tr class="empty-row"><td colspan="8">Cliquez sur "+ Ajouter" pour créer un objet</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -647,6 +647,7 @@
         <div class="form-group full"><label>Description</label><textarea name="description" rows="2" placeholder="Description de l'objet..."></textarea></div>
         <div class="form-group"><label>Couleur principale</label><select name="couleur_principale" id="sel-obj-couleur-0"><option value="">— Choisir —</option></select></div>
         <div class="form-group"><label>Nb de pièce / module (0–6)</label><input type="number" name="nb_pieces" id="obj-nb-pieces" min="0" max="6" value="0" oninput="updateModules()"></div>
+        <div class="form-group"><label>Stock produit fini</label><input type="number" name="stock" id="obj-stock" min="0" value="0" placeholder="0"></div>
       </div>
 
       <div class="form-section-title">Impression</div>
@@ -668,6 +669,7 @@
           <div class="form-group full"><label>Description</label><input type="text" name="piece_1_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_1_temps" id="obj-temps-1" placeholder="00:30" oninput="calcTempsTotal()"></div>
           <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_1_qte" id="obj-qte-1" placeholder="0" step="0.01" min="0"></div>
+          <div class="form-group"><label>Stock de ce module</label><input type="number" name="piece_1_stock" id="obj-piece-1-stock" min="0" value="0" placeholder="0"></div>
         </div>
       </div>
 
@@ -680,6 +682,7 @@
           <div class="form-group full"><label>Description</label><input type="text" name="piece_2_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_2_temps" id="obj-temps-2" placeholder="00:30" oninput="calcTempsTotal()"></div>
           <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_2_qte" id="obj-qte-2" placeholder="0" step="0.01" min="0"></div>
+          <div class="form-group"><label>Stock de ce module</label><input type="number" name="piece_2_stock" id="obj-piece-2-stock" min="0" value="0" placeholder="0"></div>
         </div>
       </div>
 
@@ -692,6 +695,7 @@
           <div class="form-group full"><label>Description</label><input type="text" name="piece_3_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_3_temps" id="obj-temps-3" placeholder="00:30" oninput="calcTempsTotal()"></div>
           <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_3_qte" id="obj-qte-3" placeholder="0" step="0.01" min="0"></div>
+          <div class="form-group"><label>Stock de ce module</label><input type="number" name="piece_3_stock" id="obj-piece-3-stock" min="0" value="0" placeholder="0"></div>
         </div>
       </div>
 
@@ -704,6 +708,7 @@
           <div class="form-group full"><label>Description</label><input type="text" name="piece_4_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_4_temps" id="obj-temps-4" placeholder="00:30" oninput="calcTempsTotal()"></div>
           <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_4_qte" id="obj-qte-4" placeholder="0" step="0.01" min="0"></div>
+          <div class="form-group"><label>Stock de ce module</label><input type="number" name="piece_4_stock" id="obj-piece-4-stock" min="0" value="0" placeholder="0"></div>
         </div>
       </div>
 
@@ -716,6 +721,7 @@
           <div class="form-group full"><label>Description</label><input type="text" name="piece_5_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_5_temps" id="obj-temps-5" placeholder="00:30" oninput="calcTempsTotal()"></div>
           <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_5_qte" id="obj-qte-5" placeholder="0" step="0.01" min="0"></div>
+          <div class="form-group"><label>Stock de ce module</label><input type="number" name="piece_5_stock" id="obj-piece-5-stock" min="0" value="0" placeholder="0"></div>
         </div>
       </div>
 
@@ -728,6 +734,7 @@
           <div class="form-group full"><label>Description</label><input type="text" name="piece_6_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_6_temps" id="obj-temps-6" placeholder="00:30" oninput="calcTempsTotal()"></div>
           <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_6_qte" id="obj-qte-6" placeholder="0" step="0.01" min="0"></div>
+          <div class="form-group"><label>Stock de ce module</label><input type="number" name="piece_6_stock" id="obj-piece-6-stock" min="0" value="0" placeholder="0"></div>
         </div>
       </div>
 
@@ -1549,7 +1556,7 @@ async function loadObjets(){
     objets=data||[];
     renderObjets(objets);
   }catch(err){
-    document.getElementById('tbody-objets').innerHTML='<tr class="empty-row"><td colspan="7">Table introuvable — créez-la dans Supabase</td></tr>';
+    document.getElementById('tbody-objets').innerHTML='<tr class="empty-row"><td colspan="8">Table introuvable — créez-la dans Supabase</td></tr>';
   }
 }
 
@@ -1560,9 +1567,9 @@ function renderObjets(data){
   document.getElementById('stat-obj-multi').textContent=data.filter(function(r){return r.multi_couleur;}).length;
   var cats=new Set(data.map(function(r){return r.categorie;}).filter(Boolean)).size;
   document.getElementById('stat-obj-cats').textContent=cats;
-  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">Aucun objet — cliquez sur "+ Ajouter"</td></tr>';return;}
+  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="8">Aucun objet — cliquez sur "+ Ajouter"</td></tr>';return;}
   tbody.innerHTML=data.map(function(r){
-    return '<tr><td><strong>'+esc(r.nom||'—')+'</strong></td><td>'+esc(r.categorie||'—')+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur_principale)+'"></span>'+esc(r.couleur_principale||'—')+'</td><td style="font-family:var(--font-mono)">'+(r.nb_pieces||0)+'</td><td><span class="badge '+(r.multi_couleur?'badge-yes':'badge-no')+'">'+(r.multi_couleur?'Oui':'Non')+'</span></td><td style="font-family:var(--font-mono)">'+esc(r.temps_total||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditObjet(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'objets_vente\',\''+r.id+'\',loadObjets)">✕</button></div></td></tr>';
+    return '<tr><td><strong>'+esc(r.nom||'—')+'</strong></td><td>'+esc(r.categorie||'—')+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur_principale)+'"></span>'+esc(r.couleur_principale||'—')+'</td><td style="font-family:var(--font-mono)">'+(r.nb_pieces||0)+'</td><td><span class="badge '+(r.multi_couleur?'badge-yes':'badge-no')+'">'+(r.multi_couleur?'Oui':'Non')+'</span></td><td style="font-family:var(--font-mono)">'+esc(r.temps_total||'—')+'</td><td><span class="badge '+(r.stock>0?'badge-yes':'badge-no')+'">'+(r.stock!=null?r.stock:0)+'</span></td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditObjet(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'objets_vente\',\''+r.id+'\',loadObjets)">✕</button></div></td></tr>';
   }).join('');
 }
 
@@ -1600,6 +1607,7 @@ async function openEditObjet(id){
     form.nom.value=r.nom||'';
     form.categorie.value=r.categorie||'';
     form.description.value=r.description||'';
+    document.getElementById('obj-stock').value=r.stock!=null?r.stock:0;
     document.getElementById('chk-multi-couleur').checked=r.multi_couleur||false;
     document.getElementById('sel-obj-couleur-0').value=r.couleur_principale||'';
     document.getElementById('obj-nb-pieces').value=r.nb_pieces||0;
@@ -1632,7 +1640,8 @@ async function saveObjet(e){
       temps_principal:form.temps_principal.value||null,
       qte_matiere:parseFloat(form.qte_matiere.value)||null,
       temps_total:document.getElementById('obj-temps-total').value||null,
-      qualite_impression:parseFloat(form.qualite_impression.value)||null
+      qualite_impression:parseFloat(form.qualite_impression.value)||null,
+      stock:parseInt(document.getElementById('obj-stock').value)||0
     };
     for(var i=1;i<=6;i++){
       body['piece_'+i+'_nom']=form['piece_'+i+'_nom'].value||null;
@@ -1640,6 +1649,7 @@ async function saveObjet(e){
       body['piece_'+i+'_temps']=document.getElementById('obj-temps-'+i).value||null;
       body['piece_'+i+'_couleur']=form['piece_'+i+'_couleur'].value||null;
       body['piece_'+i+'_qte']=parseFloat(document.getElementById('obj-qte-'+i).value)||null;
+      body['piece_'+i+'_stock']=parseInt(document.getElementById('obj-piece-'+i+'-stock').value)||0;
     }
     if(editId){await api('PATCH','objets_vente',body,'?id=eq.'+editId);toast('Objet modifié ✓','success');}
     else{await api('POST','objets_vente',body);toast('Objet ajouté ✓','success');}
