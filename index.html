@@ -220,6 +220,7 @@
     <button class="nav-btn active" onclick="showPage('filaments',event)">🧵 Filaments</button>
     <button class="nav-btn" onclick="showPage('accessoires',event)">🛒 Accessoires</button>
     <button class="nav-btn" onclick="showPage('objets',event)">🛍️ Objets à vendre</button>
+    <button class="nav-btn" onclick="showPage('rapport',event)">📊 Rapport</button>
   </nav>
   <main>
 
@@ -240,7 +241,7 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID Bobine</th><th>Marque</th><th>Couleur</th><th>Matière</th><th>Poids (g)</th><th>Prix (€)</th><th>€/g</th><th>Qté</th><th>Entamé</th><th>Fournisseur</th><th></th></tr></thead>
+          <thead><tr><th>ID Bobine</th><th>Marque</th><th>Couleur</th><th>Matière</th><th>Poids (g)</th><th>Prix (€)</th><th>€/g</th><th>Qté</th><th>Entamé</th><th>Fournisseur</th><th>État</th><th></th></tr></thead>
           <tbody id="tbody-filaments"><tr class="empty-row"><td colspan="11"><span class="spinner"></span>Chargement...</td></tr></tbody>
         </table>
       </div>
@@ -505,6 +506,26 @@
 
     <!-- IMPORT / EXPORT -->
 
+    <!-- RAPPORT -->
+    <div class="page" id="page-rapport">
+      <div class="subnav">
+        <button class="subnav-btn active" onclick="showSubPage('rapport','rapport-filaments',event)">🧵 Filaments</button>
+        <button class="subnav-btn" onclick="showSubPage('rapport','rapport-produits',event)">🛍️ Produits / Modules</button>
+      </div>
+
+      <!-- Rapport Filaments -->
+      <div class="subpage active" id="subpage-rapport-filaments">
+        <div class="section-header"><span class="section-title">Rapport — Stock filaments</span></div>
+        <div id="rapport-fil-content"><div class="loading"><span class="spinner"></span></div></div>
+      </div>
+
+      <!-- Rapport Produits -->
+      <div class="subpage" id="subpage-rapport-produits">
+        <div class="section-header"><span class="section-title">Rapport — Stock produits &amp; modules</span></div>
+        <div id="rapport-prod-content"><div class="loading"><span class="spinner"></span></div></div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -532,6 +553,7 @@
           <input type="checkbox" name="entame" id="chk-entame" style="width:18px;height:18px;accent-color:var(--accent)">
           <label for="chk-entame" style="text-transform:none;font-size:14px;cursor:pointer">Entamée</label>
         </div>
+        <div class="form-group"><label>État</label><select name="etat" id="sel-etat-fil"><option value="disponible">✅ Disponible</option><option value="epuise">🔴 Épuisé</option><option value="sorti">⬜ Sorti du stock</option></select></div>
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn-ghost" onclick="closeModal('modal-filament')">Annuler</button>
@@ -766,6 +788,7 @@
           </div>
           <div class="form-group"><label>Temps d'impression total (calculé)</label><input type="text" id="calc-temps-total" class="calc-field" readonly></div>
           <div class="form-group"><label>Quantité matière totale (g) (calculé)</label><input type="text" id="calc-qte-total" class="calc-field" readonly></div>
+          <div class="form-group"><label>Nombre de plaques d'impression</label><input type="number" name="nb_plaques" id="calc-nb-plaques" min="1" value="1" placeholder="1"></div>
           <div class="form-group"><label>Nb de couleurs (calculé)</label><input type="text" id="calc-nb-couleurs" class="calc-field" readonly></div>
         </div>
       </div>
@@ -1183,9 +1206,9 @@ function renderFilaments(data){
   document.getElementById('stat-valeur').textContent=tv.toFixed(2)+' €';
   document.getElementById('stat-matieres').textContent=ms;
   document.getElementById('stat-entamees').textContent=en;
-  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="11">Aucun filament — cliquez sur "+ Ajouter"</td></tr>';return;}
+  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="12">Aucun filament — cliquez sur "+ Ajouter"</td></tr>';return;}
   tbody.innerHTML=data.map(function(r){
-    return '<tr><td><span style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">'+esc(r.id_bobine)+'</span></td><td>'+esc(r.marque)+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur)+'"></span>'+esc(r.couleur)+'</td><td><span class="badge '+badgeMatiere(r.type_matiere)+'">'+esc(r.type_matiere)+'</span></td><td style="font-family:var(--font-mono)">'+r.poids_g+'g</td><td style="font-family:var(--font-mono)">'+parseFloat(r.prix_euros).toFixed(2)+'€</td><td style="font-family:var(--font-mono);color:var(--teal)">'+parseFloat(r.prix_par_gramme||0).toFixed(4)+'</td><td style="font-family:var(--font-mono)">'+(r.quantite||1)+'</td><td><span class="badge '+(r.entame?'badge-yes':'badge-no')+'">'+(r.entame?'Oui':'Non')+'</span></td><td style="font-size:13px;color:var(--text2)">'+esc((r.fournisseurs&&r.fournisseurs.nom)||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditFilament(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'filaments\',\''+r.id+'\',loadFilaments)">✕</button></div></td></tr>';
+    return '<tr><td><span style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">'+esc(r.id_bobine)+'</span></td><td>'+esc(r.marque)+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur)+'"></span>'+esc(r.couleur)+'</td><td><span class="badge '+badgeMatiere(r.type_matiere)+'">'+esc(r.type_matiere)+'</span></td><td style="font-family:var(--font-mono)">'+r.poids_g+'g</td><td style="font-family:var(--font-mono)">'+parseFloat(r.prix_euros).toFixed(2)+'€</td><td style="font-family:var(--font-mono);color:var(--teal)">'+parseFloat(r.prix_par_gramme||0).toFixed(4)+'</td><td style="font-family:var(--font-mono)">'+(r.quantite||1)+'</td><td><span class="badge '+(r.entame?'badge-yes':'badge-no')+'">'+(r.entame?'Oui':'Non')+'</span></td><td style="font-size:13px;color:var(--text2)">'+esc((r.fournisseurs&&r.fournisseurs.nom)||'—')+'</td><td><span class="badge '+(r.etat==='epuise'?'badge-no':r.etat==='sorti'?'badge-other':'badge-yes')+'">'+(r.etat==='epuise'?'Épuisé':r.etat==='sorti'?'Sorti':'Disponible')+'</span></td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditFilament(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'filaments\',\''+r.id+'\',loadFilaments)">✕</button></div></td></tr>';
   }).join('');
 }
 
@@ -1239,6 +1262,7 @@ async function openEditFilament(id){
     document.getElementById('date-stock').value=r.date_mise_en_stock||'';
     document.getElementById('chk-refill').checked=r.refill||false;
     document.getElementById('chk-entame').checked=r.entame||false;
+    document.getElementById('sel-etat-fil').value=r.etat||'disponible';
     calcPrixG();
   }catch(err){toast('Erreur : '+err.message,'error');}
 }
@@ -1248,7 +1272,7 @@ async function saveFilament(e){
   var editId=document.getElementById('fil-edit-id').value;
   btn.textContent='...'; btn.disabled=true;
   try{
-    var body={id_bobine:form.id_bobine.value.trim(),marque:form.marque.value,couleur:form.couleur.value,type_matiere:form.type_matiere.value,format_bobine:form.format_bobine.value,refill:form.refill.checked,entame:form.entame.checked,poids_g:parseFloat(form.poids_g.value),prix_euros:parseFloat(form.prix_euros.value),quantite:parseInt(form.quantite.value)||1,date_mise_en_stock:form.date_mise_en_stock.value||null,fournisseur_id:form.fournisseur_id.value||null};
+    var body={id_bobine:form.id_bobine.value.trim(),marque:form.marque.value,couleur:form.couleur.value,type_matiere:form.type_matiere.value,format_bobine:form.format_bobine.value,refill:form.refill.checked,entame:form.entame.checked,etat:form.etat.value||'disponible',poids_g:parseFloat(form.poids_g.value),prix_euros:parseFloat(form.prix_euros.value),quantite:parseInt(form.quantite.value)||1,date_mise_en_stock:form.date_mise_en_stock.value||null,fournisseur_id:form.fournisseur_id.value||null};
     if(editId){await api('PATCH','filaments',body,'?id=eq.'+editId);toast('Filament modifié ✓','success');}
     else{await api('POST','filaments',body);toast('Filament ajouté ✓','success');}
     closeModal('modal-filament'); form.reset();
@@ -1336,6 +1360,7 @@ function showPage(name,e){
   if(e&&e.target) e.target.classList.add('active');
   if(name==='parametres') loadParamsPage();
   if(name==='objets') loadObjets();
+  if(name==='rapport') loadRapportFilaments();
 }
 
 function openModal(id){
@@ -1384,6 +1409,8 @@ function showSubPage(pageId, subName, e) {
   if(subName==='consommables') loadConsommables();
   if(subName==='paramcalcul') loadParamCalcul();
   if(subName==='calculprix') loadCalculsPrix();
+  if(subName==='rapport-filaments') loadRapportFilaments();
+  if(subName==='rapport-produits') loadRapportProduits();
 }
 
 /* ======= ACCESSOIRES : DURÉE DE VIE ======= */
@@ -1987,6 +2014,7 @@ async function saveCalculPrix(e){
       objet_id:form.objet_id.value||null,
       modules_selectionnes:modulesChecked.join(','),
       accessoires_ids:accIds.join(','),
+      nb_plaques:parseInt((document.getElementById('calc-nb-plaques')||{}).value)||1,
       nb_heures_impression:form.nb_heures_impression.value||null,
       nb_heures_mo:parseFloat(form.nb_heures_mo.value)||null,
       taux_echec:parseFloat(form.taux_echec.value)||null,
@@ -2047,6 +2075,7 @@ async function openEditCalculPrix(id){
     form.pct_charge_vente.value=r.pct_charge_vente||'';
     form.prix_moyen_constate.value=r.prix_moyen_constate||'';
     form.date_prix_moyen.value=r.date_prix_moyen||'';
+    var nbpl=document.getElementById('calc-nb-plaques'); if(nbpl) nbpl.value=r.nb_plaques||1;
 
     // Restaurer les filaments via selectedIndex (plus fiable que sel.value=)
     for(var i=1;i<=10;i++){
@@ -2063,6 +2092,67 @@ async function openEditCalculPrix(id){
   }catch(err){toast('Erreur : '+err.message,'error');}
 }
 /* ======= FIN CALCUL DU PRIX ======= */
+
+
+/* ======= RAPPORT ======= */
+async function loadRapportFilaments(){
+  var el=document.getElementById('rapport-fil-content');
+  if(el) el.innerHTML='<div class="loading"><span class="spinner"></span></div>';
+  try{
+    var data=await api('GET','filaments',null,'?order=couleur');
+    var byCouleur={},byType={},byFormat={},refillCount=0,nonRefillCount=0,dispCount=0,epuiseCount=0,sortiCount=0;
+    data.forEach(function(r){
+      var q=r.quantite||1;
+      var c=r.couleur||'?'; if(!byCouleur[c]) byCouleur[c]={count:0,poids:0}; byCouleur[c].count+=q; byCouleur[c].poids+=(r.poids_g||0)*q;
+      var t=r.type_matiere||'?'; if(!byType[t]) byType[t]={count:0,poids:0}; byType[t].count+=q; byType[t].poids+=(r.poids_g||0)*q;
+      var f=r.format_bobine||'Standard'; if(!byFormat[f]) byFormat[f]={count:0}; byFormat[f].count+=q;
+      if(r.refill) refillCount+=q; else nonRefillCount+=q;
+      var etat=r.etat||'disponible';
+      if(etat==='disponible') dispCount+=q; else if(etat==='epuise') epuiseCount+=q; else sortiCount+=q;
+    });
+    var html='';
+    // Par couleur
+    html+='<h3 style="font-family:var(--font-mono);font-size:13px;text-transform:uppercase;color:var(--text2);margin:0 0 10px">Par couleur</h3>';
+    html+='<div class="table-wrap" style="margin-bottom:28px"><table><thead><tr><th>Couleur</th><th>Nb bobines</th><th>Poids total (g)</th></tr></thead><tbody>';
+    Object.keys(byCouleur).sort().forEach(function(c){var v=byCouleur[c];html+='<tr><td><span class="color-dot" style="background:'+colorHex(c)+'"></span>'+esc(c)+'</td><td style="font-family:var(--font-mono)">'+v.count+'</td><td style="font-family:var(--font-mono)">'+v.poids.toFixed(0)+' g</td></tr>';});
+    html+='</tbody></table></div>';
+    // Par type
+    html+='<h3 style="font-family:var(--font-mono);font-size:13px;text-transform:uppercase;color:var(--text2);margin:0 0 10px">Par type de matière</h3>';
+    html+='<div class="table-wrap" style="margin-bottom:28px"><table><thead><tr><th>Matière</th><th>Nb bobines</th><th>Poids total (g)</th></tr></thead><tbody>';
+    Object.keys(byType).sort().forEach(function(t){var v=byType[t];html+='<tr><td><span class="badge '+badgeMatiere(t)+'">'+esc(t)+'</span></td><td style="font-family:var(--font-mono)">'+v.count+'</td><td style="font-family:var(--font-mono)">'+v.poids.toFixed(0)+' g</td></tr>';});
+    html+='</tbody></table></div>';
+    // Par format
+    html+='<h3 style="font-family:var(--font-mono);font-size:13px;text-transform:uppercase;color:var(--text2);margin:0 0 10px">Par format de bobine</h3>';
+    html+='<div class="table-wrap" style="margin-bottom:28px"><table><thead><tr><th>Format</th><th>Nb bobines</th></tr></thead><tbody>';
+    Object.keys(byFormat).sort().forEach(function(f){html+='<tr><td>'+esc(f)+'</td><td style="font-family:var(--font-mono)">'+byFormat[f].count+'</td></tr>';});
+    html+='</tbody></table></div>';
+    // Cartes synthèse
+    html+='<div class="settings-grid">';
+    html+='<div class="settings-card"><div class="settings-card-title">🔄 Refill vs Standard</div><p style="font-family:var(--font-mono);margin:8px 0">Refill : <strong>'+refillCount+'</strong></p><p style="font-family:var(--font-mono);margin:8px 0">Standard : <strong>'+nonRefillCount+'</strong></p></div>';
+    html+='<div class="settings-card"><div class="settings-card-title">📊 Par état</div><p style="font-family:var(--font-mono);margin:8px 0">✅ Disponible : <strong style="color:var(--teal)">'+dispCount+'</strong></p><p style="font-family:var(--font-mono);margin:8px 0">🔴 Épuisé : <strong style="color:#e74c3c">'+epuiseCount+'</strong></p><p style="font-family:var(--font-mono);margin:8px 0">⬜ Sorti du stock : <strong style="color:var(--text2)">'+sortiCount+'</strong></p></div>';
+    html+='</div>';
+    if(el) el.innerHTML=html;
+  }catch(err){if(el) el.innerHTML='<p style="color:#e74c3c">Erreur : '+esc(err.message)+'</p>';}
+}
+
+async function loadRapportProduits(){
+  var el=document.getElementById('rapport-prod-content');
+  if(el) el.innerHTML='<div class="loading"><span class="spinner"></span></div>';
+  try{
+    var data=await api('GET','objets_vente',null,'?order=nom');
+    var html='<div class="table-wrap"><table><thead><tr><th>Produit</th><th>Catégorie</th><th>Stock fini</th><th>Module 1</th><th>Module 2</th><th>Module 3</th><th>Module 4</th><th>Module 5</th><th>Module 6</th></tr></thead><tbody>';
+    if(!data||!data.length){html+='<tr class="empty-row"><td colspan="9">Aucun produit</td></tr>';}
+    else{data.forEach(function(r){
+      html+='<tr><td><strong>'+esc(r.nom||'—')+'</strong></td><td>'+esc(r.categorie||'—')+'</td>';
+      html+='<td><span class="badge '+(r.stock>0?'badge-yes':'badge-no')+'">'+(r.stock!=null?r.stock:0)+'</span></td>';
+      for(var i=1;i<=6;i++){var nom=r['piece_'+i+'_nom'],st=r['piece_'+i+'_stock'];if(nom){html+='<td><div style="font-size:11px;color:var(--text2);margin-bottom:4px">'+esc(nom)+'</div><span class="badge '+(st>0?'badge-yes':'badge-no')+'">'+(st!=null?st:0)+'</span></td>';}else{html+='<td style="color:var(--text3)">—</td>';}}
+      html+='</tr>';
+    });}
+    html+='</tbody></table></div>';
+    if(el) el.innerHTML=html;
+  }catch(err){if(el) el.innerHTML='<p style="color:#e74c3c">Erreur : '+esc(err.message)+'</p>';}
+}
+/* ======= FIN RAPPORT ======= */
 
 /* ======= MODULE EXPORT ======= */
 function cleanFilament(r) {
