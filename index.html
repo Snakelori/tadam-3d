@@ -152,11 +152,18 @@
 
     /* SOUS-ONGLETS */
     .subnav{display:flex;border-bottom:2px solid var(--border);margin-bottom:24px;gap:0;overflow-x:auto;}
-    .subnav-btn{font-family:var(--font-mono);font-size:12px;font-weight:700;padding:10px 18px;border:none;background:none;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;}
-    .subnav-btn:hover{color:var(--text);}
+    .subnav-btn{font-family:var(--font-mono);font-size:12px;font-weight:700;padding:10px 18px;border:none;background:none;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;border-radius:var(--radius) var(--radius) 0 0;}
+    .subnav-btn:hover{color:var(--accent);background:rgba(26,107,255,0.07);}
     .subnav-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
     .subpage{display:none;}
-    .subpage.active{display:block;}
+    .subpage.active{display:block;animation:pageIn .2s ease;}
+    /* SOUS-ONGLETS NIVEAU 2 */
+    .subnav2{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px;gap:0;overflow-x:auto;}
+    .subnav2-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;padding:8px 14px;border:none;background:none;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;white-space:nowrap;border-radius:8px 8px 0 0;}
+    .subnav2-btn:hover{color:var(--accent);background:rgba(26,107,255,0.06);}
+    .subnav2-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+    .subsubpage{display:none;}
+    .subsubpage.active{display:block;animation:pageIn .2s ease;}
 
     /* CALCUL PRIX */
     .calc-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
@@ -233,7 +240,7 @@
     <button class="nav-btn" onclick="showPage('parametres',event)">⚙️ Paramètres</button>
     <button class="nav-btn active" onclick="showPage('filaments',event)">🧵 Filaments</button>
     <button class="nav-btn" onclick="showPage('accessoires',event)">🛒 Accessoires</button>
-    <button class="nav-btn" onclick="showPage('objets',event)">🛍️ Objets à vendre</button>
+    <button class="nav-btn" onclick="showPage('objets',event)">🛍️ Objets</button>
     <button class="nav-btn" onclick="showPage('rapport',event)">📊 Rapport</button>
   </nav>
   <main>
@@ -399,17 +406,26 @@
       </div>
     </div>
 
-    <!-- OBJETS À VENDRE -->
+    <!-- OBJETS -->
     <div class="page" id="page-objets">
+      <!-- Niveau 1 : Objets à vendre / Objets vendus -->
       <div class="subnav">
-        <button class="subnav-btn active" onclick="showSubPage('objets','catalogue',event)">📦 Catalogues</button>
-        <button class="subnav-btn" onclick="showSubPage('objets','consommables',event)">🧴 Consommables</button>
-        <button class="subnav-btn" onclick="showSubPage('objets','paramcalcul',event)">⚙️ Paramètres de calcul</button>
-        <button class="subnav-btn" onclick="showSubPage('objets','calculprix',event)">💰 Calcul du prix</button>
+        <button class="subnav-btn active" onclick="showSubPage('objets','objetsvendre',event)">🛍️ Objets à vendre</button>
+        <button class="subnav-btn" onclick="showSubPage('objets','objetsvendus',event)">💸 Objets vendus</button>
       </div>
 
-      <!-- SOUS-PAGE : CATALOGUE -->
-      <div class="subpage active" id="subpage-catalogue">
+      <!-- SOUS-PAGE NIVEAU 1 : OBJETS À VENDRE -->
+      <div class="subpage active" id="subpage-objetsvendre">
+        <!-- Niveau 2 : sous-navigation interne -->
+        <div class="subnav2">
+          <button class="subnav2-btn active" onclick="showSubPage2('catalogue',event)">📦 Catalogues</button>
+          <button class="subnav2-btn" onclick="showSubPage2('consommables',event)">🧴 Consommables</button>
+          <button class="subnav2-btn" onclick="showSubPage2('paramcalcul',event)">⚙️ Paramètres de calcul</button>
+          <button class="subnav2-btn" onclick="showSubPage2('calculprix',event)">💰 Calcul du prix</button>
+        </div>
+
+      <!-- SOUS-SOUS-PAGE : CATALOGUE -->
+      <div class="subsubpage active" id="subpage-catalogue">
         <div class="stats-row">
           <div class="stat-card"><div class="stat-label">Objets référencés</div><div class="stat-value accent" id="stat-obj-total">—</div></div>
           <div class="stat-card"><div class="stat-label">Multi couleur</div><div class="stat-value teal" id="stat-obj-multi">—</div></div>
@@ -430,8 +446,8 @@
         </div>
       </div>
 
-      <!-- SOUS-PAGE : CONSOMMABLES -->
-      <div class="subpage" id="subpage-consommables">
+      <!-- SOUS-SOUS-PAGE : CONSOMMABLES -->
+      <div class="subsubpage" id="subpage-consommables">
         <div class="section-header">
           <div style="display:flex;align-items:center;gap:12px">
             <span class="section-title">Consommables</span>
@@ -447,8 +463,8 @@
         </div>
       </div>
 
-      <!-- SOUS-PAGE : PARAMÈTRES DE CALCUL -->
-      <div class="subpage" id="subpage-paramcalcul">
+      <!-- SOUS-SOUS-PAGE : PARAMÈTRES DE CALCUL -->
+      <div class="subsubpage" id="subpage-paramcalcul">
         <div class="section-header"><span class="section-title">Paramètres de calcul du prix</span></div>
         <form id="form-paramcalcul" onsubmit="saveParamCalcul(event)">
           <input type="hidden" id="param-edit-id">
@@ -502,8 +518,8 @@
         </form>
       </div>
 
-      <!-- SOUS-PAGE : CALCUL DU PRIX -->
-      <div class="subpage" id="subpage-calculprix">
+      <!-- SOUS-SOUS-PAGE : CALCUL DU PRIX -->
+      <div class="subsubpage" id="subpage-calculprix">
         <div class="section-header">
           <span class="section-title">Calcul du prix des produits</span>
           <button class="btn btn-primary" onclick="openAddCalculPrix()">+ Nouveau calcul</button>
@@ -512,6 +528,30 @@
           <table>
             <thead><tr><th>Produit</th><th>Coût réel</th><th>Coût avec échec</th><th>Prix vente (sans échec)</th><th>Prix vente (avec échec)</th><th>Prix moyen constaté</th><th>Date</th><th></th></tr></thead>
             <tbody id="tbody-calculprix"><tr class="empty-row"><td colspan="8">Cliquez sur "+ Nouveau calcul"</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      </div><!-- fin subpage-objetsvendre -->
+
+      <!-- SOUS-PAGE NIVEAU 1 : OBJETS VENDUS -->
+      <div class="subpage" id="subpage-objetsvendus">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Ventes enregistrées</div><div class="stat-value accent" id="stat-ventes-total">—</div></div>
+          <div class="stat-card"><div class="stat-label">Pièces vendues</div><div class="stat-value teal" id="stat-ventes-pieces">—</div></div>
+          <div class="stat-card"><div class="stat-label">Dernière vente</div><div class="stat-value amber" id="stat-ventes-last" style="font-size:14px">—</div></div>
+        </div>
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="section-title">Historique des ventes</span>
+            <span class="count-badge" id="count-ventes">0</span>
+          </div>
+          <button class="btn btn-primary" onclick="openAddVente()">+ Enregistrer une vente</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Produit vendu</th><th>Qté vendue</th><th>Stock restant</th><th>Date de vente</th><th>Lieu de vente</th><th></th></tr></thead>
+            <tbody id="tbody-ventes"><tr class="empty-row"><td colspan="6">Aucune vente — cliquez sur "+ Enregistrer une vente"</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -993,6 +1033,56 @@
   </div>
 </div>
 
+<!-- MODAL VENTE -->
+<div class="modal-overlay" id="modal-vente">
+  <div class="modal">
+    <div class="modal-title">💸 ENREGISTRER UNE VENTE</div>
+    <form id="form-vente" onsubmit="saveVente(event)">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Objet vendu *</label>
+          <select id="vente-objet-id" required onchange="onVenteObjetChange()">
+            <option value="">— Choisir un objet —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Stock actuel</label>
+          <input type="text" id="vente-stock-actuel" class="calc-field" readonly placeholder="—">
+        </div>
+        <div class="form-group">
+          <label>Nombre de pièces vendues *</label>
+          <input type="number" id="vente-nb" min="1" value="1" required oninput="onVenteNbChange()">
+        </div>
+        <div class="form-group">
+          <label>Date de vente *</label>
+          <input type="date" id="vente-date" required>
+        </div>
+        <div class="form-group">
+          <label>Lieu de vente *</label>
+          <select id="vente-lieu" required>
+            <option value="">— Choisir —</option>
+            <option value="Etsy">Etsy</option>
+            <option value="Bamboulab">Bamboulab</option>
+            <option value="Amazon">Amazon</option>
+            <option value="Direct">Vente directe</option>
+            <option value="Leboncoin">Leboncoin</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+        <div class="form-group full" id="vente-stock-warning" style="display:none">
+          <div style="background:#fdecea;border:1px solid var(--red);border-radius:8px;padding:10px 14px;font-family:var(--font-mono);font-size:12px;color:var(--red)">
+            ⚠️ La quantité vendue ne peut pas dépasser le stock disponible.
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-vente')">Annuler</button>
+        <button type="submit" class="btn btn-primary" id="btn-save-vente">Enregistrer la vente</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1450,15 +1540,22 @@ function toast(msg,type){
 /* ======= SOUS-ONGLETS ======= */
 function showSubPage(pageId, subName, e) {
   var page = document.getElementById('page-'+pageId);
-  page.querySelectorAll('.subpage').forEach(function(p){p.classList.remove('active');});
-  page.querySelectorAll('.subnav-btn').forEach(function(b){b.classList.remove('active');});
+  page.querySelectorAll(':scope > .subpage').forEach(function(p){p.classList.remove('active');});
+  page.querySelectorAll(':scope > .subnav .subnav-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('subpage-'+subName).classList.add('active');
+  if(e&&e.target) e.target.classList.add('active');
+  if(subName==='objetsvendus') loadObjetsVendus();
+  if(subName==='rapport-filaments') loadRapportFilaments();
+  if(subName==='rapport-produits') loadRapportProduits();
+}
+function showSubPage2(subName, e) {
+  document.querySelectorAll('.subnav2-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.subsubpage').forEach(function(p){p.classList.remove('active');});
   document.getElementById('subpage-'+subName).classList.add('active');
   if(e&&e.target) e.target.classList.add('active');
   if(subName==='consommables') loadConsommables();
   if(subName==='paramcalcul') loadParamCalcul();
-  if(subName==='calculprix') loadCalculsPrix();
-  if(subName==='rapport-filaments') loadRapportFilaments();
-  if(subName==='rapport-produits') loadRapportProduits();
+  if(subName==='calculprix'){ loadCalculsPrix(); loadObjets(); }
 }
 
 /* ======= ACCESSOIRES : DURÉE DE VIE ======= */
@@ -1763,6 +1860,114 @@ function calcTempsTotal(){
   document.getElementById('obj-temps-total').value=total>0?formatHHmm(total):'';
 }
 /* ======= FIN MODULE OBJETS ======= */
+
+/* ======= MODULE OBJETS VENDUS ======= */
+async function loadObjetsVendus(){
+  try{
+    var data=await api('GET','objets_vendus',null,'?select=*,objets_vente(nom,stock)&order=date_vente.desc,created_at.desc');
+    renderObjetsVendus(data||[]);
+  }catch(err){
+    document.getElementById('tbody-ventes').innerHTML='<tr class="empty-row"><td colspan="6">Erreur : '+esc(err.message)+'</td></tr>';
+  }
+}
+function renderObjetsVendus(data){
+  var tbody=document.getElementById('tbody-ventes');
+  document.getElementById('count-ventes').textContent=data.length;
+  var totalPieces=data.reduce(function(s,r){return s+(r.nombre_vendus||0);},0);
+  animateCounter(document.getElementById('stat-ventes-total'),data.length);
+  animateCounter(document.getElementById('stat-ventes-pieces'),totalPieces);
+  var lastDate=data.length?data[0].date_vente||'—':'—';
+  document.getElementById('stat-ventes-last').textContent=lastDate;
+  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="6">Aucune vente — cliquez sur "+ Enregistrer une vente"</td></tr>';return;}
+  tbody.innerHTML=data.map(function(r){
+    var nomObjet=r.objets_vente?esc(r.objets_vente.nom||'—'):'<span style="color:var(--text3)">Objet supprimé</span>';
+    var stockRestant=r.objets_vente!=null?r.objets_vente.stock:'—';
+    var stockBadge=stockRestant!=='—'?'<span class="badge '+(stockRestant>0?'badge-yes':'badge-no')+'">'+stockRestant+'</span>':'—';
+    var lieuMap={'Etsy':'🏪 Etsy','Bamboulab':'🐼 Bamboulab','Amazon':'📦 Amazon','Direct':'🤝 Direct','Leboncoin':'🟠 Leboncoin','Autre':'📌 Autre'};
+    return '<tr><td><strong>'+nomObjet+'</strong></td><td style="font-family:var(--font-mono)">'+(r.nombre_vendus||0)+'</td><td>'+stockBadge+'</td><td style="font-family:var(--font-mono);font-size:13px;color:var(--text2)">'+(r.date_vente||'—')+'</td><td>'+(lieuMap[r.lieu_vente]||esc(r.lieu_vente||'—'))+'</td><td><button class="btn btn-danger btn-sm" onclick="deleteVente(\''+r.id+'\',\''+r.objet_id+'\','+r.nombre_vendus+')">✕</button></td></tr>';
+  }).join('');
+}
+async function openAddVente(){
+  var sel=document.getElementById('vente-objet-id');
+  sel.innerHTML='<option value="">— Choisir un objet —</option>';
+  if(!objets||!objets.length){
+    var od=await api('GET','objets_vente',null,'?select=id,nom,stock&order=nom');
+    objets=od||[];
+  }
+  objets.forEach(function(o){
+    var opt=document.createElement('option');
+    opt.value=o.id; opt.textContent=o.nom+(o.stock!=null?' (stock: '+o.stock+')':'');
+    opt.dataset.stock=o.stock!=null?o.stock:0;
+    sel.appendChild(opt);
+  });
+  document.getElementById('vente-stock-actuel').value='';
+  document.getElementById('vente-nb').value=1;
+  document.getElementById('vente-stock-warning').style.display='none';
+  var today=new Date().toISOString().split('T')[0];
+  document.getElementById('vente-date').value=today;
+  document.getElementById('vente-lieu').value='';
+  openModal('modal-vente');
+}
+function onVenteObjetChange(){
+  var sel=document.getElementById('vente-objet-id');
+  var opt=sel.options[sel.selectedIndex];
+  var stock=opt&&opt.dataset.stock!==undefined?parseInt(opt.dataset.stock):null;
+  document.getElementById('vente-stock-actuel').value=stock!=null?stock+' pièce(s)':'—';
+  document.getElementById('vente-nb').max=stock!=null?stock:'';
+  onVenteNbChange();
+}
+function onVenteNbChange(){
+  var sel=document.getElementById('vente-objet-id');
+  var opt=sel.options[sel.selectedIndex];
+  var stock=opt&&opt.dataset.stock!==undefined?parseInt(opt.dataset.stock):null;
+  var nb=parseInt(document.getElementById('vente-nb').value)||0;
+  var warn=document.getElementById('vente-stock-warning');
+  warn.style.display=(stock!=null&&nb>stock)?'block':'none';
+}
+async function saveVente(e){
+  e.preventDefault();
+  var objetId=document.getElementById('vente-objet-id').value;
+  var nb=parseInt(document.getElementById('vente-nb').value)||0;
+  var dateVente=document.getElementById('vente-date').value;
+  var lieu=document.getElementById('vente-lieu').value;
+  var sel=document.getElementById('vente-objet-id');
+  var opt=sel.options[sel.selectedIndex];
+  var stock=opt&&opt.dataset.stock!==undefined?parseInt(opt.dataset.stock):null;
+  if(!objetId){toast('Choisir un objet','error');return;}
+  if(nb<1){toast('Quantité invalide','error');return;}
+  if(stock!=null&&nb>stock){toast('Quantité supérieure au stock !','error');return;}
+  if(!lieu){toast('Choisir un lieu de vente','error');return;}
+  try{
+    // Enregistrer la vente
+    await api('POST','objets_vendus',{objet_id:objetId,nombre_vendus:nb,date_vente:dateVente,lieu_vente:lieu});
+    // Décrémenter le stock
+    var newStock=stock!=null?Math.max(0,stock-nb):null;
+    if(newStock!=null) await api('PATCH','objets_vente',{stock:newStock},'?id=eq.'+objetId);
+    // Mettre à jour le cache local
+    var o=objets.find(function(x){return x.id===objetId;});
+    if(o&&newStock!=null) o.stock=newStock;
+    toast('Vente enregistrée ✓ — stock mis à jour','success');
+    closeModal('modal-vente');
+    await loadObjetsVendus();
+  }catch(err){toast('Erreur : '+err.message,'error');}
+}
+async function deleteVente(id,objetId,nb){
+  if(!confirm('Supprimer cette vente ? Le stock sera restauré (+'+nb+' pièce(s)).')) return;
+  try{
+    await api('DELETE','objets_vendus',null,'?id=eq.'+id);
+    // Restaurer le stock
+    var objetData=await api('GET','objets_vente',null,'?id=eq.'+objetId+'&select=stock');
+    if(objetData&&objetData.length){
+      var currentStock=objetData[0].stock||0;
+      await api('PATCH','objets_vente',{stock:currentStock+nb},'?id=eq.'+objetId);
+      var o=objets.find(function(x){return x.id===objetId;});
+      if(o) o.stock=currentStock+nb;
+    }
+    toast('Vente supprimée ✓ — stock restauré','success');
+    await loadObjetsVendus();
+  }catch(err){toast('Erreur : '+err.message,'error');}
+}
+/* ======= FIN MODULE OBJETS VENDUS ======= */
 
 /* ======= CALCUL DU PRIX ======= */
 var calculsData=[];
