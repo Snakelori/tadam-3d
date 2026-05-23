@@ -486,7 +486,8 @@
 
             <div class="settings-card">
               <div class="settings-card-title">📋 Coûts fixes</div>
-              <div class="form-group"><label>Coût logistique unitaire (€)</label><input type="number" name="cout_logistique_unitaire" step="0.01" placeholder="0.50"></div>
+              <div class="form-group" style="margin-bottom:10px"><label>Coût logistique unitaire (€)</label><input type="number" name="cout_logistique_unitaire" step="0.01" placeholder="0.50"></div>
+              <div class="form-group"><label>Coût à la plaque (€)</label><input type="number" name="cout_par_plaque" step="0.01" min="0" placeholder="0.00"></div>
             </div>
 
             <div class="settings-card">
@@ -843,7 +844,7 @@
           </div>
           <div class="form-group"><label>Temps d'impression total (calculé)</label><input type="text" id="calc-temps-total" class="calc-field" readonly></div>
           <div class="form-group"><label>Quantité matière totale (g) (calculé)</label><input type="text" id="calc-qte-total" class="calc-field" readonly></div>
-          <div class="form-group"><label>Nombre de plaques d'impression</label><input type="number" name="nb_plaques" id="calc-nb-plaques" min="1" value="1" placeholder="1"></div>
+          <div class="form-group"><label>Nombre de plaques d'impression</label><input type="number" name="nb_plaques" id="calc-nb-plaques" min="1" value="1" placeholder="1" oninput="calcCoutPlaque()"></div>
           <div class="form-group"><label>Nb de couleurs (calculé)</label><input type="text" id="calc-nb-couleurs" class="calc-field" readonly></div>
         </div>
       </div>
@@ -882,6 +883,7 @@
         <div class="form-grid">
           <div class="form-group"><label>Coût fiche produit (€)</label><input type="text" id="calc-cout-fiche" class="calc-field" readonly></div>
           <div class="form-group"><label>Coût logistique (€)</label><input type="text" id="calc-cout-logistique" class="calc-field" readonly></div>
+          <div class="form-group"><label>Coût plaques (nb plaques × coût/plaque)</label><input type="text" id="calc-cout-plaque" class="calc-field" readonly placeholder="0.00 €"></div>
         </div>
       </div>
 
@@ -925,7 +927,7 @@
           <div style="margin-top:10px;display:grid;gap:6px;line-height:1.7">
             <div style="background:var(--bg2);border-radius:6px;padding:8px 12px">
               <span style="font-family:var(--font-mono);font-weight:700;color:var(--text)">Coût produit réel</span>
-              <span style="color:var(--text2)"> = filaments + accessoires + logistique + fiche + électricité + usure + maintenance + main d'œuvre + mise en vente</span>
+              <span style="color:var(--text2)"> = filaments + accessoires + logistique + fiche + électricité + usure + maintenance + main d'œuvre + mise en vente + <strong>coût plaques (nb plaques × coût/plaque)</strong></span>
             </div>
             <div style="background:var(--bg2);border-radius:6px;padding:8px 12px">
               <span style="font-family:var(--font-mono);font-weight:700;color:var(--accent)">Coût produit avec échec</span>
@@ -1665,7 +1667,7 @@ function fillParamForm(r){
   var form=document.getElementById('form-paramcalcul');
   if(!form) return;
   document.getElementById('param-edit-id').value=r.id||'';
-  ['prix_kwh','conso_imprimante','usure_par_produit','cout_maintenance','taux_horaire_mo','cout_fiche_produit','nb_produit_rentabilite','cout_logistique_unitaire','site_vente','cout_mise_en_vente','pct_charge_vente','taux_marge_vente','taux_ursaff','taux_impot'].forEach(function(f){
+  ['prix_kwh','conso_imprimante','usure_par_produit','cout_maintenance','taux_horaire_mo','cout_fiche_produit','nb_produit_rentabilite','cout_logistique_unitaire','cout_par_plaque','site_vente','cout_mise_en_vente','pct_charge_vente','taux_marge_vente','taux_ursaff','taux_impot'].forEach(function(f){
     if(form[f]) form[f].value=r[f]!=null?r[f]:'';
   });
   updateCoutFichePreview();
@@ -1708,6 +1710,7 @@ async function saveParamCalcul(e){
     cout_fiche_produit:parseFloat(form.cout_fiche_produit.value)||null,
     nb_produit_rentabilite:parseInt(form.nb_produit_rentabilite.value)||null,
     cout_logistique_unitaire:parseFloat(form.cout_logistique_unitaire.value)||null,
+    cout_par_plaque:parseFloat(form.cout_par_plaque.value)||null,
     site_vente:form.site_vente.value||null,
     cout_mise_en_vente:parseFloat(form.cout_mise_en_vente.value)||null,
     pct_charge_vente:parseFloat(form.pct_charge_vente.value)||null,
@@ -2148,6 +2151,7 @@ async function openAddCalculPrix(){
     if(cmaint) cmaint.value=paramCalcul.cout_maintenance?paramCalcul.cout_maintenance.toFixed(2)+' €':'';
     var cvente=document.getElementById('calc-cout-vente');
     if(cvente) cvente.value=paramCalcul.cout_mise_en_vente?paramCalcul.cout_mise_en_vente.toFixed(2)+' €':'';
+    calcCoutPlaque();
   }
   // Peupler select objet
   var sel=document.getElementById('sel-calc-objet');
@@ -2255,6 +2259,14 @@ function calcTotalElec(){
   calcResultats();
 }
 
+function calcCoutPlaque(){
+  var nbPlaques=parseInt((document.getElementById('calc-nb-plaques')||{}).value)||1;
+  var coutParPlaque=(paramCalcul&&paramCalcul.cout_par_plaque)||0;
+  var el=document.getElementById('calc-cout-plaque');
+  if(el) el.value=coutParPlaque>0?(coutParPlaque*nbPlaques).toFixed(2)+' €':'';
+  calcResultats();
+}
+
 function calcTotalMO(){
   var heures=parseHHmm((document.getElementById('calc-nb-mo')||{}).value||'')/60;
   var taux=(paramCalcul&&paramCalcul.taux_horaire_mo)||0;
@@ -2284,8 +2296,10 @@ function calcResultats(){
   var moCout=parseFloat(moTxt)||0;
   var venteTxt=((document.getElementById('calc-cout-vente')||{}).value||'').replace(' €','');
   var venteCout=parseFloat(venteTxt)||0;
+  var plaqueTxt=((document.getElementById('calc-cout-plaque')||{}).value||'').replace(' €','');
+  var plaqueCout=parseFloat(plaqueTxt)||0;
 
-  var coutReel=filCout+accCout+ficheCout+logCout+elecCout+usureCout+maintCout+moCout+venteCout;
+  var coutReel=filCout+accCout+ficheCout+logCout+elecCout+usureCout+maintCout+moCout+venteCout+plaqueCout;
   var taux=(parseFloat(document.getElementById('calc-taux-echec')&&document.getElementById('calc-taux-echec').value)||0)/100;
   var coutEchec=coutReel*(1+taux);
   var pct=parseFloat(document.getElementById('calc-pct-charge')&&document.getElementById('calc-pct-charge').value)||0;
