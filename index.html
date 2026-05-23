@@ -883,7 +883,6 @@
         <div class="form-grid">
           <div class="form-group"><label>Coût fiche produit (€)</label><input type="text" id="calc-cout-fiche" class="calc-field" readonly></div>
           <div class="form-group"><label>Coût logistique (€)</label><input type="text" id="calc-cout-logistique" class="calc-field" readonly></div>
-          <div class="form-group"><label>Coût plaques (nb plaques × coût/plaque)</label><input type="text" id="calc-cout-plaque" class="calc-field" readonly placeholder="0.00 €"></div>
         </div>
       </div>
 
@@ -912,6 +911,19 @@
         <div class="form-grid">
           <div class="form-group"><label>Taux d'échec (%)</label><input type="number" name="taux_echec" id="calc-taux-echec" step="0.01" min="0" max="100" placeholder="0" oninput="calcResultats()"></div>
           <div class="form-group"><label>Frais mise en vente (€)</label><input type="text" id="calc-cout-vente" class="calc-field" readonly></div>
+        </div>
+      </div>
+
+      <!-- Coût des plaques -->
+      <div class="calc-section">
+        <div class="calc-section-title">🖨️ Coût des plaques d'impression</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Coût à la plaque — depuis paramètres (€)</label><input type="text" id="calc-prix-par-plaque" class="calc-field" readonly placeholder="Non défini"></div>
+          <div class="form-group"><label>Nombre de plaques</label><input type="text" id="calc-nb-plaques-disp" class="calc-field" readonly></div>
+          <div class="form-group full" style="margin-top:4px">
+            <label>Total coût des plaques (calculé)</label>
+            <input type="text" id="calc-cout-plaque" class="result-field" readonly placeholder="0.00 €" style="font-size:16px;font-weight:700;">
+          </div>
         </div>
       </div>
 
@@ -2262,8 +2274,16 @@ function calcTotalElec(){
 function calcCoutPlaque(){
   var nbPlaques=parseInt((document.getElementById('calc-nb-plaques')||{}).value)||1;
   var coutParPlaque=(paramCalcul&&paramCalcul.cout_par_plaque)||0;
+  // Affichage du prix par plaque (depuis paramètres)
+  var ePrix=document.getElementById('calc-prix-par-plaque');
+  if(ePrix) ePrix.value=coutParPlaque>0?coutParPlaque.toFixed(2)+' €/plaque':'Non défini';
+  // Affichage du nombre de plaques
+  var eNb=document.getElementById('calc-nb-plaques-disp');
+  if(eNb) eNb.value=nbPlaques+' plaque'+(nbPlaques>1?'s':'');
+  // Total
+  var total=coutParPlaque*nbPlaques;
   var el=document.getElementById('calc-cout-plaque');
-  if(el) el.value=coutParPlaque>0?(coutParPlaque*nbPlaques).toFixed(2)+' €':'';
+  if(el) el.value=total>0?total.toFixed(2)+' €':'0.00 €';
   calcResultats();
 }
 
