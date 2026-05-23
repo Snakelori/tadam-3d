@@ -851,16 +851,40 @@
           </div>
         </details>
 
-        <div class="form-grid">
-          <div class="form-group"><label>Coût produit réel (€)</label><input type="text" id="calc-cout-reel" class="result-field" readonly></div>
-          <div class="form-group"><label>Coût produit avec échec (€)</label><input type="text" id="calc-cout-echec" class="result-field" readonly></div>
-          <div class="form-group"><label>% charge vente (modifiable)</label><input type="number" name="pct_charge_vente" id="calc-pct-charge" step="0.01" min="0" oninput="calcResultats()"></div>
-          <div class="form-group"><label>Coût fabrication réel (€)</label><input type="text" id="calc-fab-reel" class="result-field" readonly></div>
-          <div class="form-group"><label>Coût fabrication avec échec (€)</label><input type="text" id="calc-fab-echec" class="result-field" readonly></div>
-          <div class="form-group"><label>Prix vente sans échec (€)</label><input type="text" id="calc-prix-sans" class="result-field" readonly></div>
-          <div class="form-group"><label>Prix vente avec échec (€)</label><input type="text" id="calc-prix-avec" class="result-field" readonly></div>
-          <div class="form-group"><label>Prix moyen constaté (€)</label><input type="number" name="prix_moyen_constate" step="0.01" min="0" placeholder="0.00"></div>
-          <div class="form-group"><label>Date du prix constaté</label><input type="date" name="date_prix_moyen"></div>
+        <!-- Bloc 1 : Coûts -->
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+          <div style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)">💸 Coûts de production</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Coût produit réel (€)</label><input type="text" id="calc-cout-reel" class="result-field" readonly></div>
+            <div class="form-group"><label>Coût produit avec échec (€)</label><input type="text" id="calc-cout-echec" class="result-field" readonly></div>
+            <div class="form-group"><label>% charge vente (modifiable)</label><input type="number" name="pct_charge_vente" id="calc-pct-charge" step="0.01" min="0" oninput="calcResultats()"></div>
+            <div class="form-group"><label>Coût fabrication réel (€)</label><input type="text" id="calc-fab-reel" class="result-field" readonly></div>
+            <div class="form-group"><label>Coût fabrication avec échec (€)</label><input type="text" id="calc-fab-echec" class="result-field" readonly></div>
+          </div>
+        </div>
+
+        <!-- Bloc 2 : Prix de vente (mis en avant) -->
+        <div style="background:linear-gradient(135deg,#e6f7f0 0%,#d0f0e4 100%);border:2px solid #5bc99a;border-radius:10px;padding:16px;margin-bottom:12px">
+          <div style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:#0a7a5a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #a0dcc8">🏷️ Prix de vente recommandés</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <label style="font-size:11px;font-weight:600;color:#0a7a5a;display:block;margin-bottom:4px">Sans prise en compte des échecs</label>
+              <input type="text" id="calc-prix-sans" readonly style="width:100%;font-family:var(--font-mono);font-size:20px;font-weight:800;color:#0a7a5a;background:#fff;border:2px solid #5bc99a;border-radius:8px;padding:10px 14px;box-sizing:border-box">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:600;color:#c0392b;display:block;margin-bottom:4px">Avec prise en compte des échecs</label>
+              <input type="text" id="calc-prix-avec" readonly style="width:100%;font-family:var(--font-mono);font-size:20px;font-weight:800;color:#c0392b;background:#fff8f7;border:2px solid #e8a09a;border-radius:8px;padding:10px 14px;box-sizing:border-box">
+            </div>
+          </div>
+        </div>
+
+        <!-- Bloc 3 : Prix marché -->
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+          <div style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)">📊 Prix marché constaté</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Prix moyen constaté (€)</label><input type="number" name="prix_moyen_constate" step="0.01" min="0" placeholder="0.00"></div>
+            <div class="form-group"><label>Date du prix constaté</label><input type="date" name="date_prix_moyen"></div>
+          </div>
         </div>
       </div>
 
