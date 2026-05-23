@@ -757,6 +757,10 @@
       <!-- Filaments -->
       <div class="calc-section">
         <div class="calc-section-title">🧵 Filaments utilisés</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <label style="font-size:13px;color:var(--text2);white-space:nowrap;font-weight:600">⏱ Total heure d'impression (HH:mm)</label>
+          <input type="text" name="nb_heures_impression" id="calc-nb-heures" placeholder="02:30" oninput="calcTotalElec()" style="width:110px;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text)">
+        </div>
         <div id="calc-filaments-container">
           <!-- Généré dynamiquement pour 10 filaments -->
         </div>
@@ -791,7 +795,6 @@
       <div class="calc-section">
         <div class="calc-section-title">⚡ Électricité</div>
         <div class="form-grid">
-          <div class="form-group"><label>Nb d'heures d'impression (HH:mm)</label><input type="text" name="nb_heures_impression" id="calc-nb-heures" placeholder="02:30" oninput="calcTotalElec()"></div>
           <div class="form-group"><label>Total coût électrique (€)</label><input type="text" id="calc-cout-elec" class="calc-field" readonly></div>
         </div>
       </div>
@@ -1664,12 +1667,12 @@ function renderCalculsPrix(data){
 }
 
 function buildFilamentsUI(){
-  var html='';
+  var html='<div style="display:grid;grid-template-columns:3fr 1fr 1fr;gap:8px;margin-bottom:4px;font-family:var(--font-mono);font-size:10px;color:var(--text3);text-transform:uppercase">';
+  html+='<span>Filament</span><span>Qté (g)</span><span>Coût (€)</span></div>';
   for(var i=1;i<=10;i++){
-    html+='<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;align-items:center">';
+    html+='<div style="display:grid;grid-template-columns:3fr 1fr 1fr;gap:8px;margin-bottom:6px;align-items:center">';
     html+='<select id="calc-fil-'+i+'" onchange="onFilamentChange('+i+')" style="font-size:13px"><option value="">— Filament '+i+' —</option></select>';
-    html+='<input type="number" id="calc-fil-'+i+'-qte" placeholder="g" step="0.1" min="0" oninput="calcTotalFilaments()" style="font-size:13px">';
-    html+='<input type="text" id="calc-fil-'+i+'-temps" placeholder="HH:mm" oninput="calcTotalFilaments()" style="font-size:13px">';
+    html+='<input type="number" id="calc-fil-'+i+'-qte" placeholder="g" step="0.01" min="0" oninput="calcTotalFilaments()" style="font-size:13px">';
     html+='<input type="text" id="calc-fil-'+i+'-prix" class="calc-field" readonly placeholder="0.00 €" style="font-size:12px">';
     html+='</div>';
   }
@@ -1804,6 +1807,9 @@ function calcModulesTotal(){
   var tt=document.getElementById('calc-temps-total'); if(tt) tt.value=totalMins>0?formatHHmm(totalMins):'';
   var qt=document.getElementById('calc-qte-total'); if(qt) qt.value=totalQte.toFixed(1)+' g';
   var nc=document.getElementById('calc-nb-couleurs'); if(nc) nc.value=couleurs.size||'';
+  // Pré-remplir le champ "Total heure d'impression" avec le total des modules
+  var nh=document.getElementById('calc-nb-heures'); if(nh) nh.value=totalMins>0?formatHHmm(totalMins):'';
+  calcTotalElec();
   prefillFilamentsFromModules();
   calcResultats();
 }
@@ -1818,7 +1824,6 @@ function prefillFilamentsFromModules(){
   for(var i=1;i<=10;i++){
     var sel=document.getElementById('calc-fil-'+i);
     var qteEl=document.getElementById('calc-fil-'+i+'-qte');
-    var tempsEl=document.getElementById('calc-fil-'+i+'-temps');
     var prixEl=document.getElementById('calc-fil-'+i+'-prix');
     if(!sel) continue;
     var m=modules[i-1];
@@ -1828,7 +1833,6 @@ function prefillFilamentsFromModules(){
       if(m.couleur) match=filaments.find(function(f){return f.couleur&&f.couleur.toLowerCase()===m.couleur;});
       sel.value=match?match.id:'';
       if(qteEl) qteEl.value=m.qte||'';
-      if(tempsEl) tempsEl.value=m.temps||'';
       // Calculer le coût filament
       var prixG=match?(match.prix_par_gramme||0):0;
       var qte=parseFloat(m.qte)||0;
@@ -1837,7 +1841,6 @@ function prefillFilamentsFromModules(){
       // Ligne non utilisée : vider
       sel.value='';
       if(qteEl) qteEl.value='';
-      if(tempsEl) tempsEl.value='';
       if(prixEl) prixEl.value='';
     }
   }
@@ -1933,7 +1936,6 @@ async function saveCalculPrix(e){
       var sel=document.getElementById('calc-fil-'+i);
       body['fil_'+i+'_id']=(sel&&sel.value)||null;
       body['fil_'+i+'_qte']=parseFloat((document.getElementById('calc-fil-'+i+'-qte')||{}).value)||null;
-      body['fil_'+i+'_temps']=(document.getElementById('calc-fil-'+i+'-temps')||{}).value||null;
       var opt=sel&&sel.options[sel.selectedIndex];
       body['fil_'+i+'_prix_g']=parseFloat(opt&&opt.dataset.prixg)||null;
     }
@@ -1970,8 +1972,6 @@ async function openEditCalculPrix(id){
       if(sel&&r['fil_'+i+'_id']){sel.value=r['fil_'+i+'_id'];}
       var qte=document.getElementById('calc-fil-'+i+'-qte');
       if(qte) qte.value=r['fil_'+i+'_qte']||'';
-      var temps=document.getElementById('calc-fil-'+i+'-temps');
-      if(temps) temps.value=r['fil_'+i+'_temps']||'';
     }
     calcTotalFilaments(); calcResultats();
   }catch(err){toast('Erreur : '+err.message,'error');}
