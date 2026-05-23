@@ -526,8 +526,8 @@
         </div>
         <div class="table-wrap" style="margin-bottom:20px">
           <table>
-            <thead><tr><th>Produit</th><th>Coût réel</th><th>Coût avec échec</th><th>Prix vente (sans échec)</th><th>Prix vente (avec échec)</th><th>Prix moyen constaté</th><th>Date</th><th></th></tr></thead>
-            <tbody id="tbody-calculprix"><tr class="empty-row"><td colspan="8">Cliquez sur "+ Nouveau calcul"</td></tr></tbody>
+            <thead><tr><th>Produit</th><th>Date calcul</th><th>Coût réel</th><th>Coût avec échec</th><th>Prix vente (sans échec)</th><th>Prix vente (avec échec)</th><th>Prix moyen constaté</th><th>Date marché</th><th></th></tr></thead>
+            <tbody id="tbody-calculprix"><tr class="empty-row"><td colspan="9">Cliquez sur "+ Nouveau calcul"</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -836,6 +836,7 @@
         <div class="calc-section-title">🛍️ Produit à imprimer</div>
         <div class="form-grid">
           <div class="form-group full"><label>Produit *</label><select name="objet_id" id="sel-calc-objet" onchange="onObjetChange()" required><option value="">— Choisir un objet —</option></select></div>
+          <div class="form-group full"><label>📅 Date de réalisation du calcul</label><input type="date" name="date_calcul" id="calc-date-calcul"></div>
           <div class="form-group full">
             <label>Modules à imprimer</label>
             <div id="calc-modules-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;min-height:32px;padding:10px;background:var(--bg3);border-radius:8px;font-size:13px;color:var(--text3)">Sélectionnez d'abord un produit</div>
@@ -898,7 +899,7 @@
         <div class="form-grid">
           <div class="form-group"><label>Usure par produit (€)</label><input type="text" id="calc-cout-usure" class="calc-field" readonly></div>
           <div class="form-group"><label>Coût maintenance (€)</label><input type="text" id="calc-cout-maintenance" class="calc-field" readonly></div>
-          <div class="form-group"><label>Nb heures main d'œuvre</label><input type="number" name="nb_heures_mo" id="calc-nb-mo" step="0.25" min="0" placeholder="0" oninput="calcTotalMO()"></div>
+          <div class="form-group"><label>Nb heures main d'œuvre (HH:MM)</label><input type="text" name="nb_heures_mo" id="calc-nb-mo" placeholder="01:30" oninput="calcTotalMO()"></div>
           <div class="form-group"><label>Total coût main d'œuvre (€)</label><input type="text" id="calc-cout-mo" class="calc-field" readonly></div>
         </div>
       </div>
@@ -2038,7 +2039,7 @@ function renderCalculsPrix(data){
   if(!data||!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="8">Cliquez sur "+ Nouveau calcul"</td></tr>';return;}
   tbody.innerHTML=data.map(function(r){
     var objNom=r.objet_id?(objets.find(function(o){return o.id===r.objet_id;})||{}).nom||'—':'—';
-    return '<tr><td><strong>'+esc(objNom)+'</strong></td><td style="font-family:var(--font-mono)">'+(r.cout_produit_reel!=null?parseFloat(r.cout_produit_reel).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono)">'+(r.cout_produit_echec!=null?parseFloat(r.cout_produit_echec).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_sans_echec!=null?parseFloat(r.prix_vente_sans_echec).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_avec_echec!=null?parseFloat(r.prix_vente_avec_echec).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono)">'+(r.prix_moyen_constate!=null?parseFloat(r.prix_moyen_constate).toFixed(2)+' €':'—')+'</td><td style="font-size:12px;color:var(--text2)">'+(r.date_prix_moyen||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditCalculPrix(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'calculs_prix\',\''+r.id+'\',loadCalculsPrix)">✕</button></div></td></tr>';
+    return '<tr><td><strong>'+esc(objNom)+'</strong></td><td style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">'+(r.date_calcul||'—')+'</td><td style="font-family:var(--font-mono)">'+(r.cout_produit_reel!=null?parseFloat(r.cout_produit_reel).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono)">'+(r.cout_produit_echec!=null?parseFloat(r.cout_produit_echec).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_sans_echec!=null?parseFloat(r.prix_vente_sans_echec).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_avec_echec!=null?parseFloat(r.prix_vente_avec_echec).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono)">'+(r.prix_moyen_constate!=null?parseFloat(r.prix_moyen_constate).toFixed(2)+' €':'—')+'</td><td style="font-size:12px;color:var(--text2)">'+(r.date_prix_moyen||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditCalculPrix(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'calculs_prix\',\''+r.id+'\',loadCalculsPrix)">✕</button></div></td></tr>';
   }).join('');
 }
 
@@ -2255,10 +2256,10 @@ function calcTotalElec(){
 }
 
 function calcTotalMO(){
-  var nb=parseFloat((document.getElementById('calc-nb-mo')||{}).value)||0;
+  var heures=parseHHmm((document.getElementById('calc-nb-mo')||{}).value||'')/60;
   var taux=(paramCalcul&&paramCalcul.taux_horaire_mo)||0;
   var el=document.getElementById('calc-cout-mo');
-  if(el) el.value=nb>0?(nb*taux).toFixed(2)+' €':'';
+  if(el) el.value=heures>0?(heures*taux).toFixed(2)+' €':'';
   calcResultats();
 }
 
@@ -2319,7 +2320,8 @@ async function saveCalculPrix(e){
       accessoires_ids:accIds.join(','),
       nb_plaques:parseInt((document.getElementById('calc-nb-plaques')||{}).value)||1,
       nb_heures_impression:form.nb_heures_impression.value||null,
-      nb_heures_mo:parseFloat(form.nb_heures_mo.value)||null,
+      nb_heures_mo:form.nb_heures_mo.value||null,
+      date_calcul:(document.getElementById('calc-date-calcul')||{}).value||null,
       taux_echec:parseFloat(form.taux_echec.value)||null,
       pct_charge_vente:parseFloat(form.pct_charge_vente.value)||null,
       prix_moyen_constate:parseFloat(form.prix_moyen_constate.value)||null,
@@ -2374,6 +2376,7 @@ async function openEditCalculPrix(id){
     calcTotalElec();
     form.nb_heures_mo.value=r.nb_heures_mo||'';
     calcTotalMO();
+    var dcEl=document.getElementById('calc-date-calcul'); if(dcEl) dcEl.value=r.date_calcul||'';
     form.taux_echec.value=r.taux_echec||'';
     form.pct_charge_vente.value=r.pct_charge_vente||'';
     form.prix_moyen_constate.value=r.prix_moyen_constate||'';
