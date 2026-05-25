@@ -112,6 +112,22 @@
     .modal-overlay.open .modal{transform:translateY(0);}
     .modal-title{font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--accent);margin-bottom:24px;letter-spacing:0.5px;}
 
+    /* STOCK COULEUR MODAL */
+    .sc-section{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+    .sc-section-title{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .sc-rows{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+    .sc-row{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;}
+    .sc-add-row{display:flex;gap:8px;align-items:center;margin-top:8px;}
+    .sc-add-row input{flex:1;min-width:0;padding:8px 10px;font-size:13px;}
+    .sc-add-row input[type=number]{width:80px;flex:0 0 80px;}
+    /* RAPPORT COULEUR CARDS */
+    .prod-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow-sm);}
+    .prod-card-title{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+    .prod-piece-row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+    .prod-piece-label{font-family:var(--font-mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+    .prod-color-chips{display:flex;flex-wrap:wrap;gap:6px;}
+    .prod-color-chip{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:12px;font-family:var(--font-mono);}
+
     /* FORM */
     .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
     .form-group{display:flex;flex-direction:column;gap:6px;}
@@ -1099,6 +1115,16 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="modal-stock-couleur">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-title">🎨 STOCK PAR COULEUR — <span id="sc-objet-nom"></span></div>
+    <div id="sc-content"><div class="loading"><span class="spinner"></span></div></div>
+    <div class="form-actions" style="margin-top:18px">
+      <button type="button" class="btn btn-ghost" onclick="closeModal('modal-stock-couleur');loadObjets()">Fermer &amp; actualiser</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1761,7 +1787,7 @@ function renderObjets(data){
   document.getElementById('stat-obj-cats').textContent=cats;
   if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="8">Aucun objet — cliquez sur "+ Ajouter"</td></tr>';return;}
   tbody.innerHTML=data.map(function(r){
-    return '<tr><td><strong>'+esc(r.nom||'—')+'</strong></td><td>'+esc(r.categorie||'—')+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur_principale)+'"></span>'+esc(r.couleur_principale||'—')+'</td><td style="font-family:var(--font-mono)">'+(r.nb_pieces||0)+'</td><td><span class="badge '+(r.multi_couleur?'badge-yes':'badge-no')+'">'+(r.multi_couleur?'Oui':'Non')+'</span></td><td style="font-family:var(--font-mono)">'+esc(r.temps_total||'—')+'</td><td><span class="badge '+(r.stock>0?'badge-yes':'badge-no')+'">'+(r.stock!=null?r.stock:0)+'</span></td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditObjet(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'objets_vente\',\''+r.id+'\',loadObjets)">✕</button></div></td></tr>';
+    return '<tr><td><strong>'+esc(r.nom||'—')+'</strong></td><td>'+esc(r.categorie||'—')+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur_principale)+'"></span>'+esc(r.couleur_principale||'—')+'</td><td style="font-family:var(--font-mono)">'+(r.nb_pieces||0)+'</td><td><span class="badge '+(r.multi_couleur?'badge-yes':'badge-no')+'">'+(r.multi_couleur?'Oui':'Non')+'</span></td><td style="font-family:var(--font-mono)">'+esc(r.temps_total||'—')+'</td><td><span class="badge '+(r.stock>0?'badge-yes':'badge-no')+'">'+(r.stock!=null?r.stock:0)+'</span></td><td><div style="display:flex;gap:6px"><button class="btn btn-sm" style="background:linear-gradient(135deg,#a855f7,#6366f1);color:#fff;border:none" onclick="openStockCouleur(\''+r.id+'\')" title="Stock par couleur">🎨</button><button class="btn btn-warning btn-sm" onclick="openEditObjet(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'objets_vente\',\''+r.id+'\',loadObjets)">✕</button></div></td></tr>';
   }).join('');
 }
 
@@ -1877,6 +1903,121 @@ function calcTempsTotal(){
   document.getElementById('obj-temps-total').value=total>0?formatHHmm(total):'';
 }
 /* ======= FIN MODULE OBJETS ======= */
+
+/* ======= MODULE STOCK PAR COULEUR ======= */
+var currentStockObjet=null;
+
+async function openStockCouleur(objetId){
+  var o=objets.find(function(x){return x.id===objetId;});
+  if(!o){
+    var d=await api('GET','objets_vente',null,'?select=id,nom,stock,piece_1_nom,piece_1_stock,piece_2_nom,piece_2_stock,piece_3_nom,piece_3_stock,piece_4_nom,piece_4_stock,piece_5_nom,piece_5_stock,piece_6_nom,piece_6_stock&id=eq.'+objetId);
+    o=d&&d[0];
+  }
+  if(!o){toast('Objet introuvable','error');return;}
+  currentStockObjet={id:o.id,nom:o.nom,pieces:[]};
+  currentStockObjet.pieces.push({index:0,nom:o.nom+' (fini)',stock:o.stock!=null?o.stock:0});
+  for(var i=1;i<=6;i++){
+    if(o['piece_'+i+'_nom']){
+      currentStockObjet.pieces.push({index:i,nom:o['piece_'+i+'_nom'],stock:o['piece_'+i+'_stock']!=null?o['piece_'+i+'_stock']:0});
+    }
+  }
+  document.getElementById('sc-objet-nom').textContent=o.nom;
+  document.getElementById('sc-content').innerHTML='<div class="loading"><span class="spinner"></span></div>';
+  openModal('modal-stock-couleur');
+  await renderStockCouleurModal();
+}
+
+async function renderStockCouleurModal(){
+  var obj=currentStockObjet;
+  if(!obj)return;
+  try{
+    var data=await api('GET','objets_stock_couleur',null,'?objet_id=eq.'+obj.id+'&order=piece_index,couleur');
+    var stocks=data||[];
+    var html='';
+    obj.pieces.forEach(function(piece){
+      var ps=stocks.filter(function(s){return s.piece_index===piece.index;});
+      html+=renderPieceStockSection(piece,ps);
+    });
+    document.getElementById('sc-content').innerHTML=html||'<p style="color:var(--text3)">Aucun module trouvé.</p>';
+  }catch(err){
+    document.getElementById('sc-content').innerHTML='<p style="color:var(--red)">Erreur: '+esc(err.message)+'</p>';
+  }
+}
+
+function renderPieceStockSection(piece,stocks){
+  var totalCouleur=stocks.reduce(function(s,r){return s+(r.quantite||0);},0);
+  var html='<div class="sc-section">';
+  html+='<div class="sc-section-title">'+(piece.index===0?'📦':'🧩')+' '+esc(piece.nom);
+  html+=' <span style="font-size:11px;font-weight:400;color:var(--text2)">Stock total: '+piece.stock+' | Par couleur: '+totalCouleur+'</span></div>';
+  if(stocks.length>0){
+    html+='<div class="sc-rows">';
+    stocks.forEach(function(s){
+      html+='<div class="sc-row">';
+      html+='<span class="color-dot" style="background:'+colorHex(s.couleur)+'"></span>';
+      html+='<span style="flex:1;font-weight:500">'+esc(s.couleur||'—')+'</span>';
+      html+='<span class="badge badge-yes" style="min-width:32px;text-align:center">'+s.quantite+'</span>';
+      html+='<button class="btn btn-danger btn-sm" onclick="deleteStockCouleur(\''+s.id+'\','+piece.index+')">✕</button>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }else{
+    html+='<p style="color:var(--text3);font-size:12px;margin:6px 0 10px">Aucun stock par couleur défini</p>';
+  }
+  html+='<div class="sc-add-row">';
+  html+='<input type="text" id="sc-couleur-'+piece.index+'" placeholder="Couleur (ex: Rouge, Noir…)">';
+  html+='<input type="number" id="sc-qte-'+piece.index+'" min="0" value="1">';
+  html+='<button class="btn btn-primary btn-sm" onclick="addStockCouleur('+piece.index+')">+ Ajouter</button>';
+  html+='</div>';
+  html+='</div>';
+  return html;
+}
+
+async function addStockCouleur(pieceIndex){
+  var obj=currentStockObjet;
+  if(!obj)return;
+  var couleurEl=document.getElementById('sc-couleur-'+pieceIndex);
+  var qteEl=document.getElementById('sc-qte-'+pieceIndex);
+  if(!couleurEl||!qteEl)return;
+  var couleur=couleurEl.value.trim();
+  var qte=parseInt(qteEl.value)||0;
+  if(!couleur){toast('Indiquez une couleur','error');return;}
+  if(qte<0){toast('Quantité invalide','error');return;}
+  var piece=obj.pieces.find(function(p){return p.index===pieceIndex;});
+  try{
+    await api('POST','objets_stock_couleur',{objet_id:obj.id,piece_index:pieceIndex,piece_nom:piece?piece.nom:'',couleur:couleur,quantite:qte});
+    toast('Stock couleur ajouté','success');
+    await syncPieceStock(obj.id,pieceIndex);
+    await renderStockCouleurModal();
+  }catch(err){toast('Erreur: '+err.message,'error');}
+}
+
+async function deleteStockCouleur(stockId,pieceIndex){
+  if(!confirm('Supprimer cette entrée ?'))return;
+  try{
+    await api('DELETE','objets_stock_couleur',null,'?id=eq.'+stockId);
+    toast('Supprimé','success');
+    await syncPieceStock(currentStockObjet.id,pieceIndex);
+    await renderStockCouleurModal();
+  }catch(err){toast('Erreur: '+err.message,'error');}
+}
+
+async function syncPieceStock(objetId,pieceIndex){
+  var data=await api('GET','objets_stock_couleur',null,'?objet_id=eq.'+objetId+'&piece_index=eq.'+pieceIndex);
+  var total=(data||[]).reduce(function(s,r){return s+(r.quantite||0);},0);
+  var patch={};
+  patch[pieceIndex>0?'piece_'+pieceIndex+'_stock':'stock']=total;
+  await api('PATCH','objets_vente',patch,'?id=eq.'+objetId);
+  var o=objets.find(function(x){return x.id===objetId;});
+  if(o){
+    if(pieceIndex>0)o['piece_'+pieceIndex+'_stock']=total;
+    else o.stock=total;
+  }
+  if(currentStockObjet&&currentStockObjet.id===objetId){
+    var piece=currentStockObjet.pieces.find(function(p){return p.index===pieceIndex;});
+    if(piece)piece.stock=total;
+  }
+}
+/* ======= FIN MODULE STOCK PAR COULEUR ======= */
 
 /* ======= MODULE OBJETS VENDUS ======= */
 async function loadObjetsVendus(){
@@ -2495,18 +2636,66 @@ async function loadRapportProduits(){
   var el=document.getElementById('rapport-prod-content');
   if(el) el.innerHTML='<div class="loading"><span class="spinner"></span></div>';
   try{
-    var data=await api('GET','objets_vente',null,'?order=nom');
-    var html='<div class="table-wrap"><table><thead><tr><th>Produit</th><th>Catégorie</th><th>Stock fini</th><th>Module 1</th><th>Module 2</th><th>Module 3</th><th>Module 4</th><th>Module 5</th><th>Module 6</th></tr></thead><tbody>';
-    if(!data||!data.length){html+='<tr class="empty-row"><td colspan="9">Aucun produit</td></tr>';}
-    else{data.forEach(function(r){
-      html+='<tr><td><strong>'+esc(r.nom||'—')+'</strong></td><td>'+esc(r.categorie||'—')+'</td>';
-      html+='<td><span class="badge '+(r.stock>0?'badge-yes':'badge-no')+'">'+(r.stock!=null?r.stock:0)+'</span></td>';
-      for(var i=1;i<=6;i++){var nom=r['piece_'+i+'_nom'],st=r['piece_'+i+'_stock'];if(nom){html+='<td><div style="font-size:11px;color:var(--text2);margin-bottom:4px">'+esc(nom)+'</div><span class="badge '+(st>0?'badge-yes':'badge-no')+'">'+(st!=null?st:0)+'</span></td>';}else{html+='<td style="color:var(--text3)">—</td>';}}
-      html+='</tr>';
-    });}
-    html+='</tbody></table></div>';
-    if(el) el.innerHTML=html;
-  }catch(err){if(el) el.innerHTML='<p style="color:#e74c3c">Erreur : '+esc(err.message)+'</p>';}
+    var produits=await api('GET','objets_vente',null,'?order=nom');
+    var couleurs=await api('GET','objets_stock_couleur',null,'?order=piece_index,couleur');
+    var couleursMap={};
+    (couleurs||[]).forEach(function(c){
+      var key=c.objet_id+'|'+c.piece_index;
+      if(!couleursMap[key])couleursMap[key]=[];
+      couleursMap[key].push(c);
+    });
+    if(!produits||!produits.length){
+      if(el)el.innerHTML='<p style="color:var(--text3);text-align:center;padding:40px">Aucun produit en catalogue</p>';
+      return;
+    }
+    var html='';
+    produits.forEach(function(r){
+      html+='<div class="prod-card">';
+      html+='<div class="prod-card-title">';
+      html+='<span>'+esc(r.nom||'—')+'</span>';
+      html+='<span style="font-size:11px;color:var(--text2);font-family:var(--font-mono)">'+esc(r.categorie||'')+'</span>';
+      html+='</div>';
+      // Objet fini (piece_index=0)
+      var keyFini=r.id+'|0';
+      var coulFini=couleursMap[keyFini]||[];
+      html+='<div class="prod-piece-row">';
+      html+='<div class="prod-piece-label">📦 Objet fini</div>';
+      html+='<div class="prod-color-chips">';
+      if(coulFini.length>0){
+        coulFini.forEach(function(c){
+          html+='<span class="prod-color-chip"><span class="color-dot" style="background:'+colorHex(c.couleur)+';margin-right:0"></span>'+esc(c.couleur)+' <strong>×'+c.quantite+'</strong></span>';
+        });
+        var tot=coulFini.reduce(function(s,c){return s+(c.quantite||0);},0);
+        html+='<span class="prod-color-chip" style="background:var(--bg2);font-weight:700;color:var(--accent)">Total: '+tot+'</span>';
+      }else{
+        html+='<span class="badge badge-'+(r.stock>0?'yes':'no')+'">'+(r.stock!=null?r.stock:0)+' (non détaillé par couleur)</span>';
+      }
+      html+='</div></div>';
+      // Modules
+      for(var i=1;i<=6;i++){
+        var nom=r['piece_'+i+'_nom'];
+        if(!nom)continue;
+        var keyMod=r.id+'|'+i;
+        var coulMod=couleursMap[keyMod]||[];
+        html+='<div class="prod-piece-row">';
+        html+='<div class="prod-piece-label">🧩 '+esc(nom)+'</div>';
+        html+='<div class="prod-color-chips">';
+        if(coulMod.length>0){
+          coulMod.forEach(function(c){
+            html+='<span class="prod-color-chip"><span class="color-dot" style="background:'+colorHex(c.couleur)+';margin-right:0"></span>'+esc(c.couleur)+' <strong>×'+c.quantite+'</strong></span>';
+          });
+          var totMod=coulMod.reduce(function(s,c){return s+(c.quantite||0);},0);
+          html+='<span class="prod-color-chip" style="background:var(--bg2);font-weight:700;color:var(--accent)">Total: '+totMod+'</span>';
+        }else{
+          var stMod=r['piece_'+i+'_stock'];
+          html+='<span class="badge badge-'+(stMod>0?'yes':'no')+'">'+(stMod!=null?stMod:0)+' (non détaillé par couleur)</span>';
+        }
+        html+='</div></div>';
+      }
+      html+='</div>';
+    });
+    if(el)el.innerHTML=html;
+  }catch(err){if(el)el.innerHTML='<p style="color:#e74c3c">Erreur : '+esc(err.message)+'</p>';}
 }
 /* ======= FIN RAPPORT ======= */
 
