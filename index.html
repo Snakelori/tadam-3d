@@ -117,9 +117,11 @@
     .sc-section-title{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
     .sc-rows{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
     .sc-row{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;}
-    .sc-add-row{display:flex;gap:8px;align-items:center;margin-top:8px;}
-    .sc-add-row input{flex:1;min-width:0;padding:8px 10px;font-size:13px;}
-    .sc-add-row input[type=number]{width:80px;flex:0 0 80px;}
+    .sc-add-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+    .sc-add-row select{flex:1;min-width:140px;padding:8px 10px;font-size:13px;}
+    .sc-add-row input{flex:1;min-width:120px;padding:8px 10px;font-size:13px;}
+    .sc-add-row input[type=number]{width:80px;flex:0 0 80px;min-width:0;}
+    .sc-couleur-autre{display:none;margin-top:6px;width:100%;}
     /* RAPPORT COULEUR CARDS */
     .prod-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow-sm);}
     .prod-card-title{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
@@ -1931,12 +1933,20 @@ async function renderStockCouleurModal(){
   var obj=currentStockObjet;
   if(!obj)return;
   try{
-    var data=await api('GET','objets_stock_couleur',null,'?objet_id=eq.'+obj.id+'&order=piece_index,couleur');
-    var stocks=data||[];
+    // Fetch existing stocks + distinct colors from filaments in parallel
+    var results=await Promise.all([
+      api('GET','objets_stock_couleur',null,'?objet_id=eq.'+obj.id+'&order=piece_index,couleur'),
+      api('GET','filaments',null,'?select=couleur&order=couleur')
+    ]);
+    var stocks=results[0]||[];
+    // Build distinct sorted color list from filaments
+    var coulSet=new Set();
+    (results[1]||[]).forEach(function(f){if(f.couleur&&f.couleur.trim())coulSet.add(f.couleur.trim());});
+    var coulList=Array.from(coulSet).sort(function(a,b){return a.localeCompare(b,'fr');});
     var html='';
     obj.pieces.forEach(function(piece){
       var ps=stocks.filter(function(s){return s.piece_index===piece.index;});
-      html+=renderPieceStockSection(piece,ps);
+      html+=renderPieceStockSection(piece,ps,coulList);
     });
     document.getElementById('sc-content').innerHTML=html||'<p style="color:var(--text3)">Aucun module trouvé.</p>';
   }catch(err){
@@ -1944,7 +1954,8 @@ async function renderStockCouleurModal(){
   }
 }
 
-function renderPieceStockSection(piece,stocks){
+function renderPieceStockSection(piece,stocks,coulList){
+  coulList=coulList||[];
   var totalCouleur=stocks.reduce(function(s,r){return s+(r.quantite||0);},0);
   var html='<div class="sc-section">';
   html+='<div class="sc-section-title">'+(piece.index===0?'📦':'🧩')+' '+esc(piece.nom);
@@ -1961,26 +1972,56 @@ function renderPieceStockSection(piece,stocks){
     });
     html+='</div>';
   }else{
-    html+='<p style="color:var(--text3);font-size:12px;margin:6px 0 10px">Aucun stock par couleur défini</p>';
+    html+='<p style="color:var(--text3);font-size:12px;margin:6px 0 8px">Aucun stock par couleur défini — utilisez le formulaire ci-dessous</p>';
   }
+  // Build color select from DB
+  var opts='<option value="">— Choisir une couleur —</option>';
+  coulList.forEach(function(c){
+    opts+='<option value="'+esc(c)+'"><span>'+esc(c)+'</span></option>';
+  });
+  opts+='<option value="__autre__">✏️ Autre couleur…</option>';
   html+='<div class="sc-add-row">';
-  html+='<input type="text" id="sc-couleur-'+piece.index+'" placeholder="Couleur (ex: Rouge, Noir…)">';
+  html+='<select id="sc-couleur-sel-'+piece.index+'" onchange="onScCouleurChange('+piece.index+')">';
+  html+=opts;
+  html+='</select>';
   html+='<input type="number" id="sc-qte-'+piece.index+'" min="0" value="1">';
   html+='<button class="btn btn-primary btn-sm" onclick="addStockCouleur('+piece.index+')">+ Ajouter</button>';
+  html+='</div>';
+  // Hidden free-text input shown when "Autre couleur" is picked
+  html+='<div class="sc-couleur-autre" id="sc-autre-wrap-'+piece.index+'">';
+  html+='<input type="text" id="sc-couleur-txt-'+piece.index+'" placeholder="Saisir la couleur…" style="width:100%">';
   html+='</div>';
   html+='</div>';
   return html;
 }
 
+function onScCouleurChange(idx){
+  var sel=document.getElementById('sc-couleur-sel-'+idx);
+  var wrap=document.getElementById('sc-autre-wrap-'+idx);
+  if(!sel||!wrap)return;
+  wrap.style.display=sel.value==='__autre__'?'block':'none';
+  if(sel.value==='__autre__'){
+    var txt=document.getElementById('sc-couleur-txt-'+idx);
+    if(txt)txt.focus();
+  }
+}
+
 async function addStockCouleur(pieceIndex){
   var obj=currentStockObjet;
   if(!obj)return;
-  var couleurEl=document.getElementById('sc-couleur-'+pieceIndex);
+  var selEl=document.getElementById('sc-couleur-sel-'+pieceIndex);
+  var txtEl=document.getElementById('sc-couleur-txt-'+pieceIndex);
   var qteEl=document.getElementById('sc-qte-'+pieceIndex);
-  if(!couleurEl||!qteEl)return;
-  var couleur=couleurEl.value.trim();
+  if(!selEl||!qteEl)return;
+  var couleur='';
+  if(selEl.value==='__autre__'){
+    couleur=txtEl?txtEl.value.trim():'';
+    if(!couleur){toast('Saisissez le nom de la couleur','error');if(txtEl)txtEl.focus();return;}
+  }else{
+    couleur=selEl.value.trim();
+  }
   var qte=parseInt(qteEl.value)||0;
-  if(!couleur){toast('Indiquez une couleur','error');return;}
+  if(!couleur){toast('Choisissez une couleur','error');selEl.focus();return;}
   if(qte<0){toast('Quantité invalide','error');return;}
   var piece=obj.pieces.find(function(p){return p.index===pieceIndex;});
   try{
