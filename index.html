@@ -545,8 +545,8 @@
         </div>
         <div class="table-wrap" style="margin-bottom:20px">
           <table>
-            <thead><tr><th>Produit</th><th>Date calcul</th><th>Coût réel</th><th>Coût avec échec</th><th>Prix vente (sans échec)</th><th>Prix vente (avec échec)</th><th>Prix moyen constaté</th><th>Date marché</th><th></th></tr></thead>
-            <tbody id="tbody-calculprix"><tr class="empty-row"><td colspan="9">Cliquez sur "+ Nouveau calcul"</td></tr></tbody>
+            <thead><tr><th>Nom détaillé</th><th>Modules</th><th>Date calcul</th><th>Coût réel</th><th>Coût avec échec</th><th>Prix vente (sans échec)</th><th>Prix vente (avec échec)</th><th>Prix moyen constaté</th><th>Date marché</th><th></th></tr></thead>
+            <tbody id="tbody-calculprix"><tr class="empty-row"><td colspan="10">Cliquez sur "+ Nouveau calcul"</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -854,6 +854,7 @@
       <div class="calc-section">
         <div class="calc-section-title">🛍️ Produit à imprimer</div>
         <div class="form-grid">
+          <div class="form-group full"><label>Nom détaillé du calcul</label><input type="text" id="calc-nom-detail" name="nom_detail" placeholder="Ex : Figurine Dragon – Rouge + Noir – Lot de 3…" maxlength="200"></div>
           <div class="form-group full"><label>Produit *</label><select name="objet_id" id="sel-calc-objet" onchange="onObjetChange()" required><option value="">— Choisir un objet —</option></select></div>
           <div class="form-group full"><label>📅 Date de réalisation du calcul</label><input type="date" name="date_calcul" id="calc-date-calcul"></div>
           <div class="form-group full">
@@ -2234,10 +2235,33 @@ async function loadCalculsPrix(){
 }
 function renderCalculsPrix(data){
   var tbody=document.getElementById('tbody-calculprix');
-  if(!data||!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="8">Cliquez sur "+ Nouveau calcul"</td></tr>';return;}
+  if(!data||!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="10">Cliquez sur "+ Nouveau calcul"</td></tr>';return;}
   tbody.innerHTML=data.map(function(r){
-    var objNom=r.objet_id?(objets.find(function(o){return o.id===r.objet_id;})||{}).nom||'—':'—';
-    return '<tr><td><strong>'+esc(objNom)+'</strong></td><td style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">'+(r.date_calcul||'—')+'</td><td style="font-family:var(--font-mono)">'+(r.cout_produit_reel!=null?parseFloat(r.cout_produit_reel).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono)">'+(r.cout_produit_echec!=null?parseFloat(r.cout_produit_echec).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_sans_echec!=null?parseFloat(r.prix_vente_sans_echec).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_avec_echec!=null?parseFloat(r.prix_vente_avec_echec).toFixed(2)+' €':'—')+'</td><td style="font-family:var(--font-mono)">'+(r.prix_moyen_constate!=null?parseFloat(r.prix_moyen_constate).toFixed(2)+' €':'—')+'</td><td style="font-size:12px;color:var(--text2)">'+(r.date_prix_moyen||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditCalculPrix(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'calculs_prix\',\''+r.id+'\',loadCalculsPrix)">✕</button></div></td></tr>';
+    // Nom détaillé (ou nom produit en fallback)
+    var nomDetail=r.nom_detail&&r.nom_detail.trim()?r.nom_detail:((r.objet_id?(objets.find(function(o){return o.id===r.objet_id;})||{}).nom||'—':'—'));
+    // Modules sélectionnés
+    var modulesHtml='<span style="color:var(--text3);font-size:11px">—</span>';
+    if(r.modules_selectionnes&&r.modules_selectionnes.trim()){
+      var obj=r.objet_id?objets.find(function(o){return o.id===r.objet_id;}):null;
+      var chips=r.modules_selectionnes.split(',').filter(Boolean).map(function(idx){
+        var i=parseInt(idx);
+        var nom=(obj&&i>0)?obj['piece_'+i+'_nom']||'Module '+i:'Objet complet';
+        return '<span style="display:inline-block;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:2px 8px;font-size:10px;font-family:var(--font-mono);margin:1px">'+esc(nom)+'</span>';
+      }).join(' ');
+      modulesHtml='<div style="display:flex;flex-wrap:wrap;gap:2px">'+chips+'</div>';
+    }
+    return '<tr>'
+      +'<td><strong>'+esc(nomDetail)+'</strong></td>'
+      +'<td>'+modulesHtml+'</td>'
+      +'<td style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">'+(r.date_calcul||'—')+'</td>'
+      +'<td style="font-family:var(--font-mono)">'+(r.cout_produit_reel!=null?parseFloat(r.cout_produit_reel).toFixed(2)+' €':'—')+'</td>'
+      +'<td style="font-family:var(--font-mono)">'+(r.cout_produit_echec!=null?parseFloat(r.cout_produit_echec).toFixed(2)+' €':'—')+'</td>'
+      +'<td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_sans_echec!=null?parseFloat(r.prix_vente_sans_echec).toFixed(2)+' €':'—')+'</td>'
+      +'<td style="font-family:var(--font-mono);color:var(--teal)">'+(r.prix_vente_avec_echec!=null?parseFloat(r.prix_vente_avec_echec).toFixed(2)+' €':'—')+'</td>'
+      +'<td style="font-family:var(--font-mono)">'+(r.prix_moyen_constate!=null?parseFloat(r.prix_moyen_constate).toFixed(2)+' €':'—')+'</td>'
+      +'<td style="font-size:12px;color:var(--text2)">'+(r.date_prix_moyen||'—')+'</td>'
+      +'<td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditCalculPrix(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'calculs_prix\',\''+r.id+'\',loadCalculsPrix)">✕</button></div></td>'
+      +'</tr>';
   }).join('');
 }
 
@@ -2547,6 +2571,7 @@ async function saveCalculPrix(e){
     var accIds=[];
     document.querySelectorAll('#calc-accessoires-list input[type=checkbox]:checked').forEach(function(cb){accIds.push(cb.value);});
     var body={
+      nom_detail:(document.getElementById('calc-nom-detail')||{}).value||null,
       objet_id:form.objet_id.value||null,
       modules_selectionnes:modulesChecked.join(','),
       accessoires_ids:accIds.join(','),
@@ -2591,6 +2616,7 @@ async function openEditCalculPrix(id){
     var r=data[0];
     document.getElementById('calc-edit-id').value=r.id;
     document.getElementById('modal-calc-title').textContent='✏️ MODIFIER CALCUL';
+    var ndEl=document.getElementById('calc-nom-detail'); if(ndEl) ndEl.value=r.nom_detail||'';
     var form=document.getElementById('form-calculprix');
     form.objet_id.value=r.objet_id||'';
     onObjetChange(); // crée les cases cochées par défaut
