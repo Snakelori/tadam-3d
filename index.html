@@ -77,11 +77,15 @@
     }
     .login-box{
       backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-      background:var(--glass-bg);
+      /* Fond semi-solide : visible même sans backdrop-filter (Android) */
+      background:rgba(16,17,38,0.92);
       border:1px solid var(--border);
       border-radius:20px;padding:44px 40px;width:100%;max-width:420px;
-      box-shadow:0 8px 60px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.12);
+      box-shadow:0 8px 60px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.10);
       position:relative;overflow:hidden;
+      /* Force GPU layer — évite la disparition sous Android WebView */
+      -webkit-transform:translateZ(0);transform:translateZ(0);
+      will-change:transform;
     }
     .login-box::before{
       content:'';position:absolute;top:0;left:0;right:0;height:1px;
@@ -96,11 +100,12 @@
     /* HEADER */
     header{
       backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-      background:rgba(14,15,26,0.7);
+      background:rgba(10,11,22,0.94);
       border-bottom:1px solid var(--border);
       padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:62px;
       position:sticky;top:0;z-index:100;
       box-shadow:0 1px 0 rgba(255,255,255,0.04),0 4px 30px rgba(0,0,0,0.3);
+      -webkit-transform:translateZ(0);transform:translateZ(0);
     }
     [data-theme="light"] header{background:rgba(232,234,246,0.75);}
     .logo{height:44px;width:auto;display:block;filter:drop-shadow(0 0 12px rgba(99,102,241,0.3));}
@@ -125,9 +130,10 @@
     /* NAV */
     nav{
       backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-      background:rgba(14,15,26,0.5);
+      background:rgba(10,11,20,0.90);
       border-bottom:1px solid var(--border);
       padding:0 28px;display:flex;position:relative;
+      -webkit-transform:translateZ(0);transform:translateZ(0);
     }
     [data-theme="light"] nav{background:rgba(232,234,246,0.6);}
     .nav-btn{
@@ -189,11 +195,12 @@
     .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px;}
     .stat-card{
       backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-      background:linear-gradient(135deg,var(--glass-bg2) 0%,var(--glass-bg) 100%);
+      background:linear-gradient(135deg,rgba(26,28,54,0.95) 0%,rgba(18,19,38,0.92) 100%);
       border:1px solid var(--border);border-radius:var(--radius);
       padding:16px 18px 18px;position:relative;overflow:hidden;
       box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,0.07);
       transition:transform .2s cubic-bezier(.4,0,.2,1),box-shadow .2s;
+      -webkit-transform:translateZ(0);transform:translateZ(0);
     }
     .stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,0.10);}
     .stat-card::before{
@@ -216,8 +223,9 @@
     .table-wrap{
       overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);
       backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-      background:var(--glass-bg);
+      background:rgba(14,15,32,0.90);
       box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,0.05);
+      -webkit-transform:translateZ(0);transform:translateZ(0);
     }
     table{width:100%;border-collapse:collapse;}
     thead{background:var(--glass-bg2);}
@@ -248,7 +256,7 @@
     .modal-overlay.open{opacity:1;pointer-events:all;}
     .modal{
       backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-      background:linear-gradient(135deg,rgba(30,27,75,0.85) 0%,rgba(14,15,26,0.9) 100%);
+      background:linear-gradient(135deg,rgba(24,22,62,0.97) 0%,rgba(12,13,28,0.97) 100%);
       border:1px solid var(--border);
       border-radius:18px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;
       padding:30px;
@@ -256,6 +264,7 @@
       transition:transform .25s cubic-bezier(.4,0,.2,1);
       box-shadow:0 12px 60px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.08);
       position:relative;
+      will-change:transform;
     }
     .modal::before{
       content:'';position:absolute;top:0;left:0;right:0;height:1px;
@@ -309,18 +318,29 @@
     .form-group.full{grid-column:1/-1;}
     label{font-family:var(--font-mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;}
     input,select,textarea{
-      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-      background:var(--glass-bg2);border:1px solid var(--border);
+      /* Fond solide — backdrop-filter retiré (instabilité Android WebView) */
+      background:#14152e;border:1px solid var(--border);
       color:var(--text);border-radius:8px;padding:10px 13px;
       font-family:var(--font-sans);font-size:14px;
       transition:border-color .2s,box-shadow .2s;outline:none;
+      -webkit-appearance:none;appearance:none;
     }
     input:focus,select:focus,textarea:focus{
       border-color:rgba(var(--accent-rgb),0.6);
       box-shadow:0 0 0 3px rgba(var(--accent-rgb),0.15),var(--glow);
+      background:#1a1b35;
     }
     input::placeholder{color:var(--text3);}
-    select option{background:#1e1b4b;color:var(--text);}
+    select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;}
+    select option{background:#14152e;color:var(--text);}
+    [data-theme="light"] input,[data-theme="light"] select,[data-theme="light"] textarea{
+      background:#fff;color:#1e1b4b;border-color:rgba(99,102,241,0.25);
+    }
+    [data-theme="light"] input:focus,[data-theme="light"] select:focus,[data-theme="light"] textarea:focus{
+      background:#f8f8ff;
+    }
+    [data-theme="light"] input::placeholder{color:#94a3b8;}
+    [data-theme="light"] select option{background:#fff;color:#1e1b4b;}
     .calc-field{
       background:rgba(6,182,212,0.08);border-color:rgba(6,182,212,0.3);
       color:var(--teal);font-family:var(--font-mono);font-size:13px;font-weight:700;
@@ -485,6 +505,20 @@
       nav{padding:0 12px;overflow-x:auto;}
       .nav-btn{padding:12px 12px;}
       .settings-grid{grid-template-columns:1fr;}
+    }
+
+    /* ── FALLBACK : backdrop-filter non supporté (Android WebView ancien) ── */
+    @supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+      .login-box{background:rgba(14,15,36,0.99)!important;}
+      header{background:rgba(8,9,20,0.99)!important;}
+      nav{background:rgba(8,9,18,0.99)!important;}
+      .stat-card{background:#1a1b36!important;}
+      .table-wrap{background:#0e0f20!important;}
+      .modal{background:#141530!important;}
+      .toast{background:#0e0f20!important;}
+      .prod-card,.settings-card,.calc-section,.sc-section,.count-badge{background:#16172e!important;}
+      .btn-ghost{background:#1a1b36!important;}
+      .btn-logout{background:#1a1b36!important;}
     }
   </style>
 </head>
