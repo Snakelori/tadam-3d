@@ -365,7 +365,7 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Produit</th><th>Type</th><th>Date achat</th><th>Qté</th><th>Prix total</th><th>Prix unitaire</th><th>€/impression</th><th>Dans coût</th><th>Fournisseur</th><th></th></tr></thead>
+          <thead><tr><th>Produit</th><th>Type</th><th>Date d'achat</th><th>Qté</th><th>Prix total</th><th>Prix unitaire</th><th>€/impression</th><th>Dans le coût</th><th>Fournisseur</th><th></th></tr></thead>
           <tbody id="tbody-accessoires"><tr class="empty-row"><td colspan="10"><span class="spinner"></span>Chargement...</td></tr></tbody>
         </table>
       </div>
@@ -531,7 +531,7 @@
       <div class="subpage active" id="subpage-objetsvendre">
         <!-- Niveau 2 : sous-navigation interne -->
         <div class="subnav2">
-          <button class="subnav2-btn active" onclick="showSubPage2('catalogue',event)">📦 Catalogues</button>
+          <button class="subnav2-btn active" onclick="showSubPage2('catalogue',event)">📦 Catalogue</button>
           <button class="subnav2-btn" onclick="showSubPage2('consommables',event)">🧴 Consommables</button>
           <button class="subnav2-btn" onclick="showSubPage2('paramcalcul',event)">⚙️ Paramètres de calcul</button>
           <button class="subnav2-btn" onclick="showSubPage2('calculprix',event)">💰 Calcul du prix</button>
@@ -541,7 +541,7 @@
       <div class="subsubpage active" id="subpage-catalogue">
         <div class="stats-row">
           <div class="stat-card"><div class="stat-label">Objets référencés</div><div class="stat-value accent" id="stat-obj-total">—</div></div>
-          <div class="stat-card"><div class="stat-label">Multi couleur</div><div class="stat-value teal" id="stat-obj-multi">—</div></div>
+          <div class="stat-card"><div class="stat-label">Multicouleur</div><div class="stat-value teal" id="stat-obj-multi">—</div></div>
           <div class="stat-card"><div class="stat-label">Catégories</div><div class="stat-value amber" id="stat-obj-cats">—</div></div>
         </div>
         <div class="section-header">
@@ -570,7 +570,7 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Produit</th><th>Fournisseur</th><th>Date achat</th><th>Qté</th><th>Prix unitaire (€)</th><th>Coûts/produit (€)</th><th></th></tr></thead>
+            <thead><tr><th>Produit</th><th>Fournisseur</th><th>Date d'achat</th><th>Qté</th><th>Prix unitaire (€)</th><th>Coût/produit (€)</th><th></th></tr></thead>
             <tbody id="tbody-consommables"><tr class="empty-row"><td colspan="7">Cliquez sur "+ Ajouter"</td></tr></tbody>
           </table>
         </div>
@@ -585,9 +585,9 @@
 
             <div class="settings-card">
               <div class="settings-card-title">⚡ Consommation électrique</div>
-              <div class="form-group" style="margin-bottom:10px"><label>Prix moyen KWh opérateur (€)</label><input type="number" name="prix_kwh" step="0.001" placeholder="0.18" oninput="updateTotalCoutHeure()"></div>
-              <div class="form-group" style="margin-bottom:10px"><label>Consommation moyenne Imprimante (KWh)</label><input type="number" name="conso_imprimante" step="0.01" min="0" placeholder="0.15" oninput="updateTotalCoutHeure()"></div>
-              <div class="form-group"><label>Total coût heure (calculé €/h)</label><input type="text" id="preview-cout-heure-elec" class="calc-field" readonly placeholder="€/h"></div>
+              <div class="form-group" style="margin-bottom:10px"><label>Prix moyen du kWh opérateur (€)</label><input type="number" name="prix_kwh" step="0.001" placeholder="0.18" oninput="updateTotalCoutHeure()"></div>
+              <div class="form-group" style="margin-bottom:10px"><label>Consommation moyenne de l'imprimante (kWh)</label><input type="number" name="conso_imprimante" step="0.01" min="0" placeholder="0.15" oninput="updateTotalCoutHeure()"></div>
+              <div class="form-group"><label>Coût total par heure (calculé, €/h)</label><input type="text" id="preview-cout-heure-elec" class="calc-field" readonly placeholder="€/h"></div>
             </div>
 
             <div class="settings-card">
@@ -606,14 +606,14 @@
             <div class="settings-card">
               <div class="settings-card-title">🛒 Frais vente en ligne</div>
               <div class="form-group" style="margin-bottom:10px"><label>Coût fiche produit (€)</label><input type="number" name="cout_fiche_produit" step="0.01" placeholder="0.00" oninput="updateCoutFichePreview()"></div>
-              <div class="form-group" style="margin-bottom:10px"><label>Nb produits pour rentabilité</label><input type="number" name="nb_produit_rentabilite" step="1" placeholder="100" oninput="updateCoutFichePreview()"></div>
+              <div class="form-group" style="margin-bottom:10px"><label>Nb de produits pour la rentabilité</label><input type="number" name="nb_produit_rentabilite" step="1" placeholder="100" oninput="updateCoutFichePreview()"></div>
               <div class="form-group" style="margin-bottom:10px">
                 <label>Coût unitaire fiche produit (calculé)</label>
                 <input type="text" id="preview-cout-fiche" class="calc-field" readonly>
               </div>
               <div class="form-group" style="margin-bottom:10px"><label>Site de mise en vente</label><input type="text" name="site_vente" placeholder="ex: Etsy, Leboncoin..."></div>
-              <div class="form-group" style="margin-bottom:10px"><label>Coût mise en vente d'un produit (€)</label><input type="number" name="cout_mise_en_vente" step="0.01" placeholder="0.20"></div>
-              <div class="form-group"><label>% charge de vente en ligne</label><input type="number" name="pct_charge_vente" step="0.01" placeholder="0.20" value="0.20"></div>
+              <div class="form-group" style="margin-bottom:10px"><label>Coût de mise en vente d'un produit (€)</label><input type="number" name="cout_mise_en_vente" step="0.01" placeholder="0.20"></div>
+              <div class="form-group"><label>% de charge de vente en ligne</label><input type="number" name="pct_charge_vente" step="0.01" placeholder="0.20" value="0.20"></div>
             </div>
 
             <div class="settings-card">
@@ -640,7 +640,7 @@
         </div>
         <div class="table-wrap" style="margin-bottom:20px">
           <table>
-            <thead><tr><th>Nom détaillé</th><th>Modules</th><th>Date calcul</th><th>Coût réel</th><th>Coût avec échec</th><th>Prix vente (sans échec)</th><th>Prix vente (avec échec)</th><th>Prix moyen constaté</th><th>Date marché</th><th></th></tr></thead>
+            <thead><tr><th>Nom détaillé</th><th>Modules</th><th>Date du calcul</th><th>Coût réel</th><th>Coût avec échec</th><th>Prix de vente (sans échec)</th><th>Prix de vente (avec échec)</th><th>Prix moyen constaté</th><th>Date constatée</th><th></th></tr></thead>
             <tbody id="tbody-calculprix"><tr class="empty-row"><td colspan="10">Cliquez sur "+ Nouveau calcul"</td></tr></tbody>
           </table>
         </div>
@@ -838,7 +838,7 @@
         </div>
         <div class="form-group full"><label>Description</label><textarea name="description" rows="2" placeholder="Description de l'objet..."></textarea></div>
         <div class="form-group"><label>Couleur principale</label><select name="couleur_principale" id="sel-obj-couleur-0"><option value="">— Choisir —</option></select></div>
-        <div class="form-group"><label>Nb de pièce / module (0–6)</label><input type="number" name="nb_pieces" id="obj-nb-pieces" min="0" max="6" value="0" oninput="updateModules()"></div>
+        <div class="form-group"><label>Nb de pièces / modules (0–6)</label><input type="number" name="nb_pieces" id="obj-nb-pieces" min="0" max="6" value="0" oninput="updateModules()"></div>
         <div class="form-group"><label>Stock produit fini</label><input type="number" name="stock" id="obj-stock" min="0" value="0" placeholder="0"></div>
       </div>
 
@@ -957,7 +957,7 @@
             <div id="calc-modules-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;min-height:32px;padding:10px;background:var(--bg3);border-radius:8px;font-size:13px;color:var(--text3)">Sélectionnez d'abord un produit</div>
           </div>
           <div class="form-group"><label>Temps d'impression total (calculé)</label><input type="text" id="calc-temps-total" class="calc-field" readonly></div>
-          <div class="form-group"><label>Quantité matière totale (g) (calculé)</label><input type="text" id="calc-qte-total" class="calc-field" readonly></div>
+          <div class="form-group"><label>Quantité de matière totale (g) (calculée)</label><input type="text" id="calc-qte-total" class="calc-field" readonly></div>
           <div class="form-group"><label>Nombre de plaques d'impression</label><input type="number" name="nb_plaques" id="calc-nb-plaques" min="1" value="1" placeholder="1" oninput="calcCoutPlaque()"></div>
           <div class="form-group"><label>Nb de couleurs (calculé)</label><input type="text" id="calc-nb-couleurs" class="calc-field" readonly></div>
         </div>
@@ -967,7 +967,7 @@
       <div class="calc-section">
         <div class="calc-section-title">🧵 Filaments utilisés</div>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-          <label style="font-size:13px;color:var(--text2);white-space:nowrap;font-weight:600">⏱ Total heure d'impression (HH:mm)</label>
+          <label style="font-size:13px;color:var(--text2);white-space:nowrap;font-weight:600">⏱ Durée totale d'impression (HH:mm)</label>
           <input type="text" name="nb_heures_impression" id="calc-nb-heures" placeholder="02:30" oninput="calcTotalElec()" style="width:110px;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text)">
         </div>
         <div id="calc-filaments-container">
@@ -995,7 +995,7 @@
       <div class="calc-section">
         <div class="calc-section-title">📋 Coûts fixes</div>
         <div class="form-grid">
-          <div class="form-group"><label>Nb produits / modules sélectionnés</label><input type="text" id="calc-nb-modules-selec" class="calc-field" readonly placeholder="0"></div>
+          <div class="form-group"><label>Nb de produits / modules sélectionnés</label><input type="text" id="calc-nb-modules-selec" class="calc-field" readonly placeholder="0"></div>
           <div class="form-group"><label>Coût fiche produit (€)</label><input type="text" id="calc-cout-fiche" class="calc-field" readonly></div>
           <div class="form-group"><label>Coût logistique (€)</label><input type="text" id="calc-cout-logistique" class="calc-field" readonly></div>
         </div>
@@ -1015,7 +1015,7 @@
         <div class="form-grid">
           <div class="form-group"><label>Usure par produit (€)</label><input type="text" id="calc-cout-usure" class="calc-field" readonly></div>
           <div class="form-group"><label>Coût maintenance (€)</label><input type="text" id="calc-cout-maintenance" class="calc-field" readonly></div>
-          <div class="form-group"><label>Nb heures main d'œuvre (HH:MM)</label><input type="text" name="nb_heures_mo" id="calc-nb-mo" placeholder="01:30" oninput="calcTotalMO()"></div>
+          <div class="form-group"><label>Nb d'heures de main-d'œuvre (HH:mm)</label><input type="text" name="nb_heures_mo" id="calc-nb-mo" placeholder="01:30" oninput="calcTotalMO()"></div>
           <div class="form-group"><label>Total coût main d'œuvre (€)</label><input type="text" id="calc-cout-mo" class="calc-field" readonly></div>
         </div>
       </div>
@@ -1025,7 +1025,7 @@
         <div class="calc-section-title">❌ Taux d'échec</div>
         <div class="form-grid">
           <div class="form-group"><label>Taux d'échec (%)</label><input type="number" name="taux_echec" id="calc-taux-echec" step="0.01" min="0" max="100" placeholder="0" oninput="calcResultats()"></div>
-          <div class="form-group"><label>Frais mise en vente (€)</label><input type="text" id="calc-cout-vente" class="calc-field" readonly></div>
+          <div class="form-group"><label>Frais de mise en vente (€)</label><input type="text" id="calc-cout-vente" class="calc-field" readonly></div>
         </div>
       </div>
 
@@ -2070,7 +2070,7 @@ async function renderStockCouleurModal(){
     });
     document.getElementById('sc-content').innerHTML=html||'<p style="color:var(--text3)">Aucun module trouvé.</p>';
   }catch(err){
-    document.getElementById('sc-content').innerHTML='<p style="color:var(--red)">Erreur: '+esc(err.message)+'</p>';
+    document.getElementById('sc-content').innerHTML='<p style="color:var(--red)">Erreur : '+esc(err.message)+'</p>';
   }
 }
 
@@ -2146,7 +2146,7 @@ async function addStockCouleur(pieceIndex){
   var piece=obj.pieces.find(function(p){return p.index===pieceIndex;});
   try{
     await api('POST','objets_stock_couleur',{objet_id:obj.id,piece_index:pieceIndex,piece_nom:piece?piece.nom:'',couleur:couleur,quantite:qte});
-    toast('Stock couleur ajouté','success');
+    toast('Stock par couleur ajouté ✓','success');
     await syncPieceStock(obj.id,pieceIndex);
     await renderStockCouleurModal();
   }catch(err){toast('Erreur: '+err.message,'error');}
@@ -2289,7 +2289,7 @@ async function saveVente(e){
   e.preventDefault();
   var selEl=document.getElementById('vente-objet-id');
   var rawVal=selEl.value; // "UUID|moduleIndex"
-  if(!rawVal){toast('Choisir un objet ou un module','error');return;}
+  if(!rawVal){toast('Veuillez choisir un objet ou un module','error');return;}
   var parts=rawVal.split('|');
   var objetId=parts[0];
   var moduleIdx=parseInt(parts[1])||0;
@@ -2301,7 +2301,7 @@ async function saveVente(e){
   var lieu=document.getElementById('vente-lieu').value;
   if(nb<1){toast('Quantité invalide','error');return;}
   if(stock!=null&&nb>stock){toast('Quantité supérieure au stock !','error');return;}
-  if(!lieu){toast('Choisir un lieu de vente','error');return;}
+  if(!lieu){toast('Veuillez choisir un lieu de vente','error');return;}
   try{
     // Enregistrer la vente
     await api('POST','objets_vendus',{objet_id:objetId,module_index:moduleIdx,module_nom:moduleNom||null,nombre_vendus:nb,date_vente:dateVente,lieu_vente:lieu});
