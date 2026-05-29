@@ -376,6 +376,7 @@
       <div class="subnav">
         <button class="subnav-btn active" onclick="showSubPage('parametres','listes',event)">⚙️ Listes de référence</button>
         <button class="subnav-btn" onclick="showSubPage('parametres','importexport',event)">📤 Import / Export</button>
+        <button class="subnav-btn" onclick="showSubPage('parametres','preferences',event)">🎨 Préférences</button>
       </div>
 
       <div class="subpage active" id="subpage-listes">
@@ -485,6 +486,37 @@
 
         </div>
       </div>
+
+      <div class="subpage" id="subpage-preferences">
+        <div class="section-header"><span class="section-title">Préférences d'affichage</span></div>
+        <div class="settings-grid">
+
+          <div class="settings-card">
+            <div class="settings-card-title">🌓 Thème par défaut</div>
+            <p style="font-size:13px;color:var(--text2);margin-bottom:18px">Choisissez le thème appliqué à chaque ouverture de l'application.</p>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <label id="pref-theme-dark-label" onclick="setPrefTheme('dark')" style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px 14px;border-radius:10px;border:2px solid var(--border);background:var(--bg3);transition:all .15s">
+                <span style="font-size:22px">🌑</span>
+                <div>
+                  <div style="font-weight:600;font-size:14px">Mode sombre</div>
+                  <div style="font-size:12px;color:var(--text2)">Fond noir — repose les yeux</div>
+                </div>
+                <span id="pref-dark-check" style="margin-left:auto;font-size:18px"></span>
+              </label>
+              <label id="pref-theme-light-label" onclick="setPrefTheme('light')" style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px 14px;border-radius:10px;border:2px solid var(--border);background:var(--bg3);transition:all .15s">
+                <span style="font-size:22px">☀️</span>
+                <div>
+                  <div style="font-weight:600;font-size:14px">Mode clair</div>
+                  <div style="font-size:12px;color:var(--text2)">Fond blanc — lisibilité maximale</div>
+                </div>
+                <span id="pref-light-check" style="margin-left:auto;font-size:18px"></span>
+              </label>
+            </div>
+            <p style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:14px">Le bouton 🌙/☀️ dans l'en-tête change le thème temporairement. Ce réglage définit le thème au démarrage.</p>
+          </div>
+
+        </div>
+      </div>
     </div>
 
     <!-- OBJETS -->
@@ -521,8 +553,8 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Nom</th><th>Catégorie</th><th>Couleur principale</th><th>Nb pièces</th><th>Multi couleur</th><th>Temps total</th><th>Stock</th><th></th></tr></thead>
-            <tbody id="tbody-objets"><tr class="empty-row"><td colspan="8">Cliquez sur "+ Ajouter" pour créer un objet</td></tr></tbody>
+            <thead><tr><th>Nom</th><th>Catégorie</th><th>Couleur principale</th><th>Nb en stock</th><th>Multi couleur</th><th>Temps total</th><th></th></tr></thead>
+            <tbody id="tbody-objets"><tr class="empty-row"><td colspan="7">Cliquez sur "+ Ajouter" pour créer un objet</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -1564,21 +1596,43 @@ async function deleteRow(table,id,reload){
   catch(err){toast('Erreur : '+err.message,'error');}
 }
 
-/* ---- UI ---- */
+/* ---- UI / THÈME ---- */
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme',theme);
+  var btn=document.getElementById('theme-toggle');
+  if(btn) btn.textContent=theme==='dark'?'☀️':'🌙';
+}
 function toggleTheme(){
   var isDark=document.documentElement.getAttribute('data-theme')==='dark';
   var next=isDark?'light':'dark';
-  document.documentElement.setAttribute('data-theme',next);
+  applyTheme(next);
   localStorage.setItem('tadam-theme',next);
-  var btn=document.getElementById('theme-toggle');
-  if(btn) btn.textContent=next==='dark'?'☀️':'🌙';
+}
+function setPrefTheme(theme){
+  localStorage.setItem('tadam-theme',theme);
+  applyTheme(theme);
+  updatePrefThemeUI(theme);
+  toast('Thème '+(theme==='dark'?'sombre':'clair')+' défini par défaut ✓','success');
+}
+function updatePrefThemeUI(theme){
+  var darkLabel=document.getElementById('pref-theme-dark-label');
+  var lightLabel=document.getElementById('pref-theme-light-label');
+  var darkCheck=document.getElementById('pref-dark-check');
+  var lightCheck=document.getElementById('pref-light-check');
+  if(!darkLabel) return;
+  var accent='2px solid var(--accent)';
+  var neutral='2px solid var(--border)';
+  darkLabel.style.border=theme==='dark'?accent:neutral;
+  lightLabel.style.border=theme==='light'?accent:neutral;
+  if(darkCheck) darkCheck.textContent=theme==='dark'?'✅':'';
+  if(lightCheck) lightCheck.textContent=theme==='light'?'✅':'';
 }
 (function(){
-  var saved=localStorage.getItem('tadam-theme')||'light';
-  document.documentElement.setAttribute('data-theme',saved);
+  var saved=localStorage.getItem('tadam-theme')||'dark';
+  applyTheme(saved);
   document.addEventListener('DOMContentLoaded',function(){
-    var btn=document.getElementById('theme-toggle');
-    if(btn) btn.textContent=saved==='dark'?'☀️':'🌙';
+    applyTheme(saved);
+    updatePrefThemeUI(saved);
   });
 })();
 
@@ -1655,6 +1709,7 @@ function showSubPage(pageId, subName, e) {
   if(subName==='objetsvendus') loadObjetsVendus();
   if(subName==='rapport-filaments') loadRapportFilaments();
   if(subName==='rapport-produits') loadRapportProduits();
+  if(subName==='preferences') updatePrefThemeUI(localStorage.getItem('tadam-theme')||'dark');
 }
 function showSubPage2(subName, e) {
   document.querySelectorAll('.subnav2-btn').forEach(function(b){b.classList.remove('active');});
@@ -1851,9 +1906,10 @@ function renderObjets(data){
   document.getElementById('stat-obj-multi').textContent=data.filter(function(r){return r.multi_couleur;}).length;
   var cats=new Set(data.map(function(r){return r.categorie;}).filter(Boolean)).size;
   document.getElementById('stat-obj-cats').textContent=cats;
-  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="8">Aucun objet — cliquez sur "+ Ajouter"</td></tr>';return;}
+  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">Aucun objet — cliquez sur "+ Ajouter"</td></tr>';return;}
   tbody.innerHTML=data.map(function(r){
-    return '<tr><td><strong>'+esc(r.nom||'—')+'</strong></td><td>'+esc(r.categorie||'—')+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur_principale)+'"></span>'+esc(r.couleur_principale||'—')+'</td><td style="font-family:var(--font-mono)">'+(r.nb_pieces||0)+'</td><td><span class="badge '+(r.multi_couleur?'badge-yes':'badge-no')+'">'+(r.multi_couleur?'Oui':'Non')+'</span></td><td style="font-family:var(--font-mono)">'+esc(r.temps_total||'—')+'</td><td><span class="badge '+(r.stock>0?'badge-yes':'badge-no')+'">'+(r.stock!=null?r.stock:0)+'</span></td><td><div style="display:flex;gap:6px"><button class="btn btn-sm" style="background:linear-gradient(135deg,#a855f7,#6366f1);color:#fff;border:none" onclick="openStockCouleur(\''+r.id+'\')" title="Stock par couleur">🎨</button><button class="btn btn-warning btn-sm" onclick="openEditObjet(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'objets_vente\',\''+r.id+'\',loadObjets)">✕</button></div></td></tr>';
+    var stock=r.stock!=null?r.stock:0;
+    return '<tr><td><strong>'+esc(r.nom||'—')+'</strong></td><td>'+esc(r.categorie||'—')+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur_principale)+'"></span>'+esc(r.couleur_principale||'—')+'</td><td><span class="badge '+(stock>0?'badge-yes':'badge-no')+'" style="font-family:var(--font-mono);font-size:12px">'+stock+'</span></td><td><span class="badge '+(r.multi_couleur?'badge-yes':'badge-no')+'">'+(r.multi_couleur?'Oui':'Non')+'</span></td><td style="font-family:var(--font-mono)">'+esc(r.temps_total||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-sm" style="background:linear-gradient(135deg,#a855f7,#6366f1);color:#fff;border:none" onclick="openStockCouleur(\''+r.id+'\')" title="Stock par couleur">🎨</button><button class="btn btn-warning btn-sm" onclick="openEditObjet(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'objets_vente\',\''+r.id+'\',loadObjets)">✕</button></div></td></tr>';
   }).join('');
 }
 
@@ -2387,9 +2443,14 @@ function buildAccessoiresCheckboxes(){
   var el=document.getElementById('calc-accessoires-list');
   if(!el) return;
   if(!achatsAccessoires||!achatsAccessoires.length){el.innerHTML='<span style="color:var(--text3)">Aucun accessoire en base</span>';return;}
-  el.innerHTML=achatsAccessoires.map(function(a){
-    return '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px 8px;background:var(--bg2);border-radius:6px;font-size:13px"><input type="checkbox" value="'+a.id+'" data-cout="'+(a.prix_par_impression||0)+'" onchange="calcTotalAccessoires()" style="accent-color:var(--accent)">'+a.produit+'<span style="font-family:var(--font-mono);font-size:11px;color:var(--text3)"> ('+parseFloat(a.prix_par_impression||0).toFixed(4)+'€/imp)</span></label>';
-  }).join('');
+  el.innerHTML='<div style="display:flex;flex-direction:column;gap:6px;width:100%">'+achatsAccessoires.map(function(a){
+    var chkId='acc-chk-'+a.id;
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;cursor:pointer" onclick="document.getElementById(\''+chkId+'\').click()">'
+      +'<input type="checkbox" id="'+chkId+'" value="'+a.id+'" data-cout="'+(a.prix_par_impression||0)+'" onchange="calcTotalAccessoires()" onclick="event.stopPropagation()" style="width:18px;height:18px;min-width:18px;accent-color:var(--accent);cursor:pointer">'
+      +'<span style="flex:1;font-size:13px;color:var(--text)">'+esc(a.produit)+'</span>'
+      +'<span style="font-family:var(--font-mono);font-size:11px;color:var(--teal);white-space:nowrap">'+parseFloat(a.prix_par_impression||0).toFixed(4)+' €/imp</span>'
+      +'</div>';
+  }).join('')+'</div>';
 }
 
 function calcTotalAccessoires(){
@@ -2455,7 +2516,12 @@ function onObjetChange(){
     if(objet['piece_'+i+'_nom']) items.push({label:objet['piece_'+i+'_nom'],temps:objet['piece_'+i+'_temps'],qte:objet['piece_'+i+'_qte'],couleur:objet['piece_'+i+'_couleur'],idx:String(i)});
   }
   container.innerHTML=items.map(function(it){
-    return '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 10px;background:var(--bg2);border-radius:6px;font-size:13px"><input type="checkbox" value="'+it.idx+'" data-temps="'+esc(it.temps||'')+'" data-qte="'+(it.qte||0)+'" data-couleur="'+esc(it.couleur||'')+'" onchange="calcModulesTotal()" style="accent-color:var(--accent)" checked>'+esc(it.label)+(it.temps?' <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">('+esc(it.temps)+')</span>':'')+'</label>';
+    var chkId='mod-chk-'+it.idx;
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;cursor:pointer" onclick="document.getElementById(\''+chkId+'\').click()">'
+      +'<input type="checkbox" id="'+chkId+'" value="'+it.idx+'" data-temps="'+esc(it.temps||'')+'" data-qte="'+(it.qte||0)+'" data-couleur="'+esc(it.couleur||'')+'" onchange="calcModulesTotal()" onclick="event.stopPropagation()" style="width:18px;height:18px;min-width:18px;accent-color:var(--accent);cursor:pointer" checked>'
+      +'<span style="flex:1;font-size:13px;color:var(--text)">'+esc(it.label)+'</span>'
+      +(it.temps?'<span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);white-space:nowrap">'+esc(it.temps)+'</span>':'')
+      +'</div>';
   }).join('');
   calcModulesTotal();
 }
@@ -2737,23 +2803,65 @@ async function loadRapportFilaments(){
       var etat=r.etat||'disponible';
       if(etat==='disponible') dispCount+=q; else if(etat==='epuise') epuiseCount+=q; else sortiCount+=q;
     });
+    // Calcul des indicateurs synthèse
+    var totalBobines=data.reduce(function(s,r){return s+(r.quantite||1);},0);
+    var valeurTotale=data.reduce(function(s,r){return s+(r.prix_euros*(r.quantite||1));},0);
+    var poidsTotalG=data.reduce(function(s,r){return s+(r.poids_g*(r.quantite||1));},0);
+    // Filament le moins cher (€/g)
+    var moinsCher=null;
+    data.forEach(function(r){if(r.prix_par_gramme>0&&(!moinsCher||r.prix_par_gramme<moinsCher.prix_par_gramme))moinsCher=r;});
+    // Filament le plus cher (€/g)
+    var plusCher=null;
+    data.forEach(function(r){if(r.prix_par_gramme>0&&(!plusCher||r.prix_par_gramme>plusCher.prix_par_gramme))plusCher=r;});
+    // Couleur la plus en stock
+    var topCouleur=Object.keys(byCouleur).sort(function(a,b){return byCouleur[b].count-byCouleur[a].count;})[0];
+    // Matière la plus utilisée
+    var topMatiere=Object.keys(byType).sort(function(a,b){return byType[b].count-byType[a].count;})[0];
+    // Couleur la plus en poids
+    var topCouleurPoids=Object.keys(byCouleur).sort(function(a,b){return byCouleur[b].poids-byCouleur[a].poids;})[0];
+
     var html='';
+    // === SYNTHÈSE ===
+    html+='<h3 style="font-family:var(--font-mono);font-size:13px;text-transform:uppercase;color:var(--text2);margin:0 0 14px;padding-bottom:8px;border-bottom:2px solid var(--border)">🔍 Synthèse du stock</h3>';
+    html+='<div class="stats-row" style="margin-bottom:28px">';
+    html+='<div class="stat-card"><div class="stat-label">Total bobines</div><div class="stat-value accent">'+totalBobines+'</div></div>';
+    html+='<div class="stat-card"><div class="stat-label">Valeur totale</div><div class="stat-value teal">'+valeurTotale.toFixed(2)+' €</div></div>';
+    html+='<div class="stat-card"><div class="stat-label">Poids total</div><div class="stat-value amber">'+(poidsTotalG/1000).toFixed(1)+' kg</div></div>';
+    html+='</div>';
+    html+='<div class="settings-grid" style="margin-bottom:28px">';
+    // Moins cher
+    if(moinsCher) html+='<div class="settings-card"><div class="settings-card-title">💚 Filament le moins cher</div><div style="font-size:15px;font-weight:700;color:var(--teal);font-family:var(--font-mono)">'+(moinsCher.prix_par_gramme).toFixed(4)+' €/g</div><div style="font-size:13px;margin-top:6px;color:var(--text2)"><span class="color-dot" style="background:'+colorHex(moinsCher.couleur)+'"></span>'+esc(moinsCher.marque)+' — '+esc(moinsCher.couleur)+' ('+esc(moinsCher.type_matiere)+')</div></div>';
+    // Plus cher
+    if(plusCher) html+='<div class="settings-card"><div class="settings-card-title">🔴 Filament le plus cher</div><div style="font-size:15px;font-weight:700;color:var(--red);font-family:var(--font-mono)">'+(plusCher.prix_par_gramme).toFixed(4)+' €/g</div><div style="font-size:13px;margin-top:6px;color:var(--text2)"><span class="color-dot" style="background:'+colorHex(plusCher.couleur)+'"></span>'+esc(plusCher.marque)+' — '+esc(plusCher.couleur)+' ('+esc(plusCher.type_matiere)+')</div></div>';
+    // Couleur + en stock (quantité)
+    if(topCouleur) html+='<div class="settings-card"><div class="settings-card-title">📦 Couleur la plus en stock</div><div style="font-size:15px;font-weight:700;color:var(--accent);font-family:var(--font-mono)">'+byCouleur[topCouleur].count+' bobine(s)</div><div style="font-size:13px;margin-top:6px;color:var(--text2)"><span class="color-dot" style="background:'+colorHex(topCouleur)+'"></span>'+esc(topCouleur)+' — '+byCouleur[topCouleur].poids.toFixed(0)+' g total</div></div>';
+    // Matière la plus utilisée
+    if(topMatiere) html+='<div class="settings-card"><div class="settings-card-title">🔥 Matière la plus utilisée</div><div style="font-size:15px;font-weight:700;color:var(--amber);font-family:var(--font-mono)">'+byType[topMatiere].count+' bobine(s)</div><div style="font-size:13px;margin-top:6px"><span class="badge '+badgeMatiere(topMatiere)+'">'+esc(topMatiere)+'</span> — '+byType[topMatiere].poids.toFixed(0)+' g total</div></div>';
+    // Plus en poids
+    if(topCouleurPoids&&topCouleurPoids!==topCouleur) html+='<div class="settings-card"><div class="settings-card-title">⚖️ Couleur + volumineuse</div><div style="font-size:15px;font-weight:700;color:var(--text);font-family:var(--font-mono)">'+byCouleur[topCouleurPoids].poids.toFixed(0)+' g</div><div style="font-size:13px;margin-top:6px;color:var(--text2)"><span class="color-dot" style="background:'+colorHex(topCouleurPoids)+'"></span>'+esc(topCouleurPoids)+' ('+byCouleur[topCouleurPoids].count+' bob.)</div></div>';
+    html+='</div>';
+
+    // === TABLEAUX TRIÉS PAR NOMBRE DÉCROISSANT ===
+    var couleursSorted=Object.keys(byCouleur).sort(function(a,b){return byCouleur[b].count-byCouleur[a].count;});
+    var typesSorted=Object.keys(byType).sort(function(a,b){return byType[b].count-byType[a].count;});
+    var formatsSorted=Object.keys(byFormat).sort(function(a,b){return byFormat[b].count-byFormat[a].count;});
+
     // Par couleur
-    html+='<h3 style="font-family:var(--font-mono);font-size:13px;text-transform:uppercase;color:var(--text2);margin:0 0 10px">Par couleur</h3>';
+    html+='<h3 style="font-family:var(--font-mono);font-size:13px;text-transform:uppercase;color:var(--text2);margin:0 0 10px">Par couleur <span style="font-size:11px;color:var(--text3);font-weight:400">(ordre décroissant)</span></h3>';
     html+='<div class="table-wrap" style="margin-bottom:28px"><table><thead><tr><th>Couleur</th><th>Nb bobines</th><th>Poids total (g)</th></tr></thead><tbody>';
-    Object.keys(byCouleur).sort().forEach(function(c){var v=byCouleur[c];html+='<tr><td><span class="color-dot" style="background:'+colorHex(c)+'"></span>'+esc(c)+'</td><td style="font-family:var(--font-mono)">'+v.count+'</td><td style="font-family:var(--font-mono)">'+v.poids.toFixed(0)+' g</td></tr>';});
+    couleursSorted.forEach(function(c){var v=byCouleur[c];html+='<tr><td><span class="color-dot" style="background:'+colorHex(c)+'"></span>'+esc(c)+'</td><td style="font-family:var(--font-mono)">'+v.count+'</td><td style="font-family:var(--font-mono)">'+v.poids.toFixed(0)+' g</td></tr>';});
     html+='</tbody></table></div>';
     // Par type
-    html+='<h3 style="font-family:var(--font-mono);font-size:13px;text-transform:uppercase;color:var(--text2);margin:0 0 10px">Par type de matière</h3>';
+    html+='<h3 style="font-family:var(--font-mono);font-size:13px;text-transform:uppercase;color:var(--text2);margin:0 0 10px">Par type de matière <span style="font-size:11px;color:var(--text3);font-weight:400">(ordre décroissant)</span></h3>';
     html+='<div class="table-wrap" style="margin-bottom:28px"><table><thead><tr><th>Matière</th><th>Nb bobines</th><th>Poids total (g)</th></tr></thead><tbody>';
-    Object.keys(byType).sort().forEach(function(t){var v=byType[t];html+='<tr><td><span class="badge '+badgeMatiere(t)+'">'+esc(t)+'</span></td><td style="font-family:var(--font-mono)">'+v.count+'</td><td style="font-family:var(--font-mono)">'+v.poids.toFixed(0)+' g</td></tr>';});
+    typesSorted.forEach(function(t){var v=byType[t];html+='<tr><td><span class="badge '+badgeMatiere(t)+'">'+esc(t)+'</span></td><td style="font-family:var(--font-mono)">'+v.count+'</td><td style="font-family:var(--font-mono)">'+v.poids.toFixed(0)+' g</td></tr>';});
     html+='</tbody></table></div>';
     // Par format
-    html+='<h3 style="font-family:var(--font-mono);font-size:13px;text-transform:uppercase;color:var(--text2);margin:0 0 10px">Par format de bobine</h3>';
+    html+='<h3 style="font-family:var(--font-mono);font-size:13px;text-transform:uppercase;color:var(--text2);margin:0 0 10px">Par format de bobine <span style="font-size:11px;color:var(--text3);font-weight:400">(ordre décroissant)</span></h3>';
     html+='<div class="table-wrap" style="margin-bottom:28px"><table><thead><tr><th>Format</th><th>Nb bobines</th></tr></thead><tbody>';
-    Object.keys(byFormat).sort().forEach(function(f){html+='<tr><td>'+esc(f)+'</td><td style="font-family:var(--font-mono)">'+byFormat[f].count+'</td></tr>';});
+    formatsSorted.forEach(function(f){html+='<tr><td>'+esc(f)+'</td><td style="font-family:var(--font-mono)">'+byFormat[f].count+'</td></tr>';});
     html+='</tbody></table></div>';
-    // Cartes synthèse
+    // Cartes état
     html+='<div class="settings-grid">';
     html+='<div class="settings-card"><div class="settings-card-title">🔄 Refill vs Standard</div><p style="font-family:var(--font-mono);margin:8px 0">Refill : <strong>'+refillCount+'</strong></p><p style="font-family:var(--font-mono);margin:8px 0">Standard : <strong>'+nonRefillCount+'</strong></p></div>';
     html+='<div class="settings-card"><div class="settings-card-title">📊 Par état</div><p style="font-family:var(--font-mono);margin:8px 0">✅ Disponible : <strong style="color:var(--teal)">'+dispCount+'</strong></p><p style="font-family:var(--font-mono);margin:8px 0">🔴 Épuisé : <strong style="color:#e74c3c">'+epuiseCount+'</strong></p><p style="font-family:var(--font-mono);margin:8px 0">⬜ Sorti du stock : <strong style="color:var(--text2)">'+sortiCount+'</strong></p></div>';
