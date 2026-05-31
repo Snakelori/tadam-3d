@@ -182,16 +182,22 @@
     .form-group{display:flex;flex-direction:column;gap:5px;}
     .form-group.full{grid-column:1/-1;}
     label{font-family:var(--font-mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;}
-    input,select,textarea{
+    input:not([type=checkbox]):not([type=radio]),select,textarea{
       background:var(--bg3);border:1px solid var(--border);color:var(--text);
       border-radius:8px;padding:9px 12px;font-family:var(--font-sans);font-size:14px;
       transition:border-color .15s;outline:none;-webkit-appearance:none;appearance:none;width:100%;
     }
-    input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),0.12);}
+    input[type=checkbox],input[type=radio]{
+      -webkit-appearance:checkbox;appearance:auto;
+      width:18px;height:18px;min-width:18px;flex-shrink:0;
+      accent-color:var(--accent);cursor:pointer;
+      background:transparent;border:none;padding:0;border-radius:0;
+    }
+    input:not([type=checkbox]):not([type=radio]):focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),0.12);}
     input::placeholder{color:var(--text3);}
     select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238899b4' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:32px;}
     select option{background:var(--bg3);color:var(--text);}
-    [data-theme="light"] input,[data-theme="light"] select,[data-theme="light"] textarea{background:#fff;color:#0f172a;border-color:var(--border);}
+    [data-theme="light"] input:not([type=checkbox]):not([type=radio]),[data-theme="light"] select,[data-theme="light"] textarea{background:#fff;color:#0f172a;border-color:var(--border);}
     [data-theme="light"] select option{background:#fff;color:#0f172a;}
     .calc-field{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.3);color:var(--teal);font-family:var(--font-mono);font-size:13px;font-weight:700;}
     .form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;}
