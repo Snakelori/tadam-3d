@@ -731,6 +731,10 @@
           <label>Date de 1ère utilisation</label>
           <input type="date" name="date_premiere_utilisation" id="date-premiere-util">
         </div>
+        <div class="form-group" id="entame-qte-group" style="display:none">
+          <label>Quantité restante (g)</label>
+          <input type="number" name="quantite_restante_g" id="qte-restante-g" step="0.1" min="0" placeholder="ex : 650">
+        </div>
         <div class="form-group"><label>État</label><select name="etat" id="sel-etat-fil"><option value="disponible">✅ Disponible</option><option value="epuise">🔴 Épuisé</option><option value="sorti">⬜ Sorti du stock</option></select></div>
       </div>
       <div class="form-actions">
@@ -1463,7 +1467,9 @@ function renderFilaments(data){
   if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="12">Aucun filament — cliquez sur "+ Ajouter"</td></tr>';return;}
   tbody.innerHTML=data.map(function(r){
     var engageCell=r.entame
-      ?'<span class="badge badge-yes">Engagé</span>'+(r.date_premiere_utilisation?'<br><span style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">'+esc(r.date_premiere_utilisation)+'</span>':'')
+      ?'<span class="badge badge-yes">Engagé</span>'
+        +(r.date_premiere_utilisation?'<br><span style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">📅 '+esc(r.date_premiere_utilisation)+'</span>':'')
+        +(r.quantite_restante_g!=null?'<br><span style="font-family:var(--font-mono);font-size:10px;color:var(--amber)">⚖️ '+parseFloat(r.quantite_restante_g).toFixed(0)+' g restants</span>':'')
       :'<span class="badge badge-no">Non</span>';
     return '<tr><td><span style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">'+esc(r.id_bobine)+'</span></td><td>'+esc(r.marque)+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur)+'"></span>'+esc(r.couleur)+'</td><td><span class="badge '+badgeMatiere(r.type_matiere)+'">'+esc(r.type_matiere)+'</span></td><td style="font-family:var(--font-mono)">'+r.poids_g+'g</td><td style="font-family:var(--font-mono)">'+parseFloat(r.prix_euros).toFixed(2)+'€</td><td style="font-family:var(--font-mono);color:var(--teal)">'+parseFloat(r.prix_par_gramme||0).toFixed(4)+'</td><td style="font-family:var(--font-mono)">'+(r.quantite||1)+'</td><td>'+engageCell+'</td><td style="font-size:13px;color:var(--text2)">'+esc((r.fournisseurs&&r.fournisseurs.nom)||'—')+'</td><td><span class="badge '+(r.etat==='epuise'?'badge-no':r.etat==='sorti'?'badge-other':'badge-yes')+'">'+(r.etat==='epuise'?'Épuisé':r.etat==='sorti'?'Sorti':'Disponible')+'</span></td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditFilament(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'filaments\',\''+r.id+'\',loadFilaments)">✕</button></div></td></tr>';
   }).join('');
@@ -1495,8 +1501,10 @@ function openAddFilament(){
   document.getElementById('modal-fil-title').textContent='+ NOUVEAU FILAMENT';
   document.getElementById('btn-save-fil').textContent='Enregistrer';
   document.getElementById('form-filament').reset();
-  var grp=document.getElementById('entame-date-group');
-  if(grp) grp.style.display='none';
+  var grpD=document.getElementById('entame-date-group');
+  var grpQ=document.getElementById('entame-qte-group');
+  if(grpD) grpD.style.display='none';
+  if(grpQ) grpQ.style.display='none';
   openModal('modal-filament');
 }
 async function openEditFilament(id){
@@ -1523,8 +1531,12 @@ async function openEditFilament(id){
     document.getElementById('chk-entame').checked=r.entame||false;
     var dateUtil=document.getElementById('date-premiere-util');
     var dateGrp=document.getElementById('entame-date-group');
+    var qteEl=document.getElementById('qte-restante-g');
+    var qteGrp=document.getElementById('entame-qte-group');
     if(dateUtil) dateUtil.value=r.date_premiere_utilisation||'';
-    if(dateGrp) dateGrp.style.display=(r.entame)?'flex':'none';
+    if(qteEl)   qteEl.value=r.quantite_restante_g!=null?r.quantite_restante_g:'';
+    if(dateGrp) dateGrp.style.display=r.entame?'flex':'none';
+    if(qteGrp)  qteGrp.style.display=r.entame?'flex':'none';
     document.getElementById('sel-etat-fil').value=r.etat||'disponible';
     calcPrixG();
   }catch(err){toast('Erreur : '+err.message,'error');}
@@ -1536,7 +1548,8 @@ async function saveFilament(e){
   btn.textContent='...'; btn.disabled=true;
   try{
     var dateUtil=document.getElementById('date-premiere-util');
-    var body={id_bobine:form.id_bobine.value.trim(),marque:form.marque.value,couleur:form.couleur.value,type_matiere:form.type_matiere.value,format_bobine:form.format_bobine.value,refill:form.refill.checked,entame:form.entame.checked,etat:form.etat.value||'disponible',poids_g:parseFloat(form.poids_g.value),prix_euros:parseFloat(form.prix_euros.value),quantite:parseInt(form.quantite.value)||1,date_mise_en_stock:form.date_mise_en_stock.value||null,fournisseur_id:form.fournisseur_id.value||null,date_premiere_utilisation:(dateUtil&&dateUtil.value)||null};
+    var qteRestEl=document.getElementById('qte-restante-g');
+    var body={id_bobine:form.id_bobine.value.trim(),marque:form.marque.value,couleur:form.couleur.value,type_matiere:form.type_matiere.value,format_bobine:form.format_bobine.value,refill:form.refill.checked,entame:form.entame.checked,etat:form.etat.value||'disponible',poids_g:parseFloat(form.poids_g.value),prix_euros:parseFloat(form.prix_euros.value),quantite:parseInt(form.quantite.value)||1,date_mise_en_stock:form.date_mise_en_stock.value||null,fournisseur_id:form.fournisseur_id.value||null,date_premiere_utilisation:(dateUtil&&dateUtil.value)||null,quantite_restante_g:(qteRestEl&&qteRestEl.value!=='')?parseFloat(qteRestEl.value):null};
     if(editId){await api('PATCH','filaments',body,'?id=eq.'+editId);toast('Filament modifié ✓','success');}
     else{await api('POST','filaments',body);toast('Filament ajouté ✓','success');}
     closeModal('modal-filament'); form.reset();
@@ -1697,15 +1710,18 @@ document.querySelectorAll('.modal-overlay').forEach(function(m){
 
 function onEngageChange(){
   var chk=document.getElementById('chk-entame');
-  var grp=document.getElementById('entame-date-group');
+  var grpDate=document.getElementById('entame-date-group');
+  var grpQte=document.getElementById('entame-qte-group');
   var dateEl=document.getElementById('date-premiere-util');
-  if(!grp) return;
-  if(chk&&chk.checked){
-    grp.style.display='flex';
+  var qteEl=document.getElementById('qte-restante-g');
+  var engaged=chk&&chk.checked;
+  if(grpDate) grpDate.style.display=engaged?'flex':'none';
+  if(grpQte)  grpQte.style.display=engaged?'flex':'none';
+  if(engaged){
     if(dateEl&&!dateEl.value) dateEl.value=new Date().toISOString().split('T')[0];
   } else {
-    grp.style.display='none';
     if(dateEl) dateEl.value='';
+    if(qteEl)  qteEl.value='';
   }
 }
 
