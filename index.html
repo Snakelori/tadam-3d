@@ -127,7 +127,15 @@
     .stat-value.accent{color:var(--accent);}
 
     /* TABLE */
-    .table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg2);box-shadow:var(--shadow-sm);}
+    .table-wrap{
+      overflow-x:auto;-webkit-overflow-scrolling:touch;
+      border-radius:var(--radius);border:1px solid var(--border);background:var(--bg2);box-shadow:var(--shadow-sm);
+      scrollbar-width:thin;scrollbar-color:var(--accent) var(--bg3);
+    }
+    .table-wrap::-webkit-scrollbar{height:6px;}
+    .table-wrap::-webkit-scrollbar-track{background:var(--bg3);border-radius:0 0 var(--radius) var(--radius);}
+    .table-wrap::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px;}
+    .table-wrap::-webkit-scrollbar-thumb:hover{background:var(--accent2);}
     table{width:100%;border-collapse:collapse;}
     thead{background:var(--bg3);}
     th{font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:11px 14px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--border);}
