@@ -215,6 +215,22 @@
     .add-item-row{display:flex;gap:8px;margin-top:10px;}
     .add-item-row input{flex:1;}
 
+    /* DÉTAIL CALCUL */
+    .bkd-section{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:10px;}
+    .bkd-header{font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;padding:8px 12px;background:var(--bg3);border-bottom:1px solid var(--border);}
+    .bkd-row{display:flex;justify-content:space-between;align-items:center;padding:5px 12px;border-bottom:1px solid var(--border2);font-size:12px;}
+    .bkd-row:last-child{border-bottom:none;}
+    .bkd-row.zero{opacity:0.45;}
+    .bkd-row.total{background:var(--bg3);font-weight:700;font-family:var(--font-mono);border-top:2px solid var(--border);}
+    .bkd-row.total .bkd-val{color:var(--text);font-size:13px;}
+    .bkd-label{color:var(--text2);}
+    .bkd-formula{font-family:var(--font-mono);font-size:11px;color:var(--text3);margin:0 8px;}
+    .bkd-val{font-family:var(--font-mono);font-size:12px;color:var(--teal);white-space:nowrap;}
+    .bkd-val.red{color:var(--red);}
+    .bkd-val.accent{color:var(--accent);}
+    .bkd-val.amber{color:var(--amber);}
+    .bkd-note{font-size:10px;color:var(--text3);padding:4px 12px 6px;font-style:italic;}
+
     /* TAG LIVRAISON */
     .livraison-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;font-family:var(--font-mono);font-size:11px;font-weight:700;margin-top:10px;}
     .livraison-tag.included{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:var(--teal);}
@@ -1110,31 +1126,14 @@
       <div class="calc-section" style="background:#f0f5ff;border-color:#b3caff">
         <div class="calc-section-title" style="color:var(--accent)">📊 Résultats</div>
 
-        <!-- Bulle méthode de calcul -->
-        <details style="margin-bottom:14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;cursor:pointer">
-          <summary style="font-family:var(--font-mono);font-weight:700;color:var(--accent);letter-spacing:0.3px;list-style:none;display:flex;align-items:center;gap:6px">
-            <span style="font-size:14px">ℹ️</span> Méthode de calcul <span style="font-size:10px;color:var(--text3);margin-left:4px">(cliquer pour développer)</span>
+        <!-- Détail dynamique du calcul -->
+        <details id="calc-breakdown-details" style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
+          <summary style="font-family:var(--font-mono);font-weight:700;color:var(--accent);letter-spacing:0.3px;list-style:none;display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--bg3);cursor:pointer;user-select:none">
+            <span style="font-size:14px">🔍</span> Détail du calcul — valeurs réelles
+            <span style="font-size:10px;color:var(--text3);margin-left:4px">(cliquer pour développer)</span>
           </summary>
-          <div style="margin-top:10px;display:grid;gap:6px;line-height:1.7">
-            <div style="background:var(--bg2);border-radius:6px;padding:8px 12px">
-              <span style="font-family:var(--font-mono);font-weight:700;color:var(--text)">Coût produit réel</span>
-              <span style="color:var(--text2)"> = filaments + accessoires + logistique + fiche + électricité + usure + maintenance + main d'œuvre + mise en vente + <strong>coût plaques (nb plaques × coût/plaque)</strong></span>
-            </div>
-            <div style="background:var(--bg2);border-radius:6px;padding:8px 12px">
-              <span style="font-family:var(--font-mono);font-weight:700;color:var(--accent)">Coût produit avec échec</span>
-              <span style="color:var(--text2)"> = Coût réel × (1 + taux d'échec %)</span>
-              <div style="font-size:11px;color:var(--text3);margin-top:2px">→ Intègre le risque d'impression ratée dans le coût unitaire</div>
-            </div>
-            <div style="background:var(--bg2);border-radius:6px;padding:8px 12px">
-              <span style="font-family:var(--font-mono);font-weight:700;color:var(--text)">Coût fabrication</span>
-              <span style="color:var(--text2)"> = Coût produit × (1 + % charge vente)</span>
-              <div style="font-size:11px;color:var(--text3);margin-top:2px">→ Deux variantes : sans échec (coût réel) et avec échec</div>
-            </div>
-            <div style="background:var(--bg2);border-radius:6px;padding:8px 12px">
-              <span style="font-family:var(--font-mono);font-weight:700;color:var(--teal)">Prix de vente</span>
-              <span style="color:var(--text2)"> = Coût fabrication × taux de marge</span>
-              <div style="font-size:11px;color:var(--text3);margin-top:2px">→ Taux de marge défini dans Paramètres de calcul (ex : 3 = ×3 = marge 200%)</div>
-            </div>
+          <div id="calc-breakdown-content" style="padding:10px 12px;display:grid;gap:8px;background:var(--bg2)">
+            <div style="color:var(--text3);font-size:12px;text-align:center;padding:12px">Saisissez des valeurs pour voir le détail...</div>
           </div>
         </details>
 
@@ -1311,9 +1310,10 @@
 
 <script>
 /* ═══ VERSIONING ═══ */
-var APP_VERSION='1.3.0';
+var APP_VERSION='1.4.0';
 var APP_DATE='2026-05-31';
 var APP_CHANGELOG=[
+  {v:'1.4.0', d:'2026-05-31', notes:['Détail dynamique du calcul : chaque valeur réelle affichée étape par étape (coûts, taux d\'échec, fabrication, marge, livraison)','Mise à jour en temps réel à chaque saisie']},
   {v:'1.3.0', d:'2026-05-31', notes:['Frais de livraison dans paramètres de calcul','Inclusion optionnelle de la livraison dans le prix de vente','Tag livraison dans les prix recommandés','Icône "À propos" avec versioning','Quantité restante sur filaments engagés','Date de 1ère utilisation sur filaments engagés']},
   {v:'1.2.0', d:'2026-05-29', notes:['Ascenseur horizontal visible sur tous les tableaux','Correction des cases à cocher (appearance:none retiré)','Colonne "Nb en stock" dans les objets à vendre','Onglet Préférences (thème par défaut)','Rapport : synthèse filaments + tri décroissant','Filament "Engagé" (ex Entamé)']},
   {v:'1.1.0', d:'2026-05-29', notes:['Design Minimal Pro (zéro backdrop-filter)','Icône officielle TADAM-3D','xlsx.js embarqué localement','Correction orthographe et grammaire générale']},
@@ -2847,6 +2847,81 @@ function calcResultats(){
   setR('calc-fab-echec',fabEchec);
   setR('calc-prix-sans',prixSans);
   setR('calc-prix-avec',prixAvec);
+
+  // ─── DÉTAIL DYNAMIQUE ───
+  var bkd=document.getElementById('calc-breakdown-content');
+  if(bkd){
+    function fmt(v){return v.toFixed(4)+' €';}
+    function fmtS(v){return v.toFixed(2)+' €';}
+    function row(label,formula,val,cls){
+      var z=val===0?' zero':'';
+      return '<div class="bkd-row'+z+(cls?' '+cls:'')+'"><span class="bkd-label">'+label+'</span><span style="display:flex;align-items:center;gap:4px"><span class="bkd-formula">'+formula+'</span><span class="bkd-val'+(cls?' '+cls:'')+'">'+val.toFixed(4)+' €</span></span></div>';
+    }
+    var html='';
+
+    // ① Coûts de production
+    html+='<div class="bkd-section">';
+    html+='<div class="bkd-header">① Coûts de production (coût réel)</div>';
+    html+=row('Filaments','',filCout);
+    html+=row('Accessoires','',accCout);
+    html+=row('Fiche produit','',ficheCout);
+    html+=row('Logistique','',logCout);
+    html+=row('Électricité','',elecCout);
+    html+=row('Usure imprimante','',usureCout);
+    html+=row('Maintenance','',maintCout);
+    html+=row('Main-d\'œuvre','',moCout);
+    html+=row('Frais mise en vente','',venteCout);
+    html+=row('Coût plaques','',plaqueCout);
+    html+='<div class="bkd-row total"><span class="bkd-label">= COÛT RÉEL</span><span class="bkd-val">'+fmtS(coutReel)+' ✓</span></div>';
+    html+='</div>';
+
+    // ② Taux d'échec
+    html+='<div class="bkd-section">';
+    html+='<div class="bkd-header">② Taux d\'échec</div>';
+    if(taux>0){
+      html+='<div class="bkd-row"><span class="bkd-label">Taux d\'échec</span><span class="bkd-val amber">'+((taux*100).toFixed(2))+' %</span></div>';
+      html+='<div class="bkd-row"><span class="bkd-label">Coût réel × (1 + '+((taux*100).toFixed(2))+'%)</span><span class="bkd-formula">'+fmtS(coutReel)+' × '+(1+taux).toFixed(4)+'</span><span class="bkd-val red">'+fmtS(coutEchec)+' ✓</span></span></div>';
+    }else{
+      html+='<div class="bkd-row zero"><span class="bkd-label">Taux d\'échec = 0 %</span><span class="bkd-val">Coût avec échec = Coût réel</span></div>';
+    }
+    html+='</div>';
+
+    // ③ Coût fabrication
+    html+='<div class="bkd-section">';
+    html+='<div class="bkd-header">③ Coût fabrication (+ charges de vente)</div>';
+    html+='<div class="bkd-row"><span class="bkd-label">% charge de vente</span><span class="bkd-val amber">'+((pct*100).toFixed(2))+' %</span></div>';
+    html+='<div class="bkd-row"><span class="bkd-label">Sans échec : '+fmtS(coutReel)+' × (1 + '+((pct*100).toFixed(1))+'%)</span><span class="bkd-formula">'+(1+pct).toFixed(4)+'</span><span class="bkd-val accent">'+fmtS(fabReel)+'</span></div>';
+    html+='<div class="bkd-row"><span class="bkd-label">Avec échec : '+fmtS(coutEchec)+' × (1 + '+((pct*100).toFixed(1))+'%)</span><span class="bkd-formula">'+(1+pct).toFixed(4)+'</span><span class="bkd-val red">'+fmtS(fabEchec)+'</span></div>';
+    html+='</div>';
+
+    // ④ Prix de vente (avant livraison)
+    var pvSansBase=fabReel*marge;
+    var pvAvecBase=fabEchec*marge;
+    html+='<div class="bkd-section">';
+    html+='<div class="bkd-header">④ Prix de vente (× taux de marge)</div>';
+    html+='<div class="bkd-row"><span class="bkd-label">Taux de marge</span><span class="bkd-val amber">× '+marge+'</span></div>';
+    html+='<div class="bkd-row"><span class="bkd-label">Sans échec : '+fmtS(fabReel)+' × '+marge+'</span><span class="bkd-formula">=</span><span class="bkd-val accent">'+fmtS(pvSansBase)+'</span></div>';
+    html+='<div class="bkd-row"><span class="bkd-label">Avec échec : '+fmtS(fabEchec)+' × '+marge+'</span><span class="bkd-formula">=</span><span class="bkd-val red">'+fmtS(pvAvecBase)+'</span></div>';
+    html+='</div>';
+
+    // ⑤ Livraison
+    html+='<div class="bkd-section">';
+    html+='<div class="bkd-header">⑤ Livraison</div>';
+    if(inclureLiv&&coutLiv>0){
+      var trans2=(document.getElementById('calc-transporteur')||{}).value||'';
+      html+='<div class="bkd-row"><span class="bkd-label">Transporteur</span><span class="bkd-val">'+esc(trans2)+'</span></div>';
+      html+='<div class="bkd-row"><span class="bkd-label">Coût livraison</span><span class="bkd-val amber">+ '+fmtS(coutLiv)+'</span></div>';
+      html+='<div class="bkd-row total"><span class="bkd-label">= Prix final sans échec</span><span class="bkd-val accent">'+fmtS(prixSans)+' ✓</span></div>';
+      html+='<div class="bkd-row total"><span class="bkd-label">= Prix final avec échec</span><span class="bkd-val red">'+fmtS(prixAvec)+' ✓</span></div>';
+    }else{
+      html+='<div class="bkd-row zero"><span class="bkd-label">Livraison non incluse dans le prix</span><span class="bkd-val">—</span></div>';
+      html+='<div class="bkd-row total"><span class="bkd-label">= Prix final sans échec</span><span class="bkd-val accent">'+fmtS(prixSans)+' ✓</span></div>';
+      html+='<div class="bkd-row total"><span class="bkd-label">= Prix final avec échec</span><span class="bkd-val red">'+fmtS(prixAvec)+' ✓</span></div>';
+    }
+    html+='</div>';
+
+    bkd.innerHTML=html;
+  }
 
   // Tag livraison
   var tagEl=document.getElementById('calc-livraison-tag');
