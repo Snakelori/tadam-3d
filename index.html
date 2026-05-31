@@ -215,13 +215,6 @@
     .add-item-row{display:flex;gap:8px;margin-top:10px;}
     .add-item-row input{flex:1;}
 
-    /* MIGRATION BANNER */
-    .migration-banner{background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.4);border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;display:none;}
-    .migration-banner.show{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;}
-    .migration-banner-text{flex:1;min-width:200px;font-size:13px;color:var(--amber);line-height:1.6;}
-    .migration-banner-sql{font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin:6px 0;color:var(--text);word-break:break-all;}
-    .migration-banner-actions{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
-
     /* LOADING */
     .loading{text-align:center;padding:36px;color:var(--text3);font-family:var(--font-mono);font-size:12px;}
     .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin-right:8px;vertical-align:middle;}
@@ -341,19 +334,6 @@
 
     <!-- FILAMENTS -->
     <div class="page active" id="page-filaments">
-      <!-- Bannière migration colonne date_premiere_utilisation -->
-      <div class="migration-banner" id="migration-banner">
-        <span style="font-size:20px">⚠️</span>
-        <div class="migration-banner-text">
-          <strong>Migration requise</strong> — La colonne <code>date_premiere_utilisation</code> n'existe pas encore dans votre base Supabase.<br>
-          Rendez-vous dans <strong>Supabase → SQL Editor</strong> et exécutez la requête suivante :
-          <div class="migration-banner-sql" id="migration-sql">ALTER TABLE filaments ADD COLUMN IF NOT EXISTS date_premiere_utilisation date;</div>
-          <div class="migration-banner-actions">
-            <button class="btn btn-warning btn-sm" onclick="copySql()">📋 Copier le SQL</button>
-            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('migration-banner').classList.remove('show')">✕ Masquer</button>
-          </div>
-        </div>
-      </div>
       <div class="stats-row">
         <div class="stat-card"><div class="stat-label">Bobines en stock</div><div class="stat-value accent" id="stat-total">—</div></div>
         <div class="stat-card"><div class="stat-label">Valeur totale</div><div class="stat-value teal" id="stat-valeur">—</div></div>
@@ -1463,30 +1443,8 @@ function openEditFournisseur(id){
   openModal('modal-fournisseur');
 }
 
-/* ---- MIGRATION CHECK ---- */
-var dateEngageSupported=null; // null=inconnu, true=ok, false=colonne absente
-async function checkDateEngageMigration(){
-  if(dateEngageSupported!==null) return;
-  try{
-    await api('GET','filaments',null,'?select=date_premiere_utilisation&limit=1');
-    dateEngageSupported=true;
-  }catch(e){
-    if(e.message&&e.message.indexOf('date_premiere_utilisation')!==-1){
-      dateEngageSupported=false;
-      document.getElementById('migration-banner').classList.add('show');
-    } else {
-      dateEngageSupported=true; // autre erreur, on laisse passer
-    }
-  }
-}
-function copySql(){
-  var sql=document.getElementById('migration-sql').textContent;
-  navigator.clipboard&&navigator.clipboard.writeText(sql).then(function(){toast('SQL copié dans le presse-papiers ✓','success');});
-}
-
 /* ---- FILAMENTS ---- */
 async function loadFilaments(){
-  checkDateEngageMigration();
   var data=await api('GET','filaments',null,'?select=*,fournisseurs(nom)&order=created_at.desc');
   renderFilaments(data);
 }
@@ -1578,21 +1536,9 @@ async function saveFilament(e){
   btn.textContent='...'; btn.disabled=true;
   try{
     var dateUtil=document.getElementById('date-premiere-util');
-    var body={id_bobine:form.id_bobine.value.trim(),marque:form.marque.value,couleur:form.couleur.value,type_matiere:form.type_matiere.value,format_bobine:form.format_bobine.value,refill:form.refill.checked,entame:form.entame.checked,etat:form.etat.value||'disponible',poids_g:parseFloat(form.poids_g.value),prix_euros:parseFloat(form.prix_euros.value),quantite:parseInt(form.quantite.value)||1,date_mise_en_stock:form.date_mise_en_stock.value||null,fournisseur_id:form.fournisseur_id.value||null};
-    if(dateEngageSupported!==false) body.date_premiere_utilisation=(dateUtil&&dateUtil.value)||null;
-    try{
-      if(editId){await api('PATCH','filaments',body,'?id=eq.'+editId);toast('Filament modifié ✓','success');}
-      else{await api('POST','filaments',body);toast('Filament ajouté ✓','success');}
-    }catch(err){
-      if(err.message&&err.message.indexOf('date_premiere_utilisation')!==-1){
-        // Colonne absente : réessayer sans la date
-        dateEngageSupported=false;
-        document.getElementById('migration-banner').classList.add('show');
-        delete body.date_premiere_utilisation;
-        if(editId){await api('PATCH','filaments',body,'?id=eq.'+editId);toast('Filament modifié (sans date — migration requise) ✓','success');}
-        else{await api('POST','filaments',body);toast('Filament ajouté (sans date — migration requise) ✓','success');}
-      } else { throw err; }
-    }
+    var body={id_bobine:form.id_bobine.value.trim(),marque:form.marque.value,couleur:form.couleur.value,type_matiere:form.type_matiere.value,format_bobine:form.format_bobine.value,refill:form.refill.checked,entame:form.entame.checked,etat:form.etat.value||'disponible',poids_g:parseFloat(form.poids_g.value),prix_euros:parseFloat(form.prix_euros.value),quantite:parseInt(form.quantite.value)||1,date_mise_en_stock:form.date_mise_en_stock.value||null,fournisseur_id:form.fournisseur_id.value||null,date_premiere_utilisation:(dateUtil&&dateUtil.value)||null};
+    if(editId){await api('PATCH','filaments',body,'?id=eq.'+editId);toast('Filament modifié ✓','success');}
+    else{await api('POST','filaments',body);toast('Filament ajouté ✓','success');}
     closeModal('modal-filament'); form.reset();
     await loadFilaments();
   }catch(err){toast('Erreur : '+err.message,'error');}
