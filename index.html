@@ -215,6 +215,18 @@
     .add-item-row{display:flex;gap:8px;margin-top:10px;}
     .add-item-row input{flex:1;}
 
+    /* TAG LIVRAISON */
+    .livraison-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;font-family:var(--font-mono);font-size:11px;font-weight:700;margin-top:10px;}
+    .livraison-tag.included{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:var(--teal);}
+    .livraison-tag.excluded{background:var(--bg3);border:1px solid var(--border);color:var(--text3);}
+
+    /* À PROPOS */
+    .about-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;width:32px;height:32px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s;}
+    .about-btn:hover{border-color:var(--accent);}
+    .about-version{display:inline-block;background:var(--bg3);border:1px solid var(--border);border-radius:20px;font-family:var(--font-mono);font-size:10px;color:var(--text2);padding:3px 10px;margin:4px 0;}
+    .about-changelog{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:12px;line-height:1.7;color:var(--text2);}
+    .about-changelog li{margin-left:16px;}
+
     /* LOADING */
     .loading{text-align:center;padding:36px;color:var(--text3);font-family:var(--font-mono);font-size:12px;}
     .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin-right:8px;vertical-align:middle;}
@@ -319,6 +331,7 @@
     <div class="header-right">
       <div class="header-status"><div class="dot" id="status-dot"></div><span id="status-text">Connecté</span></div>
       <span class="user-info" id="user-email"></span>
+      <button class="about-btn" onclick="openModal('modal-about')" title="À propos de TADAM-3D">ℹ️</button>
       <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Mode sombre / clair">🌙</button>
       <button class="btn btn-logout" onclick="doLogout()">Déconnexion</button>
     </div>
@@ -620,6 +633,30 @@
               <div class="form-group" style="margin-bottom:10px"><label>Site de mise en vente</label><input type="text" name="site_vente" placeholder="ex: Etsy, Leboncoin..."></div>
               <div class="form-group" style="margin-bottom:10px"><label>Coût de mise en vente d'un produit (€)</label><input type="number" name="cout_mise_en_vente" step="0.01" placeholder="0.20"></div>
               <div class="form-group"><label>% de charge de vente en ligne</label><input type="number" name="pct_charge_vente" step="0.01" placeholder="0.20" value="0.20"></div>
+            </div>
+
+            <div class="settings-card">
+              <div class="settings-card-title">🚚 Frais de livraison</div>
+              <div class="form-group" style="margin-bottom:10px">
+                <label>Transporteur</label>
+                <select name="transporteur" id="param-transporteur">
+                  <option value="">— Choisir —</option>
+                  <option value="Colissimo">Colissimo</option>
+                  <option value="La Poste">La Poste (courrier)</option>
+                  <option value="Chronopost">Chronopost</option>
+                  <option value="Mondial Relay">Mondial Relay</option>
+                  <option value="DPD">DPD</option>
+                  <option value="UPS">UPS</option>
+                  <option value="GLS">GLS</option>
+                  <option value="Colis Privé">Colis Privé</option>
+                  <option value="DHL Express">DHL Express</option>
+                  <option value="FedEx">FedEx</option>
+                  <option value="TNT">TNT</option>
+                  <option value="Amazon Logistics">Amazon Logistics</option>
+                  <option value="Autre">Autre</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Coût de la livraison par colis (€)</label><input type="number" name="cout_livraison" step="0.01" min="0" placeholder="5.90"></div>
             </div>
 
             <div class="settings-card">
@@ -1056,6 +1093,19 @@
         </div>
       </div>
 
+      <!-- Livraison -->
+      <div class="calc-section">
+        <div class="calc-section-title">🚚 Livraison</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <input type="checkbox" id="calc-inclure-livraison" name="inclure_livraison" style="width:18px;height:18px;min-width:18px;accent-color:var(--accent);cursor:pointer" checked onchange="calcResultats()">
+          <label for="calc-inclure-livraison" style="text-transform:none;font-size:14px;cursor:pointer;color:var(--text)">Inclure le coût de la livraison dans le prix de vente</label>
+        </div>
+        <div class="form-grid">
+          <div class="form-group"><label>Transporteur (depuis paramètres)</label><input type="text" id="calc-transporteur" class="calc-field" readonly placeholder="Non défini"></div>
+          <div class="form-group"><label>Coût de la livraison (€)</label><input type="text" id="calc-cout-livraison" class="calc-field" readonly placeholder="0.00 €"></div>
+        </div>
+      </div>
+
       <!-- Résultats -->
       <div class="calc-section" style="background:#f0f5ff;border-color:#b3caff">
         <div class="calc-section-title" style="color:var(--accent)">📊 Résultats</div>
@@ -1113,6 +1163,7 @@
               <input type="text" id="calc-prix-avec" readonly style="width:100%;font-family:var(--font-mono);font-size:20px;font-weight:800;color:#c0392b;background:#fff8f7;border:2px solid #e8a09a;border-radius:8px;padding:10px 14px;box-sizing:border-box">
             </div>
           </div>
+          <div id="calc-livraison-tag"></div>
         </div>
 
         <!-- Bloc 3 : Prix marché -->
@@ -1237,9 +1288,50 @@
   </div>
 </div>
 
+<!-- MODAL À PROPOS -->
+<div class="modal-overlay" id="modal-about">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title">ℹ️ À PROPOS — TADAM-3D</div>
+    <div style="text-align:center;margin-bottom:20px">
+      <img src="Logo_officiel_TADAM-3D_V1.png" alt="TADAM-3D" style="height:60px;width:auto;margin:0 auto 12px;display:block">
+      <div class="about-version">Version <strong id="about-version-num"></strong></div>
+      <div style="font-size:12px;color:var(--text3);font-family:var(--font-mono);margin-top:4px">Dernière mise à jour : <strong id="about-version-date"></strong></div>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">
+      Application de gestion de stock de filaments et de produits d'impression 3D. Suivi des bobines, calcul du prix de revient, catalogue d'objets à vendre et rapports analytiques.
+    </div>
+    <div class="about-changelog" id="about-changelog"></div>
+    <div class="form-actions" style="margin-top:18px">
+      <button type="button" class="btn btn-primary" style="width:100%;justify-content:center" onclick="closeModal('modal-about')">Fermer</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
+/* ═══ VERSIONING ═══ */
+var APP_VERSION='1.3.0';
+var APP_DATE='2026-05-31';
+var APP_CHANGELOG=[
+  {v:'1.3.0', d:'2026-05-31', notes:['Frais de livraison dans paramètres de calcul','Inclusion optionnelle de la livraison dans le prix de vente','Tag livraison dans les prix recommandés','Icône "À propos" avec versioning','Quantité restante sur filaments engagés','Date de 1ère utilisation sur filaments engagés']},
+  {v:'1.2.0', d:'2026-05-29', notes:['Ascenseur horizontal visible sur tous les tableaux','Correction des cases à cocher (appearance:none retiré)','Colonne "Nb en stock" dans les objets à vendre','Onglet Préférences (thème par défaut)','Rapport : synthèse filaments + tri décroissant','Filament "Engagé" (ex Entamé)']},
+  {v:'1.1.0', d:'2026-05-29', notes:['Design Minimal Pro (zéro backdrop-filter)','Icône officielle TADAM-3D','xlsx.js embarqué localement','Correction orthographe et grammaire générale']},
+  {v:'1.0.0', d:'2026-05-25', notes:['Version initiale : filaments, accessoires, objets, rapport, calcul du prix']}
+];
+(function(){
+  document.addEventListener('DOMContentLoaded',function(){
+    var vEl=document.getElementById('about-version-num');
+    var dEl=document.getElementById('about-version-date');
+    if(vEl) vEl.textContent=APP_VERSION;
+    if(dEl) dEl.textContent=APP_DATE;
+    var cl=document.getElementById('about-changelog');
+    if(cl) cl.innerHTML=APP_CHANGELOG.map(function(e){
+      return '<div style="margin-bottom:10px"><span style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--accent)">v'+e.v+'</span> <span style="font-size:11px;color:var(--text3)">— '+e.d+'</span><ul>'+e.notes.map(function(n){return '<li>'+n+'</li>';}).join('')+'</ul></div>';
+    }).join('');
+  });
+})();
+
 var SUPABASE_URL='https://fyzgxkqplhlglnzrxqbf.supabase.co';
 var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5emd4a3FwbGhsZ2xuenJ4cWJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTY0NTMsImV4cCI6MjA5NDg3MjQ1M30.f4hWv64wfXgC8yy2-zkDoEbb2CCitCe4x5e5SDPHjL0';
 var accessToken=null, currentUser=null;
@@ -1877,11 +1969,13 @@ function fillParamForm(r){
   var form=document.getElementById('form-paramcalcul');
   if(!form) return;
   document.getElementById('param-edit-id').value=r.id||'';
-  ['prix_kwh','conso_imprimante','usure_par_produit','cout_maintenance','taux_horaire_mo','cout_fiche_produit','nb_produit_rentabilite','cout_logistique_unitaire','cout_par_plaque','site_vente','cout_mise_en_vente','pct_charge_vente','taux_marge_vente','taux_ursaff','taux_impot'].forEach(function(f){
+  ['prix_kwh','conso_imprimante','usure_par_produit','cout_maintenance','taux_horaire_mo','cout_fiche_produit','nb_produit_rentabilite','cout_logistique_unitaire','cout_par_plaque','site_vente','cout_mise_en_vente','pct_charge_vente','taux_marge_vente','taux_ursaff','taux_impot','cout_livraison'].forEach(function(f){
     if(form[f]) form[f].value=r[f]!=null?r[f]:'';
   });
   updateCoutFichePreview();
   updateTotalCoutHeure();
+  var transSel=document.getElementById('param-transporteur');
+  if(transSel) transSel.value=r.transporteur||'';
   [1,2,3].forEach(function(i){
     var sel=document.getElementById('param-conso-'+i);
     if(sel&&r['conso_'+i+'_id']) sel.value=r['conso_'+i+'_id'];
@@ -1926,7 +2020,9 @@ async function saveParamCalcul(e){
     pct_charge_vente:parseFloat(form.pct_charge_vente.value)||null,
     taux_marge_vente:parseFloat(form.taux_marge_vente.value)||null,
     taux_ursaff:parseFloat(form.taux_ursaff.value)||null,
-    taux_impot:parseFloat(form.taux_impot.value)||null
+    taux_impot:parseFloat(form.taux_impot.value)||null,
+    transporteur:form.transporteur.value||null,
+    cout_livraison:parseFloat(form.cout_livraison.value)||null
   };
   try{
     if(editId){await api('PATCH','param_calcul_prix',body,'?id=eq.'+editId);paramCalcul={id:editId,...body};}
@@ -2546,6 +2642,13 @@ async function openAddCalculPrix(){
     var cvente=document.getElementById('calc-cout-vente');
     if(cvente) cvente.value=paramCalcul.cout_mise_en_vente?paramCalcul.cout_mise_en_vente.toFixed(2)+' €':'';
     calcCoutPlaque();
+    // Livraison
+    var transEl=document.getElementById('calc-transporteur');
+    var livEl=document.getElementById('calc-cout-livraison');
+    var chkLiv=document.getElementById('calc-inclure-livraison');
+    if(transEl) transEl.value=paramCalcul.transporteur||'Non défini';
+    if(livEl) livEl.value=paramCalcul.cout_livraison?paramCalcul.cout_livraison.toFixed(2)+' €':'0.00 €';
+    if(chkLiv) chkLiv.checked=true;
   }
   // Peupler select objet
   var sel=document.getElementById('sel-calc-objet');
@@ -2730,6 +2833,13 @@ function calcResultats(){
   var prixSans=fabReel*marge;
   var prixAvec=fabEchec*marge;
 
+  // Livraison
+  var chkLiv=document.getElementById('calc-inclure-livraison');
+  var inclureLiv=chkLiv&&chkLiv.checked;
+  var livTxt=((document.getElementById('calc-cout-livraison')||{}).value||'').replace(' €','');
+  var coutLiv=parseFloat(livTxt)||0;
+  if(inclureLiv&&coutLiv>0){ prixSans+=coutLiv; prixAvec+=coutLiv; }
+
   function setR(id,val){var el=document.getElementById(id);if(el) el.value=val.toFixed(2)+' €';}
   setR('calc-cout-reel',coutReel);
   setR('calc-cout-echec',coutEchec);
@@ -2737,6 +2847,17 @@ function calcResultats(){
   setR('calc-fab-echec',fabEchec);
   setR('calc-prix-sans',prixSans);
   setR('calc-prix-avec',prixAvec);
+
+  // Tag livraison
+  var tagEl=document.getElementById('calc-livraison-tag');
+  if(tagEl){
+    var trans=(document.getElementById('calc-transporteur')||{}).value||'';
+    if(inclureLiv&&coutLiv>0){
+      tagEl.innerHTML='<span class="livraison-tag included">📦 Livraison incluse'+(trans&&trans!=='Non défini'?' — '+trans:'')+(coutLiv?' ('+coutLiv.toFixed(2)+' €)':'')+'</span>';
+    } else {
+      tagEl.innerHTML='<span class="livraison-tag excluded">📦 Livraison non incluse</span>';
+    }
+  }
 }
 
 async function saveCalculPrix(e){
@@ -2749,6 +2870,7 @@ async function saveCalculPrix(e){
     document.querySelectorAll('#calc-modules-list input[type=checkbox]:checked').forEach(function(cb){modulesChecked.push(cb.value);});
     var accIds=[];
     document.querySelectorAll('#calc-accessoires-list input[type=checkbox]:checked').forEach(function(cb){accIds.push(cb.value);});
+    var chkLivSave=document.getElementById('calc-inclure-livraison');
     var body={
       nom_detail:(document.getElementById('calc-nom-detail')||{}).value||null,
       objet_id:form.objet_id.value||null,
@@ -2767,7 +2889,8 @@ async function saveCalculPrix(e){
       cout_fabrication_reel:parseFloat(((document.getElementById('calc-fab-reel')||{}).value||'').replace(' €',''))||null,
       cout_fabrication_echec:parseFloat(((document.getElementById('calc-fab-echec')||{}).value||'').replace(' €',''))||null,
       prix_vente_sans_echec:parseFloat(((document.getElementById('calc-prix-sans')||{}).value||'').replace(' €',''))||null,
-      prix_vente_avec_echec:parseFloat(((document.getElementById('calc-prix-avec')||{}).value||'').replace(' €',''))||null
+      prix_vente_avec_echec:parseFloat(((document.getElementById('calc-prix-avec')||{}).value||'').replace(' €',''))||null,
+      inclure_livraison:chkLivSave?chkLivSave.checked:true
     };
     for(var i=1;i<=10;i++){
       var sel=document.getElementById('calc-fil-'+i);
@@ -2819,6 +2942,8 @@ async function openEditCalculPrix(id){
     form.prix_moyen_constate.value=r.prix_moyen_constate||'';
     form.date_prix_moyen.value=r.date_prix_moyen||'';
     var nbpl=document.getElementById('calc-nb-plaques'); if(nbpl) nbpl.value=r.nb_plaques||1;
+    var chkLivEdit=document.getElementById('calc-inclure-livraison');
+    if(chkLivEdit) chkLivEdit.checked=r.inclure_livraison!==false;
 
     // Restaurer les filaments via selectedIndex (plus fiable que sel.value=)
     for(var i=1;i<=10;i++){
