@@ -419,6 +419,7 @@
         <button class="subnav-btn active" onclick="showSubPage('parametres','listes',event)">⚙️ Listes de référence</button>
         <button class="subnav-btn" onclick="showSubPage('parametres','importexport',event)">📤 Import / Export</button>
         <button class="subnav-btn" onclick="showSubPage('parametres','preferences',event)">🎨 Préférences</button>
+        <button class="subnav-btn" onclick="showSubPage('parametres','historique',event)">📋 Historique</button>
       </div>
 
       <div class="subpage active" id="subpage-listes">
@@ -559,6 +560,39 @@
 
         </div>
       </div>
+
+      <!-- SOUS-PAGE : HISTORIQUE -->
+      <div class="subpage" id="subpage-historique">
+        <div class="section-header"><span class="section-title">Historique des actions</span></div>
+        <div class="settings-grid" style="margin-bottom:24px">
+          <div class="settings-card">
+            <div class="settings-card-title">⏱ Rétention des données</div>
+            <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Durée de conservation des actions enregistrées. Les entrées plus anciennes sont automatiquement supprimées.</p>
+            <div class="form-group" style="margin-bottom:14px">
+              <label>Durée de rétention</label>
+              <select id="select-retention-histo" onchange="saveRetentionParam()">
+                <option value="7">7 jours</option>
+                <option value="14" selected>14 jours (par défaut)</option>
+                <option value="30">30 jours</option>
+                <option value="60">60 jours</option>
+                <option value="90">90 jours</option>
+                <option value="180">180 jours</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-danger btn-sm" onclick="purgerHistorique()">🗑 Purger tout l'historique</button>
+              <button class="btn btn-ghost btn-sm" onclick="loadHistorique()">↻ Actualiser</button>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date / Heure</th><th>Action</th><th>Entité</th><th>Détail</th></tr></thead>
+            <tbody id="tbody-historique"><tr class="empty-row"><td colspan="4">Chargement...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
     <!-- OBJETS -->
@@ -1353,9 +1387,10 @@
 
 <script>
 /* ═══ VERSIONING ═══ */
-var APP_VERSION='1.6.2';
-var APP_DATE='2026-06-07';
+var APP_VERSION='1.7.0';
+var APP_DATE='2026-06-08';
 var APP_CHANGELOG=[
+  {v:'1.7.0', d:'2026-06-08', notes:['Historique des actions : log automatique de tous les ajouts, modifications et suppressions','Onglet "Historique" dans Paramètres avec tableau filtré et purge manuelle','Rétention configurable : 7 / 14 / 30 / 60 / 90 / 180 jours (défaut 14)','Purge automatique des entrées expirées à chaque action']},
   {v:'1.6.2', d:'2026-06-07', notes:['Catalogue : une ligne par couleur en stock (Module + Couleur + Qté), groupées par objet avec rowspan']},
   {v:'1.6.1', d:'2026-06-07', notes:['Calcul de prix : noms modules/produits mis à jour en temps réel au coche/décoche des modules']},
   {v:'1.6.0', d:'2026-06-07', notes:['Connexion : affichage mot de passe (5 s) et mémorisation du dernier email','Objet : champ "Nom du produit principal" (pièce maîtresse)','Calcul de prix : colonne "Module / Produit" par ligne de filament avec auto-remplissage depuis l\'objet','Transporteur et coût livraison modifiables dans le calcul de prix']},
@@ -1712,8 +1747,10 @@ async function saveFilament(e){
     var dateUtil=document.getElementById('date-premiere-util');
     var qteRestEl=document.getElementById('qte-restante-g');
     var body={id_bobine:form.id_bobine.value.trim(),marque:form.marque.value,couleur:form.couleur.value,type_matiere:form.type_matiere.value,format_bobine:form.format_bobine.value,refill:form.refill.checked,entame:form.entame.checked,etat:form.etat.value||'disponible',poids_g:parseFloat(form.poids_g.value),prix_euros:parseFloat(form.prix_euros.value),quantite:parseInt(form.quantite.value)||1,date_mise_en_stock:form.date_mise_en_stock.value||null,fournisseur_id:form.fournisseur_id.value||null,date_premiere_utilisation:(dateUtil&&dateUtil.value)||null,quantite_restante_g:(qteRestEl&&qteRestEl.value!=='')?parseFloat(qteRestEl.value):null};
-    if(editId){await api('PATCH','filaments',body,'?id=eq.'+editId);toast('Filament modifié ✓','success');}
-    else{await api('POST','filaments',body);toast('Filament ajouté ✓','success');}
+    if(editId){await api('PATCH','filaments',body,'?id=eq.'+editId);toast('Filament modifié ✓','success');
+      logAction('modification','filament',editId,body.marque+' '+body.couleur+' '+body.type_matiere+' ('+body.id_bobine+')');}
+    else{var nf=await api('POST','filaments',body);toast('Filament ajouté ✓','success');
+      logAction('ajout','filament',nf&&nf[0]&&nf[0].id,body.marque+' '+body.couleur+' '+body.type_matiere+' ('+body.id_bobine+')');}
     closeModal('modal-filament'); form.reset();
     await loadFilaments();
   }catch(err){toast('Erreur : '+err.message,'error');}
@@ -1761,8 +1798,10 @@ async function saveAccessoire(e){
     var coutHStr=document.getElementById('acc-cout-heure').value;
     var coutHVal=coutHStr?parseFloat(coutHStr):null;
     var body={produit:form.produit.value.trim(),type_produit:form.type_produit.value,date_achat:form.date_achat.value||null,quantite:qte,prix_total_euros:parseFloat(form.prix_total_euros.value),inclure_dans_cout:form.inclure_dans_cout.checked,prix_par_impression:form.prix_par_impression.value?parseFloat(form.prix_par_impression.value):null,stock_restant:form.stock_restant.value?parseFloat(form.stock_restant.value):qte,fournisseur_id:form.fournisseur_id.value||null,duree_vie:form.duree_vie.value||null,cout_heure:isNaN(coutHVal)?null:coutHVal};
-    if(editId){await api('PATCH','achats_accessoires',body,'?id=eq.'+editId);toast('Accessoire modifié ✓','success');}
-    else{await api('POST','achats_accessoires',body);toast('Accessoire ajouté ✓','success');}
+    if(editId){await api('PATCH','achats_accessoires',body,'?id=eq.'+editId);toast('Accessoire modifié ✓','success');
+      logAction('modification','accessoire',editId,body.produit+' ('+body.type_produit+')');}
+    else{var na=await api('POST','achats_accessoires',body);toast('Accessoire ajouté ✓','success');
+      logAction('ajout','accessoire',na&&na[0]&&na[0].id,body.produit+' ('+body.type_produit+')');}
     closeModal('modal-accessoire'); form.reset();
     await loadAccessoires();
   }catch(err){toast('Erreur : '+err.message,'error');}
@@ -1775,8 +1814,10 @@ async function saveFournisseur(e){
   var editId=document.getElementById('fourn-edit-id').value;
   var body={nom:form.nom.value.trim(),site_web:form.site_web.value||null,commentaire:form.commentaire.value||null};
   try{
-    if(editId){await api('PATCH','fournisseurs',body,'?id=eq.'+editId);}
-    else{await api('POST','fournisseurs',body);}
+    if(editId){await api('PATCH','fournisseurs',body,'?id=eq.'+editId);
+      logAction('modification','fournisseur',editId,body.nom);}
+    else{var nfo=await api('POST','fournisseurs',body);
+      logAction('ajout','fournisseur',nfo&&nfo[0]&&nfo[0].id,body.nom);}
     closeModal('modal-fournisseur'); form.reset();
     document.getElementById('fourn-edit-id').value='';
     document.getElementById('modal-fourn-title').textContent='+ NOUVEAU FOURNISSEUR';
@@ -1787,8 +1828,85 @@ async function saveFournisseur(e){
 
 async function deleteRow(table,id,reload){
   if(!confirm('Supprimer cet élément ?')) return;
-  try{await api('DELETE',table,null,'?id=eq.'+id);await reload();toast('Supprimé ✓','success');}
-  catch(err){toast('Erreur : '+err.message,'error');}
+  try{
+    await api('DELETE',table,null,'?id=eq.'+id);
+    await reload();
+    toast('Supprimé ✓','success');
+    var entiteMap={filaments:'filament',achats_accessoires:'accessoire',objets_vente:'objet',
+      consommables:'consommable',calculs_prix:'calcul de prix',fournisseurs:'fournisseur',
+      objets_vendus:'vente',ref_marques:'marque',ref_couleurs:'couleur',ref_matieres:'matière',
+      ref_types_accessoires:'type accessoire',ref_formats_bobines:'format bobine'};
+    logAction('suppression', entiteMap[table]||table, id, 'Suppression dans '+table+' (id: '+id+')');
+  }catch(err){toast('Erreur : '+err.message,'error');}
+}
+
+/* ═══ HISTORIQUE DES ACTIONS ═══ */
+function getRetentionJours(){return parseInt(localStorage.getItem('tadam_retention_jours'))||14;}
+
+function logAction(action, entite, entiteId, detail){
+  // Fire-and-forget : ne bloque pas l'UI
+  try{
+    var body={action:action,entite:entite,entite_id:entiteId?String(entiteId):null,detail:detail||null,
+              user_id:currentUser?currentUser.id:null};
+    api('POST','historique_actions',body).catch(function(){});
+    // Purge asynchrone des anciens enregistrements
+    var cutoff=new Date(Date.now()-getRetentionJours()*864e5).toISOString();
+    api('DELETE','historique_actions',null,'?created_at=lt.'+cutoff).catch(function(){});
+  }catch(e){}
+}
+
+function saveRetentionParam(){
+  var sel=document.getElementById('select-retention-histo');
+  if(!sel) return;
+  localStorage.setItem('tadam_retention_jours',sel.value);
+  toast('Rétention mise à jour : '+sel.value+' jours ✓','success');
+}
+
+function initRetentionUI(){
+  var sel=document.getElementById('select-retention-histo');
+  if(!sel) return;
+  sel.value=String(getRetentionJours());
+}
+
+async function purgerHistorique(){
+  if(!confirm('Supprimer tout l\'historique des actions ? Cette action est irréversible.')) return;
+  try{
+    await api('DELETE','historique_actions',null,'?id=neq.00000000-0000-0000-0000-000000000000');
+    toast('Historique purgé ✓','success');
+    loadHistorique();
+  }catch(err){toast('Erreur purge : '+err.message,'error');}
+}
+
+async function loadHistorique(){
+  var tbody=document.getElementById('tbody-historique');
+  if(!tbody) return;
+  tbody.innerHTML='<tr class="empty-row"><td colspan="4"><span class="spinner"></span></td></tr>';
+  try{
+    var cutoff=new Date(Date.now()-getRetentionJours()*864e5).toISOString();
+    var data=await api('GET','historique_actions',null,'?created_at=gte.'+cutoff+'&order=created_at.desc&limit=500');
+    if(!data||!data.length){
+      tbody.innerHTML='<tr class="empty-row"><td colspan="4">Aucune action enregistrée</td></tr>';
+      return;
+    }
+    var actionBadge={
+      ajout:'<span class="badge badge-yes">+ Ajout</span>',
+      modification:'<span class="badge badge-other">✏ Modif.</span>',
+      suppression:'<span class="badge badge-no">✕ Suppr.</span>'
+    };
+    tbody.innerHTML=data.map(function(r){
+      var dt=new Date(r.created_at);
+      var dateStr=dt.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'})
+        +' '+dt.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      return '<tr>'
+        +'<td style="font-family:var(--font-mono);font-size:12px;white-space:nowrap;color:var(--text2)">'+dateStr+'</td>'
+        +'<td>'+(actionBadge[r.action]||esc(r.action))+'</td>'
+        +'<td style="font-family:var(--font-mono);font-size:12px;color:var(--accent)">'+esc(r.entite||'—')+'</td>'
+        +'<td style="font-size:13px;color:var(--text2)">'+esc(r.detail||'—')+'</td>'
+        +'</tr>';
+    }).join('');
+  }catch(err){
+    tbody.innerHTML='<tr class="empty-row"><td colspan="4">Erreur chargement — table historique_actions manquante ?</td></tr>';
+  }
 }
 
 /* ---- UI / THÈME ---- */
@@ -1997,6 +2115,7 @@ function showSubPage(pageId, subName, e) {
   if(subName==='rapport-filaments') loadRapportFilaments();
   if(subName==='rapport-produits') loadRapportProduits();
   if(subName==='preferences') updatePrefThemeUI(localStorage.getItem('tadam-theme')||'dark');
+  if(subName==='historique'){ initRetentionUI(); loadHistorique(); }
 }
 function showSubPage2(subName, e) {
   document.querySelectorAll('.subnav2-btn').forEach(function(b){b.classList.remove('active');});
@@ -2069,8 +2188,10 @@ async function saveConsommable(e){
   btn.textContent='...'; btn.disabled=true;
   try{
     var body={produit:form.produit.value.trim(),fournisseur:form.fournisseur.value||null,date_achat:form.date_achat.value||null,quantite:parseFloat(form.quantite.value)||null,prix_unitaire:parseFloat(form.prix_unitaire.value)||null,cout_par_produit:parseFloat(form.cout_par_produit.value)||null};
-    if(editId){await api('PATCH','consommables',body,'?id=eq.'+editId);toast('Modifié ✓','success');}
-    else{await api('POST','consommables',body);toast('Ajouté ✓','success');}
+    if(editId){await api('PATCH','consommables',body,'?id=eq.'+editId);toast('Modifié ✓','success');
+      logAction('modification','consommable',editId,body.produit);}
+    else{var nc=await api('POST','consommables',body);toast('Ajouté ✓','success');
+      logAction('ajout','consommable',nc&&nc[0]&&nc[0].id,body.produit);}
     closeModal('modal-consommable'); form.reset();
     await loadConsommables();
   }catch(err){toast('Erreur : '+err.message,'error');}
@@ -2337,8 +2458,10 @@ async function saveObjet(e){
       body['piece_'+i+'_qte']=parseFloat(document.getElementById('obj-qte-'+i).value)||null;
       body['piece_'+i+'_stock']=parseInt(document.getElementById('obj-piece-'+i+'-stock').value)||0;
     }
-    if(editId){await api('PATCH','objets_vente',body,'?id=eq.'+editId);toast('Objet modifié ✓','success');}
-    else{await api('POST','objets_vente',body);toast('Objet ajouté ✓','success');}
+    if(editId){await api('PATCH','objets_vente',body,'?id=eq.'+editId);toast('Objet modifié ✓','success');
+      logAction('modification','objet',editId,body.nom+(body.categorie?' ('+body.categorie+')':''));}
+    else{var no=await api('POST','objets_vente',body);toast('Objet ajouté ✓','success');
+      logAction('ajout','objet',no&&no[0]&&no[0].id,body.nom+(body.categorie?' ('+body.categorie+')':''));}
     closeModal('modal-objet'); form.reset();
     await loadObjets();
   }catch(err){toast('Erreur : '+err.message,'error');}
@@ -2658,6 +2781,7 @@ async function saveVente(e){
       await api('PATCH','objets_vente',patch,'?id=eq.'+objetId);
     }
     toast('Vente enregistrée ✓ — stock mis à jour','success');
+    logAction('ajout','vente',null,(moduleNom||'Objet complet')+' — '+nb+' pièce(s) via '+lieu);
     closeModal('modal-vente');
     objets=[]; // forcer rechargement complet au prochain openAddVente
     await loadObjetsVendus();
@@ -3200,8 +3324,10 @@ async function saveCalculPrix(e){
     body.total_cout_filaments=parseFloat(((document.getElementById('calc-total-fil-cout')||{}).textContent||'').replace(' €',''))||null;
     body.total_cout_accessoires=parseFloat(((document.getElementById('calc-total-acc-cout')||{}).textContent||'').replace(' €',''))||null;
 
-    if(editId){await api('PATCH','calculs_prix',body,'?id=eq.'+editId);toast('Calcul modifié ✓','success');}
-    else{await api('POST','calculs_prix',body);toast('Calcul enregistré ✓','success');}
+    if(editId){await api('PATCH','calculs_prix',body,'?id=eq.'+editId);toast('Calcul modifié ✓','success');
+      logAction('modification','calcul de prix',editId,body.nom_detail||'Calcul sans nom');}
+    else{var ncp=await api('POST','calculs_prix',body);toast('Calcul enregistré ✓','success');
+      logAction('ajout','calcul de prix',ncp&&ncp[0]&&ncp[0].id,body.nom_detail||'Calcul sans nom');}
     closeModal('modal-calculprix'); form.reset();
     await loadCalculsPrix();
   }catch(err){toast('Erreur : '+err.message,'error');}
