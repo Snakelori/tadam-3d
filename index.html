@@ -1117,8 +1117,29 @@
           <label for="calc-inclure-livraison" style="text-transform:none;font-size:14px;cursor:pointer;color:var(--text)">Inclure le coût de la livraison dans le prix de vente</label>
         </div>
         <div class="form-grid">
-          <div class="form-group"><label>Transporteur (depuis paramètres)</label><input type="text" id="calc-transporteur" class="calc-field" readonly placeholder="Non défini"></div>
-          <div class="form-group"><label>Coût de la livraison (€)</label><input type="text" id="calc-cout-livraison" class="calc-field" readonly placeholder="0.00 €"></div>
+          <div class="form-group">
+            <label>Transporteur <span style="font-weight:400;color:var(--text3);font-size:11px">(pré-rempli depuis paramètres)</span></label>
+            <select id="calc-transporteur" onchange="calcResultats()">
+              <option value="">— Non défini —</option>
+              <option value="Colissimo">Colissimo</option>
+              <option value="La Poste">La Poste (courrier)</option>
+              <option value="Chronopost">Chronopost</option>
+              <option value="Mondial Relay">Mondial Relay</option>
+              <option value="DPD">DPD</option>
+              <option value="UPS">UPS</option>
+              <option value="GLS">GLS</option>
+              <option value="Colis Privé">Colis Privé</option>
+              <option value="DHL Express">DHL Express</option>
+              <option value="FedEx">FedEx</option>
+              <option value="TNT">TNT</option>
+              <option value="Amazon Logistics">Amazon Logistics</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Coût de la livraison (€) <span style="font-weight:400;color:var(--text3);font-size:11px">(pré-rempli depuis paramètres)</span></label>
+            <input type="number" id="calc-cout-livraison" step="0.01" min="0" placeholder="0.00" oninput="calcResultats()">
+          </div>
         </div>
       </div>
 
@@ -2736,8 +2757,8 @@ async function openAddCalculPrix(){
     var transEl=document.getElementById('calc-transporteur');
     var livEl=document.getElementById('calc-cout-livraison');
     var chkLiv=document.getElementById('calc-inclure-livraison');
-    if(transEl) transEl.value=paramCalcul.transporteur||'Non défini';
-    if(livEl) livEl.value=paramCalcul.cout_livraison?paramCalcul.cout_livraison.toFixed(2)+' €':'0.00 €';
+    if(transEl) transEl.value=paramCalcul.transporteur||'';
+    if(livEl) livEl.value=paramCalcul.cout_livraison?paramCalcul.cout_livraison.toFixed(2):'';
     if(chkLiv) chkLiv.checked=true;
   }
   // Peupler select objet
@@ -2926,8 +2947,7 @@ function calcResultats(){
   // Livraison
   var chkLiv=document.getElementById('calc-inclure-livraison');
   var inclureLiv=chkLiv&&chkLiv.checked;
-  var livTxt=((document.getElementById('calc-cout-livraison')||{}).value||'').replace(' €','');
-  var coutLiv=parseFloat(livTxt)||0;
+  var coutLiv=parseFloat((document.getElementById('calc-cout-livraison')||{}).value)||0;
   if(inclureLiv&&coutLiv>0){ prixSans+=coutLiv; prixAvec+=coutLiv; }
 
   function setR(id,val){var el=document.getElementById(id);if(el) el.value=val.toFixed(2)+' €';}
