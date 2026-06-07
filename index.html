@@ -2822,17 +2822,7 @@ function onObjetChange(){
       +(it.temps?'<span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);white-space:nowrap">'+esc(it.temps)+'</span>':'')
       +'</div>';
   }).join('');
-  calcModulesTotal();
-  // Auto-remplir les noms de modules dans les lignes filaments
-  for(var j=1;j<=10;j++){
-    var mEl=document.getElementById('calc-fil-'+j+'-module');
-    if(!mEl) break;
-    if(j===1){
-      mEl.value=objet.nom_produit_principal||'';
-    } else {
-      mEl.value=objet['piece_'+(j-1)+'_nom']||'';
-    }
-  }
+  calcModulesTotal(); // syncFilamentModuleNames() est appelé dedans
 }
 
 function calcModulesTotal(){
@@ -2864,6 +2854,7 @@ function calcModulesTotal(){
   var nh=document.getElementById('calc-nb-heures'); if(nh) nh.value=totalMins>0?formatHHmm(totalMins):'';
   calcTotalElec();
   prefillFilamentsFromModules();
+  syncFilamentModuleNames();
   calcResultats();
 }
 
@@ -2920,6 +2911,29 @@ function prefillFilamentsFromModules(){
     }
   }
   calcTotalFilaments();
+}
+
+function syncFilamentModuleNames(){
+  var objSel=document.getElementById('sel-calc-objet');
+  var objet=objets.find(function(o){return o.id===(objSel&&objSel.value);});
+  // Collecter les noms des modules cochés dans l'ordre du DOM
+  var noms=[];
+  document.querySelectorAll('#calc-modules-list input[type=checkbox]:checked').forEach(function(cb){
+    var idx=parseInt(cb.value);
+    var nom='';
+    if(idx===0){
+      nom=(objet&&objet.nom_produit_principal)||'Produit principal';
+    } else {
+      nom=(objet&&objet['piece_'+idx+'_nom'])||'Module '+idx;
+    }
+    noms.push(nom);
+  });
+  // Mettre à jour les champs "module" des lignes filaments
+  for(var j=1;j<=10;j++){
+    var mEl=document.getElementById('calc-fil-'+j+'-module');
+    if(!mEl) break;
+    mEl.value=noms[j-1]||'';
+  }
 }
 
 function calcTotalElec(){
