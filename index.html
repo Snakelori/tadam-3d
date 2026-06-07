@@ -1306,6 +1306,20 @@
   </div>
 </div>
 
+<!-- MODAL CONFIRMATION ABANDON -->
+<div class="modal-overlay" id="modal-confirm-close" style="z-index:300">
+  <div class="modal" style="max-width:360px;text-align:center">
+    <div class="modal-title">⚠️ ABANDONNER LES MODIFICATIONS ?</div>
+    <p style="color:var(--text2);font-size:14px;margin-bottom:24px;line-height:1.6">
+      Les données saisies seront perdues si vous quittez ce formulaire.
+    </p>
+    <div class="form-actions" style="justify-content:center;gap:12px;flex-wrap:wrap">
+      <button type="button" class="btn btn-ghost" onclick="confirmKeepEditing()">↩ Continuer la saisie</button>
+      <button type="button" class="btn btn-danger" onclick="confirmAbandon()">Abandonner</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1788,16 +1802,91 @@ function showPage(name,e){
   if(name==='rapport') loadRapportFilaments();
 }
 
+/* ═══ PROTECTION FORMULAIRES — abandon accidentel ═══ */
+var FORM_MODALS_PROTECTED=['modal-filament','modal-accessoire','modal-fournisseur','modal-edit-item',
+  'modal-consommable','modal-objet','modal-calculprix','modal-vente','modal-import'];
+var _modalSnapshots={};
+var _pendingCloseId=null;
+
+function snapshotModal(id){
+  var el=document.getElementById(id);
+  if(!el) return;
+  var snap={};
+  el.querySelectorAll('input,textarea,select').forEach(function(f,i){
+    var key=f.id||f.name||('_idx'+i);
+    snap[key]=(f.type==='checkbox'||f.type==='radio')?(f.checked?'1':'0'):(f.value||'');
+  });
+  _modalSnapshots[id]=snap;
+}
+
+function isModalDirty(id){
+  var el=document.getElementById(id);
+  if(!el||!_modalSnapshots[id]) return false;
+  var snap=_modalSnapshots[id];
+  var dirty=false;
+  el.querySelectorAll('input,textarea,select').forEach(function(f,i){
+    if(dirty) return;
+    var key=f.id||f.name||('_idx'+i);
+    var cur=(f.type==='checkbox'||f.type==='radio')?(f.checked?'1':'0'):(f.value||'');
+    if(snap[key]!==undefined && cur!==snap[key]) dirty=true;
+  });
+  return dirty;
+}
+
+function tryCloseModal(id){
+  if(FORM_MODALS_PROTECTED.indexOf(id)>=0 && isModalDirty(id)){
+    _pendingCloseId=id;
+    document.getElementById('modal-confirm-close').classList.add('open');
+  } else {
+    closeModal(id);
+  }
+}
+
+function confirmKeepEditing(){
+  document.getElementById('modal-confirm-close').classList.remove('open');
+  _pendingCloseId=null;
+}
+
+function confirmAbandon(){
+  document.getElementById('modal-confirm-close').classList.remove('open');
+  if(_pendingCloseId){
+    var id=_pendingCloseId;
+    _pendingCloseId=null;
+    delete _modalSnapshots[id];
+    closeModal(id);
+    var form=document.querySelector('#'+id+' form');
+    if(form) form.reset();
+    if(id==='modal-filament'){
+      var gd=document.getElementById('entame-date-group');
+      var gq=document.getElementById('entame-qte-group');
+      if(gd) gd.style.display='none';
+      if(gq) gq.style.display='none';
+    }
+  }
+}
+
 function openModal(id){
   document.getElementById(id).classList.add('open');
   var today=new Date().toISOString().split('T')[0];
   var ds=document.getElementById('date-stock'), da=document.getElementById('date-achat');
   if(ds) ds.value=today;
   if(da) da.value=today;
+  // Snapshot différé (50ms) pour capturer les valeurs après remplissage JS éventuel
+  if(FORM_MODALS_PROTECTED.indexOf(id)>=0){
+    setTimeout(function(){ snapshotModal(id); }, 50);
+  }
 }
-function closeModal(id){document.getElementById(id).classList.remove('open');}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  delete _modalSnapshots[id];
+}
 document.querySelectorAll('.modal-overlay').forEach(function(m){
-  m.addEventListener('click',function(e){if(e.target===m) m.classList.remove('open');});
+  m.addEventListener('click',function(e){
+    if(e.target!==m) return;
+    var id=m.id;
+    if(id==='modal-confirm-close') return; // jamais fermé par clic extérieur
+    tryCloseModal(id);
+  });
 });
 
 function onEngageChange(){
