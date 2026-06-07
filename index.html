@@ -2265,7 +2265,7 @@ async function saveObjet(e){
   btn.textContent='...'; btn.disabled=true;
   try{
     var body={
-      nom:form.nom.value.trim(), categorie:form.categorie.value||null,
+      nom:form.nom.value.trim(), nom_produit_principal:form.nom_produit_principal.value.trim()||null, categorie:form.categorie.value||null,
       description:form.description.value||null, multi_couleur:form.multi_couleur.checked,
       couleur_principale:form.couleur_principale.value||null,
       nb_pieces:parseInt(form.nb_pieces.value)||0,
