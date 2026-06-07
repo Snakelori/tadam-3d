@@ -595,7 +595,7 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Nom</th><th>Catégorie</th><th>Couleur principale</th><th>Nb en stock</th><th>Multi couleur</th><th>Temps total</th><th></th></tr></thead>
+            <thead><tr><th>Nom</th><th>Catégorie</th><th>Module / Pièce</th><th>Couleur</th><th>Qté en stock</th><th>Temps total</th><th></th></tr></thead>
             <tbody id="tbody-objets"><tr class="empty-row"><td colspan="7">Cliquez sur "+ Ajouter" pour créer un objet</td></tr></tbody>
           </table>
         </div>
@@ -1353,9 +1353,10 @@
 
 <script>
 /* ═══ VERSIONING ═══ */
-var APP_VERSION='1.6.1';
+var APP_VERSION='1.6.2';
 var APP_DATE='2026-06-07';
 var APP_CHANGELOG=[
+  {v:'1.6.2', d:'2026-06-07', notes:['Catalogue : une ligne par couleur en stock (Module + Couleur + Qté), groupées par objet avec rowspan']},
   {v:'1.6.1', d:'2026-06-07', notes:['Calcul de prix : noms modules/produits mis à jour en temps réel au coche/décoche des modules']},
   {v:'1.6.0', d:'2026-06-07', notes:['Connexion : affichage mot de passe (5 s) et mémorisation du dernier email','Objet : champ "Nom du produit principal" (pièce maîtresse)','Calcul de prix : colonne "Module / Produit" par ligne de filament avec auto-remplissage depuis l\'objet','Transporteur et coût livraison modifiables dans le calcul de prix']},
   {v:'1.5.0', d:'2026-06-07', notes:['Protection formulaires : confirmation avant fermeture accidentelle','Détection automatique des modifications non enregistrées','Dialogue "Continuer la saisie / Abandonner" au clic en dehors du formulaire']},
@@ -2181,16 +2182,21 @@ var objets=[];
 
 async function loadObjets(){
   try{
-    var data=await api('GET','objets_vente',null,'?order=created_at.desc');
-    objets=data||[];
-    renderObjets(objets);
+    var results=await Promise.all([
+      api('GET','objets_vente',null,'?order=created_at.desc'),
+      api('GET','objets_stock_couleur',null,'?order=objet_id,piece_index,couleur')
+    ]);
+    objets=results[0]||[];
+    var stocksCouleur=results[1]||[];
+    renderObjets(objets,stocksCouleur);
   }catch(err){
-    document.getElementById('tbody-objets').innerHTML='<tr class="empty-row"><td colspan="8">Table introuvable — créez-la dans Supabase</td></tr>';
+    document.getElementById('tbody-objets').innerHTML='<tr class="empty-row"><td colspan="7">Table introuvable — créez-la dans Supabase</td></tr>';
   }
 }
 
-function renderObjets(data){
+function renderObjets(data,stocksCouleur){
   var tbody=document.getElementById('tbody-objets');
+  stocksCouleur=stocksCouleur||[];
   document.getElementById('count-objets').textContent=data.length;
   document.getElementById('stat-obj-total').textContent=data.length;
   document.getElementById('stat-obj-multi').textContent=data.filter(function(r){return r.multi_couleur;}).length;
@@ -2198,8 +2204,55 @@ function renderObjets(data){
   document.getElementById('stat-obj-cats').textContent=cats;
   if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">Aucun objet — cliquez sur "+ Ajouter"</td></tr>';return;}
   tbody.innerHTML=data.map(function(r){
+    var entries=stocksCouleur.filter(function(sc){return sc.objet_id===r.id&&(sc.quantite||0)>0;});
+    return buildObjetRows(r,entries);
+  }).join('');
+}
+
+function buildObjetRows(r,entries){
+  var actions='<div style="display:flex;gap:6px">'
+    +'<button class="btn btn-sm" style="background:linear-gradient(135deg,#a855f7,#6366f1);color:#fff;border:none" onclick="openStockCouleur(\''+r.id+'\')" title="Stock par couleur">🎨</button>'
+    +'<button class="btn btn-warning btn-sm" onclick="openEditObjet(\''+r.id+'\')">✏️</button>'
+    +'<button class="btn btn-danger btn-sm" onclick="deleteRow(\'objets_vente\',\''+r.id+'\',loadObjets)">✕</button>'
+    +'</div>';
+  // Aucune entrée couleur → ligne de repli avec stock global
+  if(!entries||!entries.length){
     var stock=r.stock!=null?r.stock:0;
-    return '<tr><td><strong>'+esc(r.nom||'—')+'</strong></td><td>'+esc(r.categorie||'—')+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur_principale)+'"></span>'+esc(r.couleur_principale||'—')+'</td><td><span class="badge '+(stock>0?'badge-yes':'badge-no')+'" style="font-family:var(--font-mono);font-size:12px">'+stock+'</span></td><td><span class="badge '+(r.multi_couleur?'badge-yes':'badge-no')+'">'+(r.multi_couleur?'Oui':'Non')+'</span></td><td style="font-family:var(--font-mono)">'+esc(r.temps_total||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-sm" style="background:linear-gradient(135deg,#a855f7,#6366f1);color:#fff;border:none" onclick="openStockCouleur(\''+r.id+'\')" title="Stock par couleur">🎨</button><button class="btn btn-warning btn-sm" onclick="openEditObjet(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'objets_vente\',\''+r.id+'\',loadObjets)">✕</button></div></td></tr>';
+    var couleur=r.couleur_principale||'—';
+    return '<tr style="border-top:2px solid var(--border)">'
+      +'<td><strong>'+esc(r.nom||'—')+'</strong></td>'
+      +'<td>'+esc(r.categorie||'—')+'</td>'
+      +'<td style="font-size:12px;color:var(--text3)">'+esc(r.nom_produit_principal||'Produit principal')+'</td>'
+      +'<td><span class="color-dot" style="background:'+colorHex(couleur)+'"></span>'+esc(couleur)+'</td>'
+      +'<td><span class="badge '+(stock>0?'badge-yes':'badge-no')+'" style="font-family:var(--font-mono);font-size:12px">'+stock+'</span></td>'
+      +'<td style="font-family:var(--font-mono)">'+esc(r.temps_total||'—')+'</td>'
+      +'<td>'+actions+'</td>'
+      +'</tr>';
+  }
+  var n=entries.length;
+  return entries.map(function(sc,idx){
+    var stock=sc.quantite||0;
+    var couleur=sc.couleur||'—';
+    var module=sc.piece_nom||(sc.piece_index===0?(r.nom_produit_principal||'Produit principal'):'Module '+sc.piece_index);
+    if(idx===0){
+      // Première ligne du groupe — rowspan sur Nom, Catégorie, Temps, Actions
+      return '<tr style="border-top:2px solid var(--border)">'
+        +'<td rowspan="'+n+'"><strong>'+esc(r.nom||'—')+'</strong></td>'
+        +'<td rowspan="'+n+'">'+esc(r.categorie||'—')+'</td>'
+        +'<td style="font-size:12px;color:var(--text3)">'+esc(module)+'</td>'
+        +'<td><span class="color-dot" style="background:'+colorHex(couleur)+'"></span>'+esc(couleur)+'</td>'
+        +'<td><span class="badge '+(stock>0?'badge-yes':'badge-no')+'" style="font-family:var(--font-mono);font-size:12px">'+stock+'</span></td>'
+        +'<td rowspan="'+n+'" style="font-family:var(--font-mono)">'+esc(r.temps_total||'—')+'</td>'
+        +'<td rowspan="'+n+'">'+actions+'</td>'
+        +'</tr>';
+    } else {
+      // Lignes suivantes du même objet
+      return '<tr>'
+        +'<td style="font-size:12px;color:var(--text3)">'+esc(module)+'</td>'
+        +'<td><span class="color-dot" style="background:'+colorHex(couleur)+'"></span>'+esc(couleur)+'</td>'
+        +'<td><span class="badge '+(stock>0?'badge-yes':'badge-no')+'" style="font-family:var(--font-mono);font-size:12px">'+stock+'</span></td>'
+        +'</tr>';
+    }
   }).join('');
 }
 
