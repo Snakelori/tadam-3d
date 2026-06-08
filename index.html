@@ -1587,10 +1587,11 @@
 
 <script>
 /* ═══ VERSIONING ═══ */
-var APP_VERSION='1.8.4';
+var APP_VERSION='1.8.5';
 var APP_DATE='2026-06-08';
 var APP_CHANGELOG=[
-  {v:'1.8.3', d:'2026-06-08', notes:['Correctif Mac : styles mobiles limités aux écrans tactiles (pointer:coarse) — plus d\'apparition d\'icônes mobile sur Mac même fenêtre étroite']},
+  {v:'1.8.5', d:'2026-06-08', notes:['Stock par couleur : quantités modifiables directement dans la liste (champ éditable + sauvegarde automatique)']},
+  {v:'1.8.4', d:'2026-06-08', notes:['Correctif Mac définitif : détection via userAgent Electron — styles mobiles jamais appliqués sur Mac']},
   {v:'1.8.2', d:'2026-06-08', notes:['Navigation mobile : menu hamburger ☰ avec panneau latéral glissant — plus de conflit avec la barre home iPhone']},
   {v:'1.8.1', d:'2026-06-08', notes:['Correctif : seules les 3 tables avec cartes alternatives sont cachées sur mobile (Calcul du prix et autres sections rétablis)','Safe area iOS améliorée']},
   {v:'1.8.0', d:'2026-06-08', notes:['Navigation mobile : barre fixe en bas (Filaments, Accessoires, Objets, Rapport, Paramètres)','Listes en cartes sur mobile : Filaments, Accessoires et Catalogue remplacent les tableaux par des fiches lisibles','Bouton + flottant (FAB) sur mobile pour ajouter rapidement un élément selon la section active']},
@@ -2907,7 +2908,12 @@ function renderPieceStockSection(piece,stocks,coulList){
       html+='<div class="sc-row">';
       html+='<span class="color-dot" style="background:'+colorHex(s.couleur)+'"></span>';
       html+='<span style="flex:1;font-weight:500">'+esc(s.couleur||'—')+'</span>';
-      html+='<span class="badge badge-yes" style="min-width:32px;text-align:center">'+s.quantite+'</span>';
+      html+='<input type="number" min="0" value="'+s.quantite+'" id="sc-edit-'+s.id+'"'
+        +' style="width:64px;padding:4px 8px;font-family:var(--font-mono);font-size:13px;font-weight:700;'
+        +'text-align:center;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);'
+        +'border-radius:6px;color:var(--teal);"'
+        +' onchange="updateStockCouleur(\''+s.id+'\','+piece.index+',this)"'
+        +' title="Modifier la quantité">';
       html+='<button class="btn btn-danger btn-sm" onclick="deleteStockCouleur(\''+s.id+'\','+piece.index+')">✕</button>';
       html+='</div>';
     });
@@ -2981,6 +2987,19 @@ async function deleteStockCouleur(stockId,pieceIndex){
     await syncPieceStock(currentStockObjet.id,pieceIndex);
     await renderStockCouleurModal();
   }catch(err){toast('Erreur: '+err.message,'error');}
+}
+
+async function updateStockCouleur(stockId,pieceIndex,inputEl){
+  var qte=parseInt(inputEl.value);
+  if(isNaN(qte)||qte<0){toast('Quantité invalide','error');return;}
+  try{
+    inputEl.style.borderColor='var(--accent)';
+    await api('PATCH','objets_stock_couleur',{quantite:qte},'?id=eq.'+stockId);
+    await syncPieceStock(currentStockObjet.id,pieceIndex);
+    toast('Stock mis à jour ✓','success');
+    inputEl.style.borderColor='rgba(16,185,129,0.3)';
+    logAction('UPDATE','objets_stock_couleur',stockId,'Quantité → '+qte);
+  }catch(err){toast('Erreur: '+err.message,'error');inputEl.style.borderColor='var(--red)';}
 }
 
 async function syncPieceStock(objetId,pieceIndex){
