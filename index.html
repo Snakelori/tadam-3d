@@ -397,7 +397,8 @@
     .m-card-stock-row:last-child{border-bottom:none;}
 
     /* ═══ MEDIA QUERIES MOBILE ═══ */
-    @media(max-width:768px){
+    /* pointer:coarse = écran tactile (iPhone/iPad uniquement — jamais Mac/PC) */
+    @media(max-width:768px) and (pointer:coarse){
       /* Cacher nav desktop */
       nav{display:none;}
       /* Cacher nav bas (remplacée par drawer) */
@@ -1565,10 +1566,11 @@
 
 <script>
 /* ═══ VERSIONING ═══ */
-var APP_VERSION='1.8.2';
+var APP_VERSION='1.8.3';
 var APP_DATE='2026-06-08';
 var APP_CHANGELOG=[
-  {v:'1.8.2', d:'2026-06-08', notes:['Navigation mobile : remplacement de la barre basse par un menu hamburger ☰ avec panneau latéral glissant','Le drawer affiche les 5 sections, l\'email connecté et le bouton de déconnexion','Plus de conflit avec la barre home iPhone']},
+  {v:'1.8.3', d:'2026-06-08', notes:['Correctif Mac : styles mobiles limités aux écrans tactiles (pointer:coarse) — plus d\'apparition d\'icônes mobile sur Mac même fenêtre étroite']},
+  {v:'1.8.2', d:'2026-06-08', notes:['Navigation mobile : menu hamburger ☰ avec panneau latéral glissant — plus de conflit avec la barre home iPhone']},
   {v:'1.8.1', d:'2026-06-08', notes:['Correctif : seules les 3 tables avec cartes alternatives sont cachées sur mobile (Calcul du prix et autres sections rétablis)','Safe area iOS améliorée']},
   {v:'1.8.0', d:'2026-06-08', notes:['Navigation mobile : barre fixe en bas (Filaments, Accessoires, Objets, Rapport, Paramètres)','Listes en cartes sur mobile : Filaments, Accessoires et Catalogue remplacent les tableaux par des fiches lisibles','Bouton + flottant (FAB) sur mobile pour ajouter rapidement un élément selon la section active']},
   {v:'1.7.0', d:'2026-06-08', notes:['Historique des actions : log automatique de tous les ajouts, modifications et suppressions','Onglet "Historique" dans Paramètres avec tableau filtré et purge manuelle','Rétention configurable : 7 / 14 / 30 / 60 / 90 / 180 jours (défaut 14)','Purge automatique des entrées expirées à chaque action']},
