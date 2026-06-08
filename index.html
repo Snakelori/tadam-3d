@@ -312,25 +312,55 @@
 
     /* ═══ MOBILE UX ═══ */
 
-    /* Bottom navigation bar (mobile only) */
-    .mobile-bottom-nav{
-      display:none;position:fixed;bottom:0;left:0;right:0;
-      background:var(--bg2);border-top:2px solid var(--border);
-      z-index:150;
-      /* Espace sous les boutons = barre home iOS */
-      padding-bottom:max(env(safe-area-inset-bottom,0px), 8px);
-      box-shadow:0 -4px 24px rgba(0,0,0,0.35);
+    /* Bouton hamburger (mobile only) */
+    .mobile-menu-btn{
+      display:none;background:var(--bg3);border:1px solid var(--border);
+      border-radius:8px;width:36px;height:36px;font-size:20px;cursor:pointer;
+      align-items:center;justify-content:center;color:var(--text2);
+      -webkit-tap-highlight-color:transparent;transition:border-color .15s;flex-shrink:0;
     }
-    .mobile-nav-btn{
-      flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-      gap:3px;padding:10px 4px 8px;
-      border:none;background:none;color:var(--text3);cursor:pointer;
-      font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:0.3px;
-      transition:color .15s;-webkit-tap-highlight-color:transparent;min-height:54px;
+    .mobile-menu-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+    /* Overlay fond sombre */
+    .mobile-drawer-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,0.55);
+      z-index:259;opacity:0;pointer-events:none;transition:opacity .25s;
     }
-    .mobile-nav-btn .mnav-icon{font-size:22px;line-height:1;}
-    .mobile-nav-btn.active{color:var(--accent);}
-    .mobile-nav-btn:active{opacity:0.7;}
+    .mobile-drawer-overlay.open{opacity:1;pointer-events:all;}
+
+    /* Panneau latéral drawer */
+    .mobile-drawer{
+      position:fixed;top:0;left:0;bottom:0;width:270px;
+      background:var(--bg2);border-right:1px solid var(--border);
+      z-index:260;transform:translateX(-100%);
+      transition:transform .25s cubic-bezier(0.4,0,0.2,1);
+      box-shadow:4px 0 32px rgba(0,0,0,0.45);
+      display:flex;flex-direction:column;
+      padding-top:max(env(safe-area-inset-top,0px),0px);
+    }
+    .mobile-drawer.open{transform:translateX(0);}
+    .mobile-drawer-head{
+      padding:18px 20px 16px;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .mobile-drawer-logo{height:30px;width:auto;}
+    .mobile-drawer-close{background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer;padding:4px;}
+    .mobile-drawer-nav{display:flex;flex-direction:column;padding:8px 0;flex:1;}
+    .mobile-drawer-item{
+      display:flex;align-items:center;gap:14px;padding:14px 20px;
+      border:none;background:none;color:var(--text2);cursor:pointer;
+      font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:0.4px;
+      text-align:left;width:100%;transition:all .15s;
+      border-left:3px solid transparent;-webkit-tap-highlight-color:transparent;
+    }
+    .mobile-drawer-item:active{background:var(--bg3);}
+    .mobile-drawer-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(var(--accent-rgb),0.07);}
+    .mobile-drawer-item .d-icon{font-size:20px;width:26px;text-align:center;}
+    .mobile-drawer-foot{
+      padding:14px 20px;border-top:1px solid var(--border);
+      padding-bottom:max(env(safe-area-inset-bottom,14px),14px);
+    }
+    .mobile-drawer-user{font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-bottom:10px;word-break:break-all;}
 
     /* FAB — bouton + flottant */
     .btn-fab{
@@ -346,7 +376,7 @@
     }
     .btn-fab:active{transform:scale(0.92);box-shadow:0 2px 10px rgba(var(--accent-rgb),0.4);}
 
-    /* Mobile card components */
+    /* Mobile cards */
     .mobile-cards-wrap{display:none;}
     .m-card{
       background:var(--bg2);border:1px solid var(--border);
@@ -363,40 +393,43 @@
     .m-card-meta-item{display:flex;flex-direction:column;gap:1px;}
     .m-card-meta-label{font-family:var(--font-mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;}
     .m-card-meta-val{font-family:var(--font-mono);font-size:12px;color:var(--text);font-weight:700;}
-    .m-card-actions{display:flex;gap:8px;justify-content:flex-end;padding-top:8px;border-top:1px solid var(--border2);}
-    .m-card-actions .btn{padding:8px 14px;}
     .m-card-stock-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border2);font-size:12px;}
     .m-card-stock-row:last-child{border-bottom:none;}
 
     /* ═══ MEDIA QUERIES MOBILE ═══ */
     @media(max-width:768px){
-      /* Cacher nav desktop, montrer nav bas */
+      /* Cacher nav desktop */
       nav{display:none;}
-      .mobile-bottom-nav{display:flex;}
-      .btn-fab{display:flex;bottom:calc(70px + max(env(safe-area-inset-bottom,0px),8px));}
+      /* Cacher nav bas (remplacée par drawer) */
+      .mobile-bottom-nav{display:none !important;}
+      /* Montrer hamburger */
+      .mobile-menu-btn{display:flex;}
 
-      /* Espace bas pour la nav fixe */
-      main{padding:14px 14px calc(88px + max(env(safe-area-inset-bottom,0px),8px));max-width:100%;}
+      /* FAB positionné normalement (pas de nav en bas) */
+      .btn-fab{display:flex;bottom:max(24px, env(safe-area-inset-bottom,24px));}
 
-      /* Header compact */
-      .header-status,.user-info{display:none;}
+      /* Espace bas safe area */
+      main{padding:14px 14px calc(24px + env(safe-area-inset-bottom,0px));max-width:100%;}
+
+      /* Header compact — cacher infos verbeux, garder boutons */
+      .header-status,.user-info,.btn-logout,.theme-toggle-btn{display:none;}
       header{height:50px;padding:0 14px;}
 
-      /* Cacher uniquement les tables qui ont une version carte mobile */
+      /* Tables → cartes */
       .table-wrap.table-cards{display:none;}
       .mobile-cards-wrap{display:block;}
 
-      /* Cacher le bouton "+ Ajouter" desktop sur pages FAB */
+      /* Cacher "+ Ajouter" desktop sur pages FAB */
       .page-fab-managed .section-header .btn-primary{display:none;}
 
-      /* Stats plus compactes */
+      /* Stats compactes */
       .stat-value{font-size:20px;}
       .stats-row{gap:8px;margin-bottom:14px;}
 
-      /* Toast au-dessus de la nav */
-      .toast{bottom:calc(80px + max(env(safe-area-inset-bottom,0px),8px));right:14px;}
+      /* Toast */
+      .toast{bottom:max(20px, env(safe-area-inset-bottom,20px));right:14px;}
 
-      /* Sub-navs scroll horizontal avec touch */
+      /* Sub-navs scroll */
       .subnav,.subnav2{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
       .subnav::-webkit-scrollbar,.subnav2::-webkit-scrollbar{display:none;}
       .subnav-btn{padding:10px 12px;}
@@ -405,11 +438,6 @@
       .form-grid{grid-template-columns:1fr;}
       .settings-grid{grid-template-columns:1fr;}
       .login-box{padding:28px 20px;margin:16px;}
-    }
-
-    @media(max-width:400px){
-      .mobile-nav-btn{font-size:8px;}
-      .mobile-nav-btn .mnav-icon{font-size:19px;}
     }
   </style>
 </head>
@@ -445,6 +473,7 @@
     <div class="header-right">
       <div class="header-status"><div class="dot" id="status-dot"></div><span id="status-text">Connecté</span></div>
       <span class="user-info" id="user-email"></span>
+      <button class="mobile-menu-btn" id="btn-mobile-menu" onclick="toggleDrawer()" title="Menu">☰</button>
       <button class="about-btn" onclick="openModal('modal-about')" title="À propos de TADAM-3D">ℹ️</button>
       <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Mode sombre / clair">🌙</button>
       <button class="btn btn-logout" onclick="doLogout()">Déconnexion</button>
@@ -479,6 +508,38 @@
 
   <!-- FAB — bouton flottant ajouter -->
   <button class="btn-fab" id="btn-fab" onclick="fabAction()" title="Ajouter" style="display:none">+</button>
+
+  <!-- DRAWER OVERLAY -->
+  <div class="mobile-drawer-overlay" id="mobile-drawer-overlay" onclick="closeDrawer()"></div>
+
+  <!-- DRAWER LATÉRAL -->
+  <div class="mobile-drawer" id="mobile-drawer">
+    <div class="mobile-drawer-head">
+      <img src="Logo_officiel_TADAM-3D_V1.png" alt="TADAM-3D" class="mobile-drawer-logo">
+      <button class="mobile-drawer-close" onclick="closeDrawer()" title="Fermer">✕</button>
+    </div>
+    <div class="mobile-drawer-nav">
+      <button class="mobile-drawer-item active" id="ditem-filaments" onclick="showPage('filaments',event)">
+        <span class="d-icon">🧵</span>Filaments
+      </button>
+      <button class="mobile-drawer-item" id="ditem-accessoires" onclick="showPage('accessoires',event)">
+        <span class="d-icon">🛒</span>Accessoires
+      </button>
+      <button class="mobile-drawer-item" id="ditem-objets" onclick="showPage('objets',event)">
+        <span class="d-icon">🛍️</span>Objets
+      </button>
+      <button class="mobile-drawer-item" id="ditem-rapport" onclick="showPage('rapport',event)">
+        <span class="d-icon">📊</span>Rapport
+      </button>
+      <button class="mobile-drawer-item" id="ditem-parametres" onclick="showPage('parametres',event)">
+        <span class="d-icon">⚙️</span>Paramètres
+      </button>
+    </div>
+    <div class="mobile-drawer-foot">
+      <div class="mobile-drawer-user" id="drawer-user-email"></div>
+      <button class="btn btn-logout" style="width:100%;justify-content:center" onclick="doLogout()">Déconnexion</button>
+    </div>
+  </div>
 
   <main>
 
@@ -1504,10 +1565,11 @@
 
 <script>
 /* ═══ VERSIONING ═══ */
-var APP_VERSION='1.8.1';
+var APP_VERSION='1.8.2';
 var APP_DATE='2026-06-08';
 var APP_CHANGELOG=[
-  {v:'1.8.1', d:'2026-06-08', notes:['Correctif : seules les 3 tables avec cartes alternatives sont cachées sur mobile (Calcul du prix et autres sections rétablis)','Safe area iOS améliorée : barre de navigation bien séparée de la barre home iPhone']},
+  {v:'1.8.2', d:'2026-06-08', notes:['Navigation mobile : remplacement de la barre basse par un menu hamburger ☰ avec panneau latéral glissant','Le drawer affiche les 5 sections, l\'email connecté et le bouton de déconnexion','Plus de conflit avec la barre home iPhone']},
+  {v:'1.8.1', d:'2026-06-08', notes:['Correctif : seules les 3 tables avec cartes alternatives sont cachées sur mobile (Calcul du prix et autres sections rétablis)','Safe area iOS améliorée']},
   {v:'1.8.0', d:'2026-06-08', notes:['Navigation mobile : barre fixe en bas (Filaments, Accessoires, Objets, Rapport, Paramètres)','Listes en cartes sur mobile : Filaments, Accessoires et Catalogue remplacent les tableaux par des fiches lisibles','Bouton + flottant (FAB) sur mobile pour ajouter rapidement un élément selon la section active']},
   {v:'1.7.0', d:'2026-06-08', notes:['Historique des actions : log automatique de tous les ajouts, modifications et suppressions','Onglet "Historique" dans Paramètres avec tableau filtré et purge manuelle','Rétention configurable : 7 / 14 / 30 / 60 / 90 / 180 jours (défaut 14)','Purge automatique des entrées expirées à chaque action']},
   {v:'1.6.2', d:'2026-06-07', notes:['Catalogue : une ligne par couleur en stock (Module + Couleur + Qté), groupées par objet avec rowspan']},
@@ -1591,7 +1653,10 @@ async function doLogout(){
 function showApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app-screen').style.display='block';
-  document.getElementById('user-email').textContent=currentUser&&currentUser.email||'';
+  var email=currentUser&&currentUser.email||'';
+  document.getElementById('user-email').textContent=email;
+  var drawerEmail=document.getElementById('drawer-user-email');
+  if(drawerEmail) drawerEmail.textContent=email;
   // FAB visible dès le départ (page filaments = page par défaut)
   var fab=document.getElementById('btn-fab');
   if(fab) fab.style.display='flex';
@@ -2165,26 +2230,38 @@ function showPage(name,e){
   _currentPage=name;
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
-  document.querySelectorAll('.mobile-nav-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.mobile-drawer-item').forEach(function(b){b.classList.remove('active');});
   document.getElementById('page-'+name).classList.add('active');
-  if(e&&e.target) e.target.classList.add('active');
-  var mBtn=document.getElementById('mnav-'+name);
-  if(mBtn) mBtn.classList.add('active');
+  if(e&&e.currentTarget&&e.currentTarget.classList.contains('nav-btn')) e.currentTarget.classList.add('active');
+  var dItem=document.getElementById('ditem-'+name);
+  if(dItem) dItem.classList.add('active');
   if(name==='parametres') loadParamsPage();
   if(name==='objets') loadObjets();
   if(name==='rapport') loadRapportFilaments();
-  // Mettre à jour FAB
+  // FAB
   var fab=document.getElementById('btn-fab');
   if(fab){
     var fabPages={filaments:true,accessoires:true,objets:true};
     fab.style.display=fabPages[name]?'flex':'none';
   }
+  // Fermer le drawer après navigation
+  closeDrawer();
 }
 
 function fabAction(){
   if(_currentPage==='filaments') openAddFilament();
   else if(_currentPage==='accessoires') openAddAccessoire();
   else if(_currentPage==='objets') openAddObjet();
+}
+
+function toggleDrawer(){
+  document.getElementById('mobile-drawer').classList.toggle('open');
+  document.getElementById('mobile-drawer-overlay').classList.toggle('open');
+}
+
+function closeDrawer(){
+  document.getElementById('mobile-drawer').classList.remove('open');
+  document.getElementById('mobile-drawer-overlay').classList.remove('open');
 }
 
 /* ═══ PROTECTION FORMULAIRES — abandon accidentel ═══ */
