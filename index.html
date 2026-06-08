@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <!-- Détection Electron en priorité — classe ajoutée avant le CSS -->
+  <script>if(/Electron/.test(navigator.userAgent)){document.documentElement.classList.add('is-electron');}</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tadam-3D</title>
@@ -397,8 +399,7 @@
     .m-card-stock-row:last-child{border-bottom:none;}
 
     /* ═══ MEDIA QUERIES MOBILE ═══ */
-    /* pointer:coarse = écran tactile (iPhone/iPad uniquement — jamais Mac/PC) */
-    @media(max-width:768px) and (pointer:coarse){
+    @media(max-width:768px){
       /* Cacher nav desktop */
       nav{display:none;}
       /* Cacher nav bas (remplacée par drawer) */
@@ -440,6 +441,26 @@
       .settings-grid{grid-template-columns:1fr;}
       .login-box{padding:28px 20px;margin:16px;}
     }
+
+    /* ═══ ELECTRON — Annuler tous les styles mobiles ═══ */
+    /* html.is-electron est ajouté par le script de détection en tête de page */
+    html.is-electron nav{display:flex !important;}
+    html.is-electron .mobile-menu-btn{display:none !important;}
+    html.is-electron .btn-fab{display:none !important;}
+    html.is-electron .mobile-bottom-nav{display:none !important;}
+    html.is-electron .mobile-drawer{display:none !important;}
+    html.is-electron .mobile-drawer-overlay{display:none !important;}
+    html.is-electron main{padding:22px 24px !important;max-width:1200px !important;}
+    html.is-electron header{height:58px !important;padding:0 24px !important;}
+    html.is-electron .header-status{display:flex !important;}
+    html.is-electron .user-info{display:inline-block !important;}
+    html.is-electron .btn-logout{display:inline-flex !important;}
+    html.is-electron .theme-toggle-btn{display:flex !important;}
+    html.is-electron .table-wrap.table-cards{display:block !important;}
+    html.is-electron .mobile-cards-wrap{display:none !important;}
+    html.is-electron .page-fab-managed .section-header .btn-primary{display:inline-flex !important;}
+    html.is-electron .form-grid{grid-template-columns:1fr 1fr !important;}
+    html.is-electron .settings-grid{grid-template-columns:repeat(auto-fit,minmax(280px,1fr)) !important;}
   </style>
 </head>
 <body>
@@ -1566,7 +1587,7 @@
 
 <script>
 /* ═══ VERSIONING ═══ */
-var APP_VERSION='1.8.3';
+var APP_VERSION='1.8.4';
 var APP_DATE='2026-06-08';
 var APP_CHANGELOG=[
   {v:'1.8.3', d:'2026-06-08', notes:['Correctif Mac : styles mobiles limités aux écrans tactiles (pointer:coarse) — plus d\'apparition d\'icônes mobile sur Mac même fenêtre étroite']},
