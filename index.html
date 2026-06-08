@@ -310,15 +310,104 @@
     .btn-dup-active-ignore{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important;}
     .btn-dup-active-overwrite{background:var(--amber)!important;color:#fff!important;border-color:var(--amber)!important;}
 
-    @media(max-width:600px){
-      main{padding:14px;}
+    /* ═══ MOBILE UX ═══ */
+
+    /* Bottom navigation bar (mobile only) */
+    .mobile-bottom-nav{
+      display:none;position:fixed;bottom:0;left:0;right:0;
+      background:var(--bg2);border-top:1px solid var(--border);
+      z-index:150;padding-bottom:env(safe-area-inset-bottom,0px);
+      box-shadow:0 -2px 20px rgba(0,0,0,0.3);
+    }
+    .mobile-nav-btn{
+      flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:2px;padding:8px 4px 9px;
+      border:none;background:none;color:var(--text3);cursor:pointer;
+      font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:0.3px;
+      transition:color .15s;-webkit-tap-highlight-color:transparent;
+    }
+    .mobile-nav-btn .mnav-icon{font-size:22px;line-height:1;}
+    .mobile-nav-btn.active{color:var(--accent);}
+    .mobile-nav-btn:active{opacity:0.7;}
+
+    /* FAB — bouton + flottant */
+    .btn-fab{
+      display:none;position:fixed;right:20px;z-index:140;
+      width:58px;height:58px;border-radius:50%;
+      background:var(--accent);color:#fff;
+      font-size:30px;font-weight:300;line-height:1;
+      border:none;cursor:pointer;
+      box-shadow:0 4px 18px rgba(var(--accent-rgb),0.55);
+      align-items:center;justify-content:center;
+      transition:transform .15s,box-shadow .15s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .btn-fab:active{transform:scale(0.92);box-shadow:0 2px 10px rgba(var(--accent-rgb),0.4);}
+
+    /* Mobile card components */
+    .mobile-cards-wrap{display:none;}
+    .m-card{
+      background:var(--bg2);border:1px solid var(--border);
+      border-radius:var(--radius);padding:13px 14px;margin-bottom:9px;
+      box-shadow:var(--shadow-sm);border-left:3px solid transparent;
+      transition:border-left-color .15s;
+    }
+    .m-card:active{border-left-color:var(--accent);}
+    .m-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:7px;gap:8px;}
+    .m-card-name{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);line-height:1.3;}
+    .m-card-sub{font-size:11px;color:var(--text3);margin-top:2px;font-family:var(--font-mono);}
+    .m-card-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+    .m-card-meta{display:grid;grid-template-columns:1fr 1fr;gap:5px 12px;margin-bottom:8px;}
+    .m-card-meta-item{display:flex;flex-direction:column;gap:1px;}
+    .m-card-meta-label{font-family:var(--font-mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;}
+    .m-card-meta-val{font-family:var(--font-mono);font-size:12px;color:var(--text);font-weight:700;}
+    .m-card-actions{display:flex;gap:8px;justify-content:flex-end;padding-top:8px;border-top:1px solid var(--border2);}
+    .m-card-actions .btn{padding:8px 14px;}
+    .m-card-stock-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border2);font-size:12px;}
+    .m-card-stock-row:last-child{border-bottom:none;}
+
+    /* ═══ MEDIA QUERIES MOBILE ═══ */
+    @media(max-width:768px){
+      /* Cacher nav desktop, montrer nav bas */
+      nav{display:none;}
+      .mobile-bottom-nav{display:flex;}
+      .btn-fab{display:flex;bottom:calc(68px + env(safe-area-inset-bottom,0px));}
+
+      /* Espace bas pour la nav fixe */
+      main{padding:14px 14px calc(84px + env(safe-area-inset-bottom,16px));max-width:100%;}
+
+      /* Header compact */
+      .header-status,.user-info,.about-btn{display:none;}
+      header{height:50px;padding:0 14px;}
+
+      /* Cacher tables desktop, montrer cartes mobile */
+      .table-wrap{display:none;}
+      .mobile-cards-wrap{display:block;}
+
+      /* Cacher le bouton "+ Ajouter" desktop sur pages FAB */
+      .page-fab-managed .section-header .btn-primary{display:none;}
+
+      /* Stats plus compactes */
+      .stat-value{font-size:20px;}
+      .stats-row{gap:8px;margin-bottom:14px;}
+
+      /* Toast au-dessus de la nav */
+      .toast{bottom:calc(76px + env(safe-area-inset-bottom,0px));right:14px;}
+
+      /* Sub-navs scroll horizontal avec touch */
+      .subnav,.subnav2{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+      .subnav::-webkit-scrollbar,.subnav2::-webkit-scrollbar{display:none;}
+      .subnav-btn{padding:10px 12px;}
+
+      /* Formulaires */
       .form-grid{grid-template-columns:1fr;}
-      .stats-row{grid-template-columns:1fr 1fr;}
-      header{padding:0 14px;}
-      nav{padding:0 10px;overflow-x:auto;}
-      .nav-btn{padding:12px 10px;}
       .settings-grid{grid-template-columns:1fr;}
       .login-box{padding:28px 20px;margin:16px;}
+    }
+
+    @media(max-width:400px){
+      .mobile-nav-btn{font-size:8px;}
+      .mobile-nav-btn .mnav-icon{font-size:19px;}
     }
   </style>
 </head>
@@ -366,10 +455,33 @@
     <button class="nav-btn" onclick="showPage('objets',event)">🛍️ Objets</button>
     <button class="nav-btn" onclick="showPage('rapport',event)">📊 Rapport</button>
   </nav>
+
+  <!-- NAVIGATION BAS MOBILE -->
+  <div class="mobile-bottom-nav" id="mobile-bottom-nav">
+    <button class="mobile-nav-btn active" id="mnav-filaments" onclick="showPage('filaments',event)">
+      <span class="mnav-icon">🧵</span>Filaments
+    </button>
+    <button class="mobile-nav-btn" id="mnav-accessoires" onclick="showPage('accessoires',event)">
+      <span class="mnav-icon">🛒</span>Accessoires
+    </button>
+    <button class="mobile-nav-btn" id="mnav-objets" onclick="showPage('objets',event)">
+      <span class="mnav-icon">🛍️</span>Objets
+    </button>
+    <button class="mobile-nav-btn" id="mnav-rapport" onclick="showPage('rapport',event)">
+      <span class="mnav-icon">📊</span>Rapport
+    </button>
+    <button class="mobile-nav-btn" id="mnav-parametres" onclick="showPage('parametres',event)">
+      <span class="mnav-icon">⚙️</span>Paramètres
+    </button>
+  </div>
+
+  <!-- FAB — bouton flottant ajouter -->
+  <button class="btn-fab" id="btn-fab" onclick="fabAction()" title="Ajouter" style="display:none">+</button>
+
   <main>
 
     <!-- FILAMENTS -->
-    <div class="page active" id="page-filaments">
+    <div class="page active page-fab-managed" id="page-filaments">
       <div class="stats-row">
         <div class="stat-card"><div class="stat-label">Bobines en stock</div><div class="stat-value accent" id="stat-total">—</div></div>
         <div class="stat-card"><div class="stat-label">Valeur totale</div><div class="stat-value teal" id="stat-valeur">—</div></div>
@@ -389,10 +501,11 @@
           <tbody id="tbody-filaments"><tr class="empty-row"><td colspan="11"><span class="spinner"></span>Chargement...</td></tr></tbody>
         </table>
       </div>
+      <div class="mobile-cards-wrap" id="cards-filaments"></div>
     </div>
 
     <!-- ACCESSOIRES -->
-    <div class="page" id="page-accessoires">
+    <div class="page page-fab-managed" id="page-accessoires">
       <div class="stats-row">
         <div class="stat-card"><div class="stat-label">Produits référencés</div><div class="stat-value accent" id="stat-acc-total">—</div></div>
         <div class="stat-card"><div class="stat-label">Total investi</div><div class="stat-value teal" id="stat-acc-valeur">—</div></div>
@@ -411,6 +524,7 @@
           <tbody id="tbody-accessoires"><tr class="empty-row"><td colspan="10"><span class="spinner"></span>Chargement...</td></tr></tbody>
         </table>
       </div>
+      <div class="mobile-cards-wrap" id="cards-accessoires"></div>
     </div>
 
     <!-- PARAMETRES - -->
@@ -596,7 +710,7 @@
     </div>
 
     <!-- OBJETS -->
-    <div class="page" id="page-objets">
+    <div class="page page-fab-managed" id="page-objets">
       <!-- Niveau 1 : Objets à vendre / Objets vendus -->
       <div class="subnav">
         <button class="subnav-btn active" onclick="showSubPage('objets','objetsvendre',event)">🛍️ Objets à vendre</button>
@@ -633,6 +747,7 @@
             <tbody id="tbody-objets"><tr class="empty-row"><td colspan="7">Cliquez sur "+ Ajouter" pour créer un objet</td></tr></tbody>
           </table>
         </div>
+        <div class="mobile-cards-wrap" id="cards-objets"></div>
       </div>
 
       <!-- SOUS-SOUS-PAGE : CONSOMMABLES -->
@@ -1387,9 +1502,10 @@
 
 <script>
 /* ═══ VERSIONING ═══ */
-var APP_VERSION='1.7.0';
+var APP_VERSION='1.8.0';
 var APP_DATE='2026-06-08';
 var APP_CHANGELOG=[
+  {v:'1.8.0', d:'2026-06-08', notes:['Navigation mobile : barre fixe en bas (Filaments, Accessoires, Objets, Rapport, Paramètres)','Listes en cartes sur mobile : Filaments, Accessoires et Catalogue remplacent les tableaux par des fiches lisibles','Bouton + flottant (FAB) sur mobile pour ajouter rapidement un élément selon la section active']},
   {v:'1.7.0', d:'2026-06-08', notes:['Historique des actions : log automatique de tous les ajouts, modifications et suppressions','Onglet "Historique" dans Paramètres avec tableau filtré et purge manuelle','Rétention configurable : 7 / 14 / 30 / 60 / 90 / 180 jours (défaut 14)','Purge automatique des entrées expirées à chaque action']},
   {v:'1.6.2', d:'2026-06-07', notes:['Catalogue : une ligne par couleur en stock (Module + Couleur + Qté), groupées par objet avec rowspan']},
   {v:'1.6.1', d:'2026-06-07', notes:['Calcul de prix : noms modules/produits mis à jour en temps réel au coche/décoche des modules']},
@@ -1473,6 +1589,9 @@ function showApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app-screen').style.display='block';
   document.getElementById('user-email').textContent=currentUser&&currentUser.email||'';
+  // FAB visible dès le départ (page filaments = page par défaut)
+  var fab=document.getElementById('btn-fab');
+  if(fab) fab.style.display='flex';
   init();
 }
 
@@ -1661,7 +1780,12 @@ function renderFilaments(data){
   document.getElementById('stat-valeur').textContent=tv.toFixed(2)+' €';
   animateCounter(document.getElementById('stat-matieres'),ms);
   animateCounter(document.getElementById('stat-entamees'),en);
-  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="12">Aucun filament — cliquez sur "+ Ajouter"</td></tr>';return;}
+  if(!data.length){
+    tbody.innerHTML='<tr class="empty-row"><td colspan="12">Aucun filament — cliquez sur "+ Ajouter"</td></tr>';
+    var cardsEl=document.getElementById('cards-filaments');
+    if(cardsEl) cardsEl.innerHTML='<div style="text-align:center;padding:36px;color:var(--text3);font-family:var(--font-mono);font-size:12px">Aucun filament — appuyez sur + pour en ajouter</div>';
+    return;
+  }
   tbody.innerHTML=data.map(function(r){
     var engageCell=r.entame
       ?'<span class="badge badge-yes">Engagé</span>'
@@ -1670,6 +1794,39 @@ function renderFilaments(data){
       :'<span class="badge badge-no">Non</span>';
     return '<tr><td><span style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">'+esc(r.id_bobine)+'</span></td><td>'+esc(r.marque)+'</td><td><span class="color-dot" style="background:'+colorHex(r.couleur)+'"></span>'+esc(r.couleur)+'</td><td><span class="badge '+badgeMatiere(r.type_matiere)+'">'+esc(r.type_matiere)+'</span></td><td style="font-family:var(--font-mono)">'+r.poids_g+'g</td><td style="font-family:var(--font-mono)">'+parseFloat(r.prix_euros).toFixed(2)+'€</td><td style="font-family:var(--font-mono);color:var(--teal)">'+parseFloat(r.prix_par_gramme||0).toFixed(4)+'</td><td style="font-family:var(--font-mono)">'+(r.quantite||1)+'</td><td>'+engageCell+'</td><td style="font-size:13px;color:var(--text2)">'+esc((r.fournisseurs&&r.fournisseurs.nom)||'—')+'</td><td><span class="badge '+(r.etat==='epuise'?'badge-no':r.etat==='sorti'?'badge-other':'badge-yes')+'">'+(r.etat==='epuise'?'Épuisé':r.etat==='sorti'?'Sorti':'Disponible')+'</span></td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditFilament(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'filaments\',\''+r.id+'\',loadFilaments)">✕</button></div></td></tr>';
   }).join('');
+  // Cartes mobiles
+  var cardsEl=document.getElementById('cards-filaments');
+  if(cardsEl){
+    cardsEl.innerHTML=data.map(function(r){
+      var etatBadge=r.etat==='epuise'?'badge-no':r.etat==='sorti'?'badge-other':'badge-yes';
+      var etatLabel=r.etat==='epuise'?'Épuisé':r.etat==='sorti'?'Sorti':'Disponible';
+      return '<div class="m-card">'
+        +'<div class="m-card-top">'
+          +'<div style="min-width:0">'
+            +'<div class="m-card-name"><span class="color-dot" style="background:'+colorHex(r.couleur)+'"></span>'+esc(r.marque)+' — '+esc(r.couleur)+'</div>'
+            +'<div class="m-card-sub">'+esc(r.id_bobine)+(r.fournisseurs&&r.fournisseurs.nom?' · '+esc(r.fournisseurs.nom):'')+'</div>'
+          +'</div>'
+          +'<div style="display:flex;gap:6px;flex-shrink:0">'
+            +'<button class="btn btn-warning btn-sm" onclick="openEditFilament(\''+r.id+'\')">✏️</button>'
+            +'<button class="btn btn-danger btn-sm" onclick="deleteRow(\'filaments\',\''+r.id+'\',loadFilaments)">✕</button>'
+          +'</div>'
+        +'</div>'
+        +'<div class="m-card-badges">'
+          +'<span class="badge '+badgeMatiere(r.type_matiere)+'">'+esc(r.type_matiere)+'</span>'
+          +'<span class="badge '+(r.entame?'badge-yes':'badge-no')+'">'+(r.entame?'Engagé':'Non engagé')+'</span>'
+          +'<span class="badge '+etatBadge+'">'+etatLabel+'</span>'
+        +'</div>'
+        +'<div class="m-card-meta">'
+          +'<div class="m-card-meta-item"><span class="m-card-meta-label">Poids</span><span class="m-card-meta-val">'+r.poids_g+'g</span></div>'
+          +'<div class="m-card-meta-item"><span class="m-card-meta-label">Prix</span><span class="m-card-meta-val">'+parseFloat(r.prix_euros).toFixed(2)+'€</span></div>'
+          +'<div class="m-card-meta-item"><span class="m-card-meta-label">€/g</span><span class="m-card-meta-val" style="color:var(--teal)">'+parseFloat(r.prix_par_gramme||0).toFixed(4)+'</span></div>'
+          +'<div class="m-card-meta-item"><span class="m-card-meta-label">Quantité</span><span class="m-card-meta-val">'+(r.quantite||1)+'</span></div>'
+          +(r.entame&&r.quantite_restante_g!=null?'<div class="m-card-meta-item"><span class="m-card-meta-label">Restant</span><span class="m-card-meta-val" style="color:var(--amber)">'+parseFloat(r.quantite_restante_g).toFixed(0)+'g</span></div>':'')
+          +(r.entame&&r.date_premiere_utilisation?'<div class="m-card-meta-item"><span class="m-card-meta-label">Engagé le</span><span class="m-card-meta-val">'+esc(r.date_premiere_utilisation)+'</span></div>':'')
+        +'</div>'
+        +'</div>';
+    }).join('');
+  }
 }
 
 /* ---- ACCESSOIRES ---- */
@@ -1686,10 +1843,43 @@ function renderAccessoires(data){
   document.getElementById('stat-acc-total').textContent=data.length;
   document.getElementById('stat-acc-valeur').textContent=tv.toFixed(2)+' €';
   document.getElementById('stat-acc-inclus').textContent=inc;
-  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="10">Aucun accessoire — cliquez sur "+ Ajouter"</td></tr>';return;}
+  if(!data.length){
+    tbody.innerHTML='<tr class="empty-row"><td colspan="10">Aucun accessoire — cliquez sur "+ Ajouter"</td></tr>';
+    var cardsEl=document.getElementById('cards-accessoires');
+    if(cardsEl) cardsEl.innerHTML='<div style="text-align:center;padding:36px;color:var(--text3);font-family:var(--font-mono);font-size:12px">Aucun accessoire — appuyez sur + pour en ajouter</div>';
+    return;
+  }
   tbody.innerHTML=data.map(function(r){
     return '<tr><td><strong>'+esc(r.produit)+'</strong></td><td><span class="badge badge-other">'+esc(r.type_produit)+'</span></td><td style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">'+(r.date_achat||'—')+'</td><td style="font-family:var(--font-mono)">'+r.quantite+'</td><td style="font-family:var(--font-mono)">'+parseFloat(r.prix_total_euros).toFixed(2)+'€</td><td style="font-family:var(--font-mono);color:var(--teal)">'+parseFloat(r.prix_unitaire||0).toFixed(4)+'€</td><td style="font-family:var(--font-mono)">'+(r.prix_par_impression!=null?parseFloat(r.prix_par_impression).toFixed(4)+'€':'—')+'</td><td><span class="badge '+(r.inclure_dans_cout?'badge-yes':'badge-no')+'">'+(r.inclure_dans_cout?'Oui':'Non')+'</span></td><td style="font-size:13px;color:var(--text2)">'+esc((r.fournisseurs&&r.fournisseurs.nom)||'—')+'</td><td><div style="display:flex;gap:6px"><button class="btn btn-warning btn-sm" onclick="openEditAccessoire(\''+r.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteRow(\'achats_accessoires\',\''+r.id+'\',loadAccessoires)">✕</button></div></td></tr>';
   }).join('');
+  // Cartes mobiles
+  var cardsEl=document.getElementById('cards-accessoires');
+  if(cardsEl){
+    cardsEl.innerHTML=data.map(function(r){
+      return '<div class="m-card">'
+        +'<div class="m-card-top">'
+          +'<div style="min-width:0">'
+            +'<div class="m-card-name">'+esc(r.produit)+'</div>'
+            +'<div class="m-card-sub">'+(r.date_achat||'—')+(r.fournisseurs&&r.fournisseurs.nom?' · '+esc(r.fournisseurs.nom):'')+'</div>'
+          +'</div>'
+          +'<div style="display:flex;gap:6px;flex-shrink:0">'
+            +'<button class="btn btn-warning btn-sm" onclick="openEditAccessoire(\''+r.id+'\')">✏️</button>'
+            +'<button class="btn btn-danger btn-sm" onclick="deleteRow(\'achats_accessoires\',\''+r.id+'\',loadAccessoires)">✕</button>'
+          +'</div>'
+        +'</div>'
+        +'<div class="m-card-badges">'
+          +'<span class="badge badge-other">'+esc(r.type_produit)+'</span>'
+          +'<span class="badge '+(r.inclure_dans_cout?'badge-yes':'badge-no')+'">'+(r.inclure_dans_cout?'Dans le coût':'Hors coût')+'</span>'
+        +'</div>'
+        +'<div class="m-card-meta">'
+          +'<div class="m-card-meta-item"><span class="m-card-meta-label">Quantité</span><span class="m-card-meta-val">'+r.quantite+'</span></div>'
+          +'<div class="m-card-meta-item"><span class="m-card-meta-label">Prix total</span><span class="m-card-meta-val">'+parseFloat(r.prix_total_euros).toFixed(2)+'€</span></div>'
+          +'<div class="m-card-meta-item"><span class="m-card-meta-label">€/unitaire</span><span class="m-card-meta-val" style="color:var(--teal)">'+parseFloat(r.prix_unitaire||0).toFixed(4)+'€</span></div>'
+          +'<div class="m-card-meta-item"><span class="m-card-meta-label">€/impression</span><span class="m-card-meta-val" style="color:var(--teal)">'+(r.prix_par_impression!=null?parseFloat(r.prix_par_impression).toFixed(4)+'€':'—')+'</span></div>'
+        +'</div>'
+        +'</div>';
+    }).join('');
+  }
 }
 
 /* ---- SAVE ---- */
@@ -1966,14 +2156,32 @@ function animateCounter(el,target,suffix){
   requestAnimationFrame(step);
 }
 
+var _currentPage='filaments';
+
 function showPage(name,e){
+  _currentPage=name;
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.mobile-nav-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('page-'+name).classList.add('active');
   if(e&&e.target) e.target.classList.add('active');
+  var mBtn=document.getElementById('mnav-'+name);
+  if(mBtn) mBtn.classList.add('active');
   if(name==='parametres') loadParamsPage();
   if(name==='objets') loadObjets();
   if(name==='rapport') loadRapportFilaments();
+  // Mettre à jour FAB
+  var fab=document.getElementById('btn-fab');
+  if(fab){
+    var fabPages={filaments:true,accessoires:true,objets:true};
+    fab.style.display=fabPages[name]?'flex':'none';
+  }
+}
+
+function fabAction(){
+  if(_currentPage==='filaments') openAddFilament();
+  else if(_currentPage==='accessoires') openAddAccessoire();
+  else if(_currentPage==='objets') openAddObjet();
 }
 
 /* ═══ PROTECTION FORMULAIRES — abandon accidentel ═══ */
@@ -2323,11 +2531,53 @@ function renderObjets(data,stocksCouleur){
   document.getElementById('stat-obj-multi').textContent=data.filter(function(r){return r.multi_couleur;}).length;
   var cats=new Set(data.map(function(r){return r.categorie;}).filter(Boolean)).size;
   document.getElementById('stat-obj-cats').textContent=cats;
-  if(!data.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">Aucun objet — cliquez sur "+ Ajouter"</td></tr>';return;}
+  if(!data.length){
+    tbody.innerHTML='<tr class="empty-row"><td colspan="7">Aucun objet — cliquez sur "+ Ajouter"</td></tr>';
+    var cardsEl=document.getElementById('cards-objets');
+    if(cardsEl) cardsEl.innerHTML='<div style="text-align:center;padding:36px;color:var(--text3);font-family:var(--font-mono);font-size:12px">Aucun objet — appuyez sur + pour en ajouter</div>';
+    return;
+  }
   tbody.innerHTML=data.map(function(r){
     var entries=stocksCouleur.filter(function(sc){return sc.objet_id===r.id&&(sc.quantite||0)>0;});
     return buildObjetRows(r,entries);
   }).join('');
+  // Cartes mobiles
+  var cardsEl=document.getElementById('cards-objets');
+  if(cardsEl){
+    cardsEl.innerHTML=data.map(function(r){
+      var entries=stocksCouleur.filter(function(sc){return sc.objet_id===r.id&&(sc.quantite||0)>0;});
+      var totalStock=entries.reduce(function(s,sc){return s+(sc.quantite||0);},0);
+      var stockLines='';
+      if(entries.length){
+        stockLines=entries.map(function(sc){
+          var module=sc.piece_nom||(sc.piece_index===0?(r.nom_produit_principal||'Produit principal'):'Module '+sc.piece_index);
+          return '<div class="m-card-stock-row">'
+            +'<span class="color-dot" style="background:'+colorHex(sc.couleur||'—')+'"></span>'
+            +'<span style="flex:1;color:var(--text)">'+esc(sc.couleur||'—')+'</span>'
+            +'<span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-right:8px">'+esc(module)+'</span>'
+            +'<span class="badge '+(sc.quantite>0?'badge-yes':'badge-no')+'" style="font-family:var(--font-mono);font-size:11px">'+sc.quantite+'</span>'
+            +'</div>';
+        }).join('');
+      } else {
+        stockLines='<div style="font-size:12px;color:var(--text3);padding:4px 0">Aucun stock par couleur renseigné</div>';
+      }
+      return '<div class="m-card">'
+        +'<div class="m-card-top">'
+          +'<div style="min-width:0">'
+            +'<div class="m-card-name">'+esc(r.nom||'—')+'</div>'
+            +'<div class="m-card-sub">'+esc(r.categorie||'—')+(r.temps_total?' · ⏱️ '+esc(r.temps_total):'')+'</div>'
+          +'</div>'
+          +'<div style="display:flex;gap:5px;flex-shrink:0">'
+            +'<button class="btn btn-sm" style="background:linear-gradient(135deg,#a855f7,#6366f1);color:#fff;border:none;padding:6px 10px" onclick="openStockCouleur(\''+r.id+'\')" title="Stock couleurs">🎨</button>'
+            +'<button class="btn btn-warning btn-sm" onclick="openEditObjet(\''+r.id+'\')">✏️</button>'
+            +'<button class="btn btn-danger btn-sm" onclick="deleteRow(\'objets_vente\',\''+r.id+'\',loadObjets)">✕</button>'
+          +'</div>'
+        +'</div>'
+        +(totalStock>0?'<div class="m-card-badges"><span class="badge badge-yes" style="font-family:var(--font-mono)">'+totalStock+' en stock</span></div>':'')
+        +'<div style="margin-bottom:4px">'+stockLines+'</div>'
+        +'</div>';
+    }).join('');
+  }
 }
 
 function buildObjetRows(r,entries){
