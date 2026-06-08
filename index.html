@@ -1598,10 +1598,11 @@
 
 <script>
 /* ═══ VERSIONING ═══ */
-var APP_VERSION='1.9.0';
+var APP_VERSION='1.9.1';
 var APP_DATE='2026-06-08';
 var APP_CHANGELOG=[
-  {v:'1.9.0', d:'2026-06-09', notes:['Images produit : ajout/suppression d\'une photo par couleur en stock via Supabase Storage','Miniature 📷 dans chaque ligne du stock par couleur','Aperçu plein écran au tap sur la miniature','Stockage cloud dans le bucket tadam-images']},
+  {v:'1.9.1', d:'2026-06-09', notes:['Catalogue objets : miniatures des photos affichées dans la colonne Couleur (desktop) et dans les cartes (mobile)','Tap sur miniature pour aperçu plein écran']},
+  {v:'1.9.0', d:'2026-06-09', notes:['Images produit : ajout/suppression d\'une photo par couleur en stock via Supabase Storage','Miniature dans chaque ligne du stock par couleur + aperçu plein écran']},
   {v:'1.8.5', d:'2026-06-08', notes:['Stock par couleur : quantités modifiables directement dans la liste']},
   {v:'1.8.4', d:'2026-06-08', notes:['Correctif Mac définitif : détection via userAgent Electron — styles mobiles jamais appliqués sur Mac']},
   {v:'1.8.2', d:'2026-06-08', notes:['Navigation mobile : menu hamburger ☰ avec panneau latéral glissant — plus de conflit avec la barre home iPhone']},
@@ -2667,7 +2668,11 @@ function renderObjets(data,stocksCouleur){
       if(entries.length){
         stockLines=entries.map(function(sc){
           var module=sc.piece_nom||(sc.piece_index===0?(r.nom_produit_principal||'Produit principal'):'Module '+sc.piece_index);
+          var thumb=sc.image_url
+            ?'<img src="'+esc(sc.image_url)+'" style="width:38px;height:38px;object-fit:cover;border-radius:5px;border:1px solid var(--border);cursor:pointer;flex-shrink:0" onclick="previewImage(\''+esc(sc.image_url)+'\')" title="Voir la photo">'
+            :'';
           return '<div class="m-card-stock-row">'
+            +thumb
             +'<span class="color-dot" style="background:'+colorHex(sc.couleur||'—')+'"></span>'
             +'<span style="flex:1;color:var(--text)">'+esc(sc.couleur||'—')+'</span>'
             +'<span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-right:8px">'+esc(module)+'</span>'
@@ -2721,13 +2726,19 @@ function buildObjetRows(r,entries){
     var stock=sc.quantite||0;
     var couleur=sc.couleur||'—';
     var module=sc.piece_nom||(sc.piece_index===0?(r.nom_produit_principal||'Produit principal'):'Module '+sc.piece_index);
+    var imgThumb=sc.image_url
+      ?'<img src="'+esc(sc.image_url)+'" style="width:34px;height:34px;object-fit:cover;border-radius:5px;border:1px solid var(--border);cursor:pointer;flex-shrink:0;vertical-align:middle;margin-left:6px" onclick="previewImage(\''+esc(sc.image_url)+'\')" title="Voir la photo">'
+      :'';
+    var couleurCell='<div style="display:flex;align-items:center">'
+      +'<span class="color-dot" style="background:'+colorHex(couleur)+'"></span>'+esc(couleur)+imgThumb
+      +'</div>';
     if(idx===0){
       // Première ligne du groupe — rowspan sur Nom, Catégorie, Temps, Actions
       return '<tr style="border-top:2px solid var(--border)">'
         +'<td rowspan="'+n+'"><strong>'+esc(r.nom||'—')+'</strong></td>'
         +'<td rowspan="'+n+'">'+esc(r.categorie||'—')+'</td>'
         +'<td style="font-size:12px;color:var(--text3)">'+esc(module)+'</td>'
-        +'<td><span class="color-dot" style="background:'+colorHex(couleur)+'"></span>'+esc(couleur)+'</td>'
+        +'<td>'+couleurCell+'</td>'
         +'<td><span class="badge '+(stock>0?'badge-yes':'badge-no')+'" style="font-family:var(--font-mono);font-size:12px">'+stock+'</span></td>'
         +'<td rowspan="'+n+'" style="font-family:var(--font-mono)">'+esc(r.temps_total||'—')+'</td>'
         +'<td rowspan="'+n+'">'+actions+'</td>'
@@ -2736,7 +2747,7 @@ function buildObjetRows(r,entries){
       // Lignes suivantes du même objet
       return '<tr>'
         +'<td style="font-size:12px;color:var(--text3)">'+esc(module)+'</td>'
-        +'<td><span class="color-dot" style="background:'+colorHex(couleur)+'"></span>'+esc(couleur)+'</td>'
+        +'<td>'+couleurCell+'</td>'
         +'<td><span class="badge '+(stock>0?'badge-yes':'badge-no')+'" style="font-family:var(--font-mono);font-size:12px">'+stock+'</span></td>'
         +'</tr>';
     }
