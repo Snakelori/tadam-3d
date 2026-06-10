@@ -1159,7 +1159,6 @@
         <div class="form-group full"><label>Description</label><textarea name="description" rows="2" placeholder="Description de l'objet..."></textarea></div>
         <div class="form-group"><label>Couleur principale</label><select name="couleur_principale" id="sel-obj-couleur-0"><option value="">— Choisir —</option></select></div>
         <div class="form-group"><label>Nb de pièces / modules (0–6)</label><input type="number" name="nb_pieces" id="obj-nb-pieces" min="0" max="6" value="0" oninput="updateModules()"></div>
-        <div class="form-group"><label>Stock produit fini</label><input type="number" name="stock" id="obj-stock" min="0" value="0" placeholder="0"></div>
       </div>
 
       <div class="form-section-title">Impression</div>
@@ -1181,7 +1180,6 @@
           <div class="form-group full"><label>Description</label><input type="text" name="piece_1_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_1_temps" id="obj-temps-1" placeholder="00:30" oninput="calcTempsTotal()"></div>
           <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_1_qte" id="obj-qte-1" placeholder="0" step="0.01" min="0"></div>
-          <div class="form-group"><label>Stock de ce module</label><input type="number" name="piece_1_stock" id="obj-piece-1-stock" min="0" value="0" placeholder="0"></div>
         </div>
       </div>
 
@@ -1194,7 +1192,6 @@
           <div class="form-group full"><label>Description</label><input type="text" name="piece_2_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_2_temps" id="obj-temps-2" placeholder="00:30" oninput="calcTempsTotal()"></div>
           <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_2_qte" id="obj-qte-2" placeholder="0" step="0.01" min="0"></div>
-          <div class="form-group"><label>Stock de ce module</label><input type="number" name="piece_2_stock" id="obj-piece-2-stock" min="0" value="0" placeholder="0"></div>
         </div>
       </div>
 
@@ -1207,7 +1204,6 @@
           <div class="form-group full"><label>Description</label><input type="text" name="piece_3_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_3_temps" id="obj-temps-3" placeholder="00:30" oninput="calcTempsTotal()"></div>
           <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_3_qte" id="obj-qte-3" placeholder="0" step="0.01" min="0"></div>
-          <div class="form-group"><label>Stock de ce module</label><input type="number" name="piece_3_stock" id="obj-piece-3-stock" min="0" value="0" placeholder="0"></div>
         </div>
       </div>
 
@@ -1220,7 +1216,6 @@
           <div class="form-group full"><label>Description</label><input type="text" name="piece_4_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_4_temps" id="obj-temps-4" placeholder="00:30" oninput="calcTempsTotal()"></div>
           <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_4_qte" id="obj-qte-4" placeholder="0" step="0.01" min="0"></div>
-          <div class="form-group"><label>Stock de ce module</label><input type="number" name="piece_4_stock" id="obj-piece-4-stock" min="0" value="0" placeholder="0"></div>
         </div>
       </div>
 
@@ -1233,7 +1228,6 @@
           <div class="form-group full"><label>Description</label><input type="text" name="piece_5_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_5_temps" id="obj-temps-5" placeholder="00:30" oninput="calcTempsTotal()"></div>
           <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_5_qte" id="obj-qte-5" placeholder="0" step="0.01" min="0"></div>
-          <div class="form-group"><label>Stock de ce module</label><input type="number" name="piece_5_stock" id="obj-piece-5-stock" min="0" value="0" placeholder="0"></div>
         </div>
       </div>
 
@@ -1246,7 +1240,6 @@
           <div class="form-group full"><label>Description</label><input type="text" name="piece_6_desc"></div>
           <div class="form-group"><label>Temps impression (HH:mm)</label><input type="text" name="piece_6_temps" id="obj-temps-6" placeholder="00:30" oninput="calcTempsTotal()"></div>
           <div class="form-group"><label>Quantité de matière (g)</label><input type="number" name="piece_6_qte" id="obj-qte-6" placeholder="0" step="0.01" min="0"></div>
-          <div class="form-group"><label>Stock de ce module</label><input type="number" name="piece_6_stock" id="obj-piece-6-stock" min="0" value="0" placeholder="0"></div>
         </div>
       </div>
 
@@ -1598,9 +1591,10 @@
 
 <script>
 /* ═══ VERSIONING ═══ */
-var APP_VERSION='1.9.1';
-var APP_DATE='2026-06-08';
+var APP_VERSION='1.9.2';
+var APP_DATE='2026-06-11';
 var APP_CHANGELOG=[
+  {v:'1.9.2', d:'2026-06-11', notes:['Formulaire objet : suppression des champs "Stock produit fini" et "Stock de ce module" — le stock est géré uniquement via Stock par couleur']},
   {v:'1.9.1', d:'2026-06-09', notes:['Catalogue objets : miniatures des photos affichées dans la colonne Couleur (desktop) et dans les cartes (mobile)','Tap sur miniature pour aperçu plein écran']},
   {v:'1.9.0', d:'2026-06-09', notes:['Images produit : ajout/suppression d\'une photo par couleur en stock via Supabase Storage','Miniature dans chaque ligne du stock par couleur + aperçu plein écran']},
   {v:'1.8.5', d:'2026-06-08', notes:['Stock par couleur : quantités modifiables directement dans la liste']},
@@ -2790,7 +2784,6 @@ async function openEditObjet(id){
     if(nppEl) nppEl.value=r.nom_produit_principal||'';
     form.categorie.value=r.categorie||'';
     form.description.value=r.description||'';
-    document.getElementById('obj-stock').value=r.stock!=null?r.stock:0;
     document.getElementById('chk-multi-couleur').checked=r.multi_couleur||false;
     document.getElementById('sel-obj-couleur-0').value=r.couleur_principale||'';
     document.getElementById('obj-nb-pieces').value=r.nb_pieces||0;
@@ -2803,7 +2796,6 @@ async function openEditObjet(id){
       var tel=document.getElementById('obj-temps-'+i); if(tel) tel.value=r['piece_'+i+'_temps']||'';
       var cel=document.getElementById('sel-obj-couleur-'+i); if(cel) cel.value=r['piece_'+i+'_couleur']||'';
       var qel=document.getElementById('obj-qte-'+i); if(qel) qel.value=r['piece_'+i+'_qte']||'';
-      var sel=document.getElementById('obj-piece-'+i+'-stock'); if(sel) sel.value=r['piece_'+i+'_stock']!=null?r['piece_'+i+'_stock']:0;
     }
     updateModules();
     calcTempsTotal();
@@ -2824,8 +2816,7 @@ async function saveObjet(e){
       temps_principal:form.temps_principal.value||null,
       qte_matiere:parseFloat(form.qte_matiere.value)||null,
       temps_total:document.getElementById('obj-temps-total').value||null,
-      qualite_impression:parseFloat(form.qualite_impression.value)||null,
-      stock:parseInt(document.getElementById('obj-stock').value)||0
+      qualite_impression:parseFloat(form.qualite_impression.value)||null
     };
     for(var i=1;i<=6;i++){
       body['piece_'+i+'_nom']=form['piece_'+i+'_nom'].value||null;
@@ -2833,7 +2824,6 @@ async function saveObjet(e){
       body['piece_'+i+'_temps']=document.getElementById('obj-temps-'+i).value||null;
       body['piece_'+i+'_couleur']=form['piece_'+i+'_couleur'].value||null;
       body['piece_'+i+'_qte']=parseFloat(document.getElementById('obj-qte-'+i).value)||null;
-      body['piece_'+i+'_stock']=parseInt(document.getElementById('obj-piece-'+i+'-stock').value)||0;
     }
     if(editId){await api('PATCH','objets_vente',body,'?id=eq.'+editId);toast('Objet modifié ✓','success');
       logAction('modification','objet',editId,body.nom+(body.categorie?' ('+body.categorie+')':''));}
